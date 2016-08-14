@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="https://b2b.kimtec.rs/B2BService/B2BProductService.asmx?wsdl" docRef="https://b2b.kimtec.rs/B2BService/B2BProductService.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="https://b2b.kimtec.rs/B2BService/B2BProductService.asmx" xmlns:q1="http://www.msan.hr/B2B/" binding="q1:B2BProductServiceSoap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="https://b2b.kimtec.rs/B2BService/B2BProductService.asmx" xmlns:q2="http://www.msan.hr/B2B/" binding="q2:B2BProductServiceSoap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>

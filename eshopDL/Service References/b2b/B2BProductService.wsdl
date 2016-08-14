@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://www.msan.hr/B2B/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://www.msan.hr/B2B/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.msan.hr/B2B/">
+      <s:element name="GetProductsList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ProductType" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsListResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsGalleryList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ProductType" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsGalleryListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsGalleryListResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsPriceList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ProductType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Brand" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="OnPromotion" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsPriceListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsPriceListResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsPriceListBySalesChannel">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ProductType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Brand" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="OnPromotion" type="s:boolean" />
+            <s:element minOccurs="1" maxOccurs="1" name="salesChannelID" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsPriceListBySalesChannelResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsPriceListBySalesChannelResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsAvailability">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsAvailabilityResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsAvailabilityResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsSpecification">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ProductType" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsSpecificationResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsSpecificationResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsSpecificationIceCat">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ProductType" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsSpecificationIceCatResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsSpecificationIceCatResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsReplacementList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsReplacementListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsReplacementListResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsRelatedList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsRelatedListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsRelatedListResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsBarcodes">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsBarcodesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsBarcodesResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCategoriesList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="CategoryTypeID" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCategoriesListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCategoriesListResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsCategory">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="CategoryTypeID" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductsCategoryResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductsCategoryResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetProductsListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsList" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsGalleryListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsGalleryList" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsGalleryListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsGalleryListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsPriceListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsPriceList" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsPriceListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsPriceListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsPriceListBySalesChannelSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsPriceListBySalesChannel" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsPriceListBySalesChannelSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsPriceListBySalesChannelResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsAvailabilitySoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsAvailability" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsAvailabilitySoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsAvailabilityResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsSpecificationSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsSpecification" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsSpecificationSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsSpecificationResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsSpecificationIceCatSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsSpecificationIceCat" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsSpecificationIceCatSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsSpecificationIceCatResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsReplacementListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsReplacementList" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsReplacementListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsReplacementListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsRelatedListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsRelatedList" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsRelatedListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsRelatedListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsBarcodesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsBarcodes" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsBarcodesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsBarcodesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCategoriesListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCategoriesList" />
+  </wsdl:message>
+  <wsdl:message name="GetCategoriesListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCategoriesListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsCategorySoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductsCategory" />
+  </wsdl:message>
+  <wsdl:message name="GetProductsCategorySoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductsCategoryResponse" />
+  </wsdl:message>
+  <wsdl:portType name="B2BProductServiceSoap">
+    <wsdl:operation name="GetProductsList">
+      <wsdl:input message="tns:GetProductsListSoapIn" />
+      <wsdl:output message="tns:GetProductsListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsGalleryList">
+      <wsdl:input message="tns:GetProductsGalleryListSoapIn" />
+      <wsdl:output message="tns:GetProductsGalleryListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsPriceList">
+      <wsdl:input message="tns:GetProductsPriceListSoapIn" />
+      <wsdl:output message="tns:GetProductsPriceListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsPriceListBySalesChannel">
+      <wsdl:input message="tns:GetProductsPriceListBySalesChannelSoapIn" />
+      <wsdl:output message="tns:GetProductsPriceListBySalesChannelSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsAvailability">
+      <wsdl:input message="tns:GetProductsAvailabilitySoapIn" />
+      <wsdl:output message="tns:GetProductsAvailabilitySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsSpecification">
+      <wsdl:input message="tns:GetProductsSpecificationSoapIn" />
+      <wsdl:output message="tns:GetProductsSpecificationSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsSpecificationIceCat">
+      <wsdl:input message="tns:GetProductsSpecificationIceCatSoapIn" />
+      <wsdl:output message="tns:GetProductsSpecificationIceCatSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsReplacementList">
+      <wsdl:input message="tns:GetProductsReplacementListSoapIn" />
+      <wsdl:output message="tns:GetProductsReplacementListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsRelatedList">
+      <wsdl:input message="tns:GetProductsRelatedListSoapIn" />
+      <wsdl:output message="tns:GetProductsRelatedListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsBarcodes">
+      <wsdl:input message="tns:GetProductsBarcodesSoapIn" />
+      <wsdl:output message="tns:GetProductsBarcodesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCategoriesList">
+      <wsdl:input message="tns:GetCategoriesListSoapIn" />
+      <wsdl:output message="tns:GetCategoriesListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsCategory">
+      <wsdl:input message="tns:GetProductsCategorySoapIn" />
+      <wsdl:output message="tns:GetProductsCategorySoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="B2BProductServiceSoap" type="tns:B2BProductServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetProductsList">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsGalleryList">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsGalleryList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsPriceList">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsPriceList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsPriceListBySalesChannel">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsPriceListBySalesChannel" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsAvailability">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsAvailability" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsSpecification">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsSpecification" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsSpecificationIceCat">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsSpecificationIceCat" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsReplacementList">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsReplacementList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsRelatedList">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsRelatedList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsBarcodes">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsBarcodes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCategoriesList">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetCategoriesList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsCategory">
+      <soap:operation soapAction="http://www.msan.hr/B2B/GetProductsCategory" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="B2BProductServiceSoap12" type="tns:B2BProductServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetProductsList">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsGalleryList">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsGalleryList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsPriceList">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsPriceList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsPriceListBySalesChannel">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsPriceListBySalesChannel" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsAvailability">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsAvailability" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsSpecification">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsSpecification" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsSpecificationIceCat">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsSpecificationIceCat" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsReplacementList">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsReplacementList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsRelatedList">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsRelatedList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsBarcodes">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsBarcodes" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCategoriesList">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetCategoriesList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductsCategory">
+      <soap12:operation soapAction="http://www.msan.hr/B2B/GetProductsCategory" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="B2BProductService">
+    <wsdl:port name="B2BProductServiceSoap" binding="tns:B2BProductServiceSoap">
+      <soap:address location="https://b2b.kimtec.rs/B2BService/B2BProductService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="B2BProductServiceSoap12" binding="tns:B2BProductServiceSoap12">
+      <soap12:address location="https://b2b.kimtec.rs/B2BService/B2BProductService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
