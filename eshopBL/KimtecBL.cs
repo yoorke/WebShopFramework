@@ -133,7 +133,7 @@ namespace eshopBL
                 product.Price = calculatePrice(double.Parse(((Label)row.FindControl("lblPartnerPrice")).Text != string.Empty ? ((Label)row.FindControl("lblPartnerPrice")).Text : "0,00"), category.PricePercent);
                 product.WebPrice = calculatePrice(double.Parse(((Label)row.FindControl("lblPartnerPrice")).Text != string.Empty ? ((Label)row.FindControl("lblPartnerPrice")).Text : "0,00"), category.WebPricePercent);
                 product.Images = new List<string>();
-                product.Images.Add(saveProductImage(((Label)row.FindControl("lblImageUrl")).Text));
+                product.Images.Add(saveProductImage(((Label)row.FindControl("lblImageUrl")).Text, product.Images != null ? product.Images.Count : 0));
                 product.Attributes = GetProductAttributes(product.Code, kimtecCategoryID);
                 product.Categories = new List<Category>();
                 product.Categories.Add(category);
@@ -200,7 +200,7 @@ namespace eshopBL
             product.Ean = kimtecProduct.Rows[0]["barcodeValue"].ToString();
             product.SupplierPrice = double.Parse(kimtecProduct.Rows[0]["partnerPrice"].ToString());
             product.Images = new List<string>();
-            product.Images.Add(saveProductImage(kimtecProduct.Rows[0]["imageUrl"].ToString()));
+            product.Images.Add(saveProductImage(kimtecProduct.Rows[0]["imageUrl"].ToString(), product.Images != null ? product.Images.Count : 0));
             product.Attributes = GetProductAttributes(code, kimtecCategoryID);
             product.Description = kimtecProduct.Rows[0]["marketingDescription"].ToString();
 
@@ -233,13 +233,16 @@ namespace eshopBL
             return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 100 * 100 - 10).ToString());
         }
 
-        private string saveProductImage(string url)
+        private string saveProductImage(string url, int count)
         {
             if (url == string.Empty)
                 return "no-image.jpg";
             CertificateWebClient webClient = new CertificateWebClient();
             string filename = Path.GetFileName(url);
-            string path = HttpContext.Current.Server.MapPath("~/images/");
+            string extension = filename.Substring(filename.LastIndexOf('.'));
+            //string path = HttpContext.Current.Server.MapPath("~/images/");
+            string fullPath = HttpContext.Current.Server.MapPath("~") + new ProductBL().CreateNewImageName(count) + extension;
+            string path = fullPath.Substring(0, fullPath.LastIndexOf('/'));
 
             //if (!File.Exists(path + filename))
             //{
@@ -247,23 +250,25 @@ namespace eshopBL
                 //webClient.Credentials = new NetworkCredential("pinservis", "*54GrrL13Dp!");
                 //webClient.Headers.Add("User-Agent: Other");
                 
-                webClient.DownloadFile(url, path + filename);
+                webClient.DownloadFile(url, fullPath);
 
-                System.Drawing.Image original = System.Drawing.Image.FromFile(HttpContext.Current.Server.MapPath("~/images/" + filename));
+            bool exists = new ProductBL().CreateProductImages(fullPath);
 
-                //System.Drawing.Image thumb = original.GetThumbnailImage(290, 232, null, IntPtr.Zero);
-                System.Drawing.Image thumb = Common.CreateThumb(original, 290, 232);
-                thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-main.jpg");
+            //System.Drawing.Image original = System.Drawing.Image.FromFile(HttpContext.Current.Server.MapPath("~/images/" + filename));
 
-                //thumb = original.GetThumbnailImage(110, 75, null, IntPtr.Zero);
-                thumb = Common.CreateThumb(original, 160, 110);
-                thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-list.jpg");
+            //System.Drawing.Image thumb = original.GetThumbnailImage(290, 232, null, IntPtr.Zero);
+            //System.Drawing.Image thumb = Common.CreateThumb(original, 290, 232);
+            //thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-main.jpg");
 
-                //thumb = original.GetThumbnailImage(30, 24, null, IntPtr.Zero);
-                thumb = Common.CreateThumb(original, 50, 40);
-                thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-thumb.jpg");
+            //thumb = original.GetThumbnailImage(110, 75, null, IntPtr.Zero);
+            //thumb = Common.CreateThumb(original, 160, 110);
+            //thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-list.jpg");
+
+            //thumb = original.GetThumbnailImage(30, 24, null, IntPtr.Zero);
+            //thumb = Common.CreateThumb(original, 50, 40);
+            //thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-thumb.jpg");
             //}
-            return filename;
+            return exists ? fullPath.Substring(fullPath.LastIndexOf('/') + 1) : string.Empty;
         }
 
         public int SaveProductSpecification()

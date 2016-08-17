@@ -313,10 +313,11 @@ namespace eshopDL
                             product.WebPrice = reader.GetDouble(5);
                             product.Brand = new Brand(-1, reader.GetString(6));
                             product.Images = new List<string>();
-                            if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
-                                product.Images.Add("/images/" + reader.GetString(7));
-                            else
-                                product.Images.Add("/images/no-image.jpg");
+                            //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
+                            //product.Images.Add("/images/" + reader.GetString(7));
+                            //else
+                            //product.Images.Add("/images/no-image.jpg");
+                            product.Images.Add(reader.GetString(7));
                             if (!Convert.IsDBNull(reader[8]))
                             {
                                 if (reader.GetDateTime(10) < DateTime.UtcNow && reader.GetDateTime(11) > DateTime.UtcNow)
@@ -1429,6 +1430,25 @@ namespace eshopDL
                     objComm.ExecuteNonQuery();
                 }
             }
+        }
+
+        public int GetMaxProductImageUrlID()
+        {
+            int id = 1;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using(SqlCommand objComm = new SqlCommand("product_getMaxImageID", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            id = reader.GetInt32(0);
+                    }
+                }
+            }
+            return id;
         }
 
         #endregion GetProduct

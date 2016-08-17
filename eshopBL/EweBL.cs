@@ -260,8 +260,10 @@ namespace eshopBL
                                                         product.Images = new System.Collections.Generic.List<string>();
                                                     if (xmlImageNode.Name == "image")
                                                     {
-                                                        if (saveImageFromUrl(xmlImageNode.InnerText.Trim()))
-                                                            product.Images.Add(Path.GetFileName(xmlImageNode.InnerText.Trim()));
+                                                        string imageUrl = saveImageFromUrl(xmlImageNode.InnerText.Trim(), product.Images != null ? product.Images.Count : 0);
+                                                        if (imageUrl != string.Empty)
+                                                            //product.Images.Add(Path.GetFileName(xmlImageNode.InnerText.Trim()));
+                                                            product.Images.Add(imageUrl);
                                                     }
                                                 }
                                                 //}
@@ -486,37 +488,47 @@ namespace eshopBL
             return "Uspešno izmenjeno " + status.ToString() + " artikala.";
         }
 
-        private bool saveImageFromUrl(string url)
+        private string saveImageFromUrl(string url, int count)
         {
             bool exists = true;
             WebClient webClient = new WebClient();
             string filename = Path.GetFileName(url);
-            string path = HttpContext.Current.Server.MapPath("~") + "images/";
+            string extension = filename.Substring(filename.LastIndexOf('.'));
+            //string path = HttpContext.Current.Server.MapPath("~") + "images/";
+            string fullPath = HttpContext.Current.Server.MapPath("~") + new ProductBL().CreateNewImageName(count) + extension;
+            string path = fullPath.Substring(0, fullPath.LastIndexOf('/'));
             //if (!File.Exists(path + filename))
             //{
                 ErrorLog.LogMessage(path + filename);
-                webClient.DownloadFile(url, path + filename);
-                
-                if (File.Exists(path + filename))
-                {
-                    exists = true;
-                    Image original = Image.FromFile(HttpContext.Current.Server.MapPath("~") + "/images/" + filename);
+            //webClient.DownloadFile(url, path + filename);
+            webClient.DownloadFile(url, fullPath);
+
+            exists = new ProductBL().CreateProductImages(fullPath);
+                //if (File.Exists(path + filename))
+                //if(File.Exists(fullPath))
+                //{
+                    //exists = true;
+                //Image original = Image.FromFile(HttpContext.Current.Server.MapPath("~") + "/images/" + filename);
+                //Image original = Image.FromFile(fullPath);
                     
                     //Image thumb = original.GetThumbnailImage(290, 232, null, IntPtr.Zero);
-                    Image thumb = Common.CreateThumb(original, 290, 232);
-                    thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-main.jpg");
+                    //Image thumb = Common.CreateThumb(original, 290, 232);
+                //thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-main.jpg");
+                //thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-main" + extension);
 
                     //thumb = original.GetThumbnailImage(110, 75, null, IntPtr.Zero);
-                    thumb = Common.CreateThumb(original, 160, 110);
-                    thumb.Save(path + filename.Substring(0, filename.IndexOf(".")) + "-list.jpg");
+                    //thumb = Common.CreateThumb(original, 160, 110);
+                //thumb.Save(path + filename.Substring(0, filename.IndexOf(".")) + "-list.jpg");
+                //thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-list" + extension);
 
                     //thumb = original.GetThumbnailImage(30, 24, null, IntPtr.Zero);
-                    thumb = Common.CreateThumb(original, 50, 40);
-                    thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-thumb.jpg");
-                }
+                    //thumb = Common.CreateThumb(original, 50, 40);
+                //thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-thumb.jpg");
+                //thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-thumb" + extension);
+                //}
             //}
 
-            return exists;
+            return exists ? fullPath.Substring(fullPath.LastIndexOf('/') + 1) : string.Empty;
         }
 
         public DataTable GetEweCategories(int? parentCategoryID, int? categoryID)
@@ -668,8 +680,10 @@ namespace eshopBL
                     product.Images = new List<string>();
                 if(xmlImageNode.Name == "image")
                 {
-                    if (saveImageFromUrl(xmlImageNode.InnerText.Trim()))
-                        product.Images.Add(Path.GetFileName(xmlImageNode.InnerText.Trim()));
+                    string imageUrl = saveImageFromUrl(xmlImageNode.InnerText.Trim(), product.Images != null ? product.Images.Count : 0);
+                    if (imageUrl != string.Empty)
+                        //product.Images.Add(Path.GetFileName(xmlImageNode.InnerText.Trim()));
+                        product.Images.Add(imageUrl);
                 }
             }
 
