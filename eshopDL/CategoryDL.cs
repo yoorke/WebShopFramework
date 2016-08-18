@@ -177,7 +177,7 @@ namespace eshopDL
                             {
                                 category.CategoryID = reader.GetInt32(0);
                                 category.Name = reader.GetString(1);
-                                category.ParentCategoryID = reader.GetInt32(2);
+                                category.ParentCategoryID = !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : 0;
                                 category.Url = reader.GetString(3);
                                 category.ImageUrl = reader.GetString(4);
                                 category.SortOrder = reader.GetInt32(5);

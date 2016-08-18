@@ -363,10 +363,10 @@ namespace eshopDL
                             product.WebPrice = reader.GetDouble(5);
                             product.Brand = new Brand(-1, reader.GetString(6));
                             product.Images = new List<string>();
-                            if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
-                                product.Images.Add("/images/" + reader.GetString(7));
-                            else
-                                product.Images.Add("/images/no-image.jpg");
+                            //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
+                                product.Images.Add(reader.GetString(7));
+                            //else
+                                //product.Images.Add("/images/no-image.jpg");
                             product.Promotion = new Promotion();
                             product.Promotion.Price = reader.GetDouble(8);
                             product.Promotion.ImageUrl = reader.GetString(9);
@@ -420,10 +420,10 @@ namespace eshopDL
                             product.WebPrice = reader.GetDouble(5);
                             product.Brand = new Brand(-1, reader.GetString(6));
                             product.Images = new List<string>();
-                            if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
-                                product.Images.Add("/images/" + reader.GetString(7));
-                            else
-                                product.Images.Add("/images/no-image.jpg");
+                            //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
+                                product.Images.Add(reader.GetString(7));
+                            //else
+                                //product.Images.Add("/images/no-image.jpg");
                             if (Convert.IsDBNull(reader[8]) == false)
                             {
                                 if (reader.GetDateTime(10) <= DateTime.UtcNow && reader.GetDateTime(11) >= DateTime.UtcNow)
@@ -634,7 +634,7 @@ namespace eshopDL
             DeleteProductImages(productID);
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("INSERT INTO productImageUrl (productID, imageUrl, sortOrder) VALUES (@productID, @imageUrl, @sortOrder)", objConn))
+                using (SqlCommand objComm = new SqlCommand("INSERT INTO productImageUrl (productID, imageUrl, sortOrder, productImageUrlID) VALUES (@productID, @imageUrl, @sortOrder, @productImageUrlID)", objConn))
                 {
                     try
                     {
@@ -646,6 +646,7 @@ namespace eshopDL
                             objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
                             objComm.Parameters.Add("@imageUrl", SqlDbType.NVarChar, 100).Value = (images[i].Contains("/images/")) ? images[i].Substring(8, images[i].Length - 8) : images[i];
                             objComm.Parameters.Add("@sortOrder", SqlDbType.Int).Value = i + 1;
+                            objComm.Parameters.Add("@productImageUrlID", SqlDbType.Int).Value = int.Parse(images[i].Substring(0, images[i].LastIndexOf('.')));
 
                             status[i] = objComm.ExecuteNonQuery();
                         }
@@ -729,13 +730,16 @@ namespace eshopDL
             return status;
         }
 
-        public int SetInStock(int supplierID, bool inStock, int categoryID)
+        public int SetInStock(int supplierID, bool inStock, int categoryID, bool showIfNotInStock)
         {
             int status = 0;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE product SET isInStock=@isInStock, isActive = @isInStock WHERE supplierID=@supplierID AND isLocked=0 AND productID IN (SELECT productID FROM productCategory WHERE categoryID=@categoryID)", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE product SET isInStock=@isInStock", objConn))
                 {
+                    if (!showIfNotInStock)
+                        objComm.CommandText += ", isActive = @isInStock";
+                    objComm.CommandText += "WHERE supplierID=@supplierID AND isLocked=0 AND productID IN (SELECT productID FROM productCategory WHERE categoryID=@categoryID)";
                     objConn.Open();
                     objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = inStock;
                     objComm.Parameters.Add("@supplierID", SqlDbType.Int).Value = supplierID;
@@ -781,13 +785,16 @@ namespace eshopDL
             return status;
         }
 
-        public int UpdatePriceAndStock(int productID, double price, double webPrice, bool isIsInStock)
+        public int UpdatePriceAndStock(int productID, double price, double webPrice, bool isIsInStock, bool showIfNotInStock)
         {
             int status = 0;
             using(SqlConnection objConn=new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE product SET price=@price, isInStock=@isInStock, webPrice=@webPrice, isActive = @isInStock WHERE productID=@productID", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE product SET price=@price, isInStock=@isInStock, webPrice=@webPrice, isActive = @isInStock", objConn))
                 {
+                    if(!showIfNotInStock)
+                        objComm.CommandText += ", isActive = @isInStock";
+                    objComm.CommandText += "WHERE productID=@productID";
                     objConn.Open();
                     objComm.Parameters.Add("@price", SqlDbType.Float).Value = price;
                     objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = isIsInStock;
@@ -1084,10 +1091,10 @@ namespace eshopDL
                                 images = new List<string>();
                             while (reader.Read())
                             {
-                                if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(0))))
-                                    images.Add("/images/" + reader.GetString(0));
-                                else
-                                    images.Add("/images/no-image.jpg");
+                                //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(0))))
+                                    images.Add(reader.GetString(0));
+                                //else
+                                    //images.Add("/images/no-image.jpg");
                             }
                         }
                     }
@@ -1372,7 +1379,7 @@ namespace eshopDL
                             product.WebPrice = reader.GetDouble(5);
                             product.Brand = new Brand(reader.GetInt32(6), reader.GetString(7));
                             product.Images = new List<string>();
-                            string directory = createImageUrl(reader.GetString(8));
+                            //string directory = createImageUrl(reader.GetString(8));
                             //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~" + directory)))
                             //{
                             //product.Images.Add(directory);

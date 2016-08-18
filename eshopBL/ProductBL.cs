@@ -191,13 +191,13 @@ namespace eshopBL
         public int SetInStock(int supplierID, bool inStock, int categoryID)
         {
             ProductDL productDL = new ProductDL();
-            return productDL.SetInStock(supplierID, inStock, categoryID);
+            return productDL.SetInStock(supplierID, inStock, categoryID, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
         }
 
         public int UpdatePriceAndStock(int productID, double price, double webPrice, bool isInStock)
         {
             ProductDL productDL = new ProductDL();
-            return productDL.UpdatePriceAndStock(productID, price, webPrice, isInStock);
+            return productDL.UpdatePriceAndStock(productID, price, webPrice, isInStock, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
         }
 
         public List<Product> GetProductsForFirstPage(int categoryID, int brandID, int numberOfProducts, string orderBy)

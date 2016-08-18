@@ -13,6 +13,7 @@ using System.Xml.Xsl;
 using System.Web;
 using System.Drawing;
 using eshopUtilities;
+using System.Configuration;
 
 namespace eshopBL
 {
@@ -461,7 +462,7 @@ namespace eshopBL
             ProductDL productDL = new ProductDL();
             CategoryBL categoryBL = new CategoryBL();
             Category category = categoryBL.GetCategory(categoryID);
-            productDL.SetInStock(supplierID, false, categoryID);
+            productDL.SetInStock(supplierID, false, categoryID, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
             int status = 0;
 
 
@@ -480,7 +481,7 @@ namespace eshopBL
                         {
                             double price = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price").InnerText.Replace('.', ',').Trim()), category.PricePercent);
                             double webPrice = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price").InnerText.Replace('.', ',').Trim()), category.WebPricePercent);
-                            status += productDL.UpdatePriceAndStock(productID, price, webPrice, true);
+                            status += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
                         }
                     }
                 }
