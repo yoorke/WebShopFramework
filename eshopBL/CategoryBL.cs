@@ -143,10 +143,10 @@ namespace eshopBL
             return list;
         }*/
 
-        public List<Category> GetNestedCategoriesList()
+        public List<Category> GetNestedCategoriesList(bool showNotActive = false)
         {
             CategoryDL categoryDL = new CategoryDL();
-            DataTable categoriesDT = categoryDL.GetCategories("sortOrder", false);
+            DataTable categoriesDT = categoryDL.GetCategories("sortOrder", showNotActive);
 
             return GetCategoriesList(categoriesDT, 1);
         }
@@ -192,9 +192,9 @@ namespace eshopBL
             return GetCategoriesDataTable(categoriesDT, 2);
         }*/
 
-        public DataTable GetNestedCategoriesDataTable()
+        public DataTable GetNestedCategoriesDataTable(bool showNotActive = false)
         {
-            List<Category> list = GetNestedCategoriesList();
+            List<Category> list = GetNestedCategoriesList(showNotActive);
             DataTable categoriesDT = new DataTable();
             categoriesDT.Columns.Add("categoryID", typeof(int));
             categoriesDT.Columns.Add("name", typeof(string));
@@ -235,10 +235,10 @@ namespace eshopBL
             return categoriesDT;
         }
 
-        public DataTable GetCategories()
+        public DataTable GetCategories(string sortBy = "categoryID, parentCategoryID", bool showNotActive = true)
         {
             CategoryDL categoryDL = new CategoryDL();
-            return categoryDL.GetCategories();
+            return categoryDL.GetCategories(sortBy, showNotActive);
         }
 
         public int SaveCategory(Category category)

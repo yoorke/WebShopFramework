@@ -739,7 +739,7 @@ namespace eshopDL
                 {
                     if (!showIfNotInStock)
                         objComm.CommandText += ", isActive = @isInStock";
-                    objComm.CommandText += "WHERE supplierID=@supplierID AND isLocked=0 AND productID IN (SELECT productID FROM productCategory WHERE categoryID=@categoryID)";
+                    objComm.CommandText += " WHERE supplierID=@supplierID AND isLocked=0 AND productID IN (SELECT productID FROM productCategory WHERE categoryID=@categoryID)";
                     objConn.Open();
                     objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = inStock;
                     objComm.Parameters.Add("@supplierID", SqlDbType.Int).Value = supplierID;
@@ -790,11 +790,11 @@ namespace eshopDL
             int status = 0;
             using(SqlConnection objConn=new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE product SET price=@price, isInStock=@isInStock, webPrice=@webPrice, isActive = @isInStock", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE product SET price=@price, isInStock=@isInStock, webPrice=@webPrice", objConn))
                 {
                     if(!showIfNotInStock)
                         objComm.CommandText += ", isActive = @isInStock";
-                    objComm.CommandText += "WHERE productID=@productID";
+                    objComm.CommandText += " WHERE productID=@productID";
                     objConn.Open();
                     objComm.Parameters.Add("@price", SqlDbType.Float).Value = price;
                     objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = isIsInStock;

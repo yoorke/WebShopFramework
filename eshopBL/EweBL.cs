@@ -469,19 +469,22 @@ namespace eshopBL
             for (int i = 0; i < eweSubcategories.Length; i++)
             {
                 XmlDocument xmlDoc = eweDL.GetXml(eweCategory, eweSubcategories[i], false, false);
-                XmlNodeList nodeList = xmlDoc.DocumentElement.SelectNodes("product");
-
-                foreach (XmlNode xmlNode in nodeList)
+                if (xmlDoc != null)
                 {
-                    string supplierCode = xmlNode.SelectSingleNode("id").InnerText.Trim();
-                    int productID;
-                    if ((productID = productDL.GetProductIDBySupplierCode(supplierCode)) > 0)
+                    XmlNodeList nodeList = xmlDoc.DocumentElement.SelectNodes("product");
+
+                    foreach (XmlNode xmlNode in nodeList)
                     {
-                        if (!productDL.IsLocked(productID))
+                        string supplierCode = xmlNode.SelectSingleNode("id").InnerText.Trim();
+                        int productID;
+                        if ((productID = productDL.GetProductIDBySupplierCode(supplierCode)) > 0)
                         {
-                            double price = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price").InnerText.Replace('.', ',').Trim()), category.PricePercent);
-                            double webPrice = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price").InnerText.Replace('.', ',').Trim()), category.WebPricePercent);
-                            status += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                            if (!productDL.IsLocked(productID))
+                            {
+                                double price = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price").InnerText.Replace('.', ',').Trim()), category.PricePercent);
+                                double webPrice = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price").InnerText.Replace('.', ',').Trim()), category.WebPricePercent);
+                                status += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                            }
                         }
                     }
                 }
