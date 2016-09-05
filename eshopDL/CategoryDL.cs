@@ -369,7 +369,7 @@ namespace eshopDL
                         if (reader.HasRows)
                             categories = new List<Category>();
                         while (reader.Read())
-                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, reader.GetInt32(3), null));
+                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, -1, null));
                     }
                 }
             }
