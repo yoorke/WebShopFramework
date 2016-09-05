@@ -86,7 +86,7 @@ namespace eshopBL
                 {
                     for (int i = 0; i < cart.Rows.Count; i++)
                     {
-                        Product product = new ProductBL().GetProduct(int.Parse(cart.Rows[i]["productID"].ToString()), string.Empty, false);
+                        Product product = new ProductBL().GetProduct(int.Parse(cart.Rows[i]["productID"].ToString()), string.Empty, false, string.Empty);
                         bool[] couponObjectStatus = new bool[coupon.Objects.Count];
                         for (int j = 0; j < coupon.Objects.Count; j++)
                         {

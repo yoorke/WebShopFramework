@@ -149,7 +149,7 @@ namespace eshopDL
                             items = new List<OrderItem>();
                         while (reader.Read())
                         {
-                            items.Add(new OrderItem(reader.GetInt32(0), reader.GetInt32(1), new ProductDL().GetProduct(reader.GetInt32(2), string.Empty, false), reader.GetDouble(3), reader.GetDouble(5), reader.GetDouble(4)));
+                            items.Add(new OrderItem(reader.GetInt32(0), reader.GetInt32(1), new ProductDL().GetProduct(reader.GetInt32(2), string.Empty, false, string.Empty), reader.GetDouble(3), reader.GetDouble(5), reader.GetDouble(4)));
                         }
                     }
                 }

@@ -15,10 +15,10 @@ namespace eshopBL
 {
     public class ProductBL
     {
-        public Product GetProduct(int productID, string url, bool count)
+        public Product GetProduct(int productID, string url, bool count, string code)
         {
             ProductDL productDL = new ProductDL();
-            return productDL.GetProduct(productID, url, count);
+            return productDL.GetProduct(productID, url, count, string.Empty);
         }
 
         /*public List<Product> GetProduct(string code)

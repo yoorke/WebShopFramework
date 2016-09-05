@@ -926,7 +926,7 @@ namespace eshopDL
 
         #region GetProduct
 
-        public Product GetProduct(int productID, string url, bool count)
+        public Product GetProduct(int productID, string url, bool count, string code)
         {
             Product product = null;
 
@@ -948,6 +948,11 @@ namespace eshopDL
                             objComm.CommandText += " WHERE url=@url";
                             objComm.Parameters.Add("@url", SqlDbType.NVarChar, 100).Value = url;
                         }
+                        else if(code != string.Empty)
+                        {
+                            objComm.CommandText += " WHERE code = @code";
+                            objComm.Parameters.Add("@code", SqlDbType.NVarChar, 50).Value = code;
+                        }
 
                         using (SqlDataReader reader = objComm.ExecuteReader())
                         {
@@ -956,7 +961,7 @@ namespace eshopDL
 
                             while (reader.Read())
                             {
-                                product.ProductID = productID;
+                                product.ProductID = reader.GetInt32(0);
                                 product.Code = reader.GetString(1);
                                 product.SupplierCode = reader.GetString(2);
                                 product.Brand = new Brand(reader.GetInt32(3), reader.GetString(8));
