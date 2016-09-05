@@ -302,5 +302,50 @@ namespace eshopBL
             }
             return exist;
         }
+
+        public bool SaveProductFromExternalApplication(string barcode, string name, double quantity, double price, bool insertIfNew)
+        {
+            Product product = new ProductDL().GetProduct(-1, string.Empty, false, barcode);
+            bool save = false;
+
+            if (product != null)
+            {
+                product.Name = name;
+                product.Price = price;
+                product.WebPrice = price;
+                product.IsInStock = quantity > 0;
+                save = true;
+            }
+            else if (insertIfNew)
+            {
+                product = new Product();
+                product.Code = barcode;
+                product.Name = name;
+                product.Price = price;
+                product.WebPrice = price;
+
+                product.Brand = new Brand(0, "Nepoznat");
+                product.Categories = new List<Category>();
+                product.Categories.Add(new Category(0, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1));
+                product.Description = string.Empty;
+                product.Ean = string.Empty;
+                product.Images = new List<string>();
+                product.Images.Add("000.jpg");
+                product.IsActive = false;
+                product.IsApproved = false;
+                product.IsInStock = quantity > 0;
+                product.IsLocked = false;
+                product.Specification = string.Empty;
+                product.SupplierCode = string.Empty;
+                product.SupplierID = 0;
+                product.VatID = 4;
+                save = true;
+            }
+            int status = 0;
+            if (save)
+                status = SaveProduct(product);
+
+            return status > 0;
+        }
     }
 }
