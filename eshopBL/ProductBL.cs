@@ -131,7 +131,7 @@ namespace eshopBL
             return productDL.SetIsInStock(productID, isInStock);
         }
 
-        public List<Product> GetProducts(string categoryUrl, List<string> brandsID, List<AttributeValue> attributeValues, string sortName, string priceFrom, string priceTo)
+        public List<Product> GetProducts(string categoryUrl, List<string> brandsID, List<AttributeValue> attributeValues, string sortName, string priceFrom, string priceTo, bool includeChildrenCategoriesProducts = false)
         {
             /*string sort = string.Empty;
             switch (sortString)
@@ -159,7 +159,7 @@ namespace eshopBL
 
 
             ProductDL productDL = new ProductDL();
-            return productDL.GetProducts(category.CategoryID, brandsID, attributeValues, getSort(sortName), getPrice(priceFrom), getPrice(priceTo));
+            return productDL.GetProducts(category.CategoryID, brandsID, attributeValues, getSort(sortName), getPrice(priceFrom), getPrice(priceTo), includeChildrenCategoriesProducts);
         }
 
         private string getSort(string sortName)

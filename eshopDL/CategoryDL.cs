@@ -50,7 +50,7 @@ namespace eshopDL
                                 else
                                     newRow[2] = 0;
                                 newRow[3] = "/proizvodi/" + reader.GetString(3);
-                                newRow[4] = "/images/" + reader.GetString(4);
+                                newRow[4] = reader.GetString(4) != string.Empty ? "/images/" + reader.GetString(4) : string.Empty;
                                 newRow[5] = (Convert.IsDBNull(reader[5]) == false) ? reader.GetInt32(5) : 0;
                                 newRow[6] = (!Convert.IsDBNull(reader[6])) ? reader.GetInt32(6) : -1;
 
@@ -369,7 +369,7 @@ namespace eshopDL
                         if (reader.HasRows)
                             categories = new List<Category>();
                         while (reader.Read())
-                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, -1, null));
+                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, reader.GetString(4), string.Empty, 0, 0, 0, string.Empty, true, -1, null));
                     }
                 }
             }
