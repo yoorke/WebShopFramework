@@ -77,7 +77,7 @@ namespace eshopUtilities
             {
                 ukupno += order.Items[i].UserPrice * order.Items[i].Quantity;
                 body.Append("<tr height='20px' valign='middle'>");
-                body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='http://www.pinshop.rs/" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
+                body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
                 body.Append("</tr>");
             }
             body.Append("</table>");
@@ -104,7 +104,7 @@ namespace eshopUtilities
             body.Append("<p><strong>Napomena: </strong>" + order.Comment + "</p>");
             
             body.Append("<br/><br/>Vaša online prodavnica ");
-            body.Append("<span style='font-weight:bold;color:#174e87'>Pinshop.rs</span>");
+            body.Append("<span style='font-weight:bold;color:#174e87'>" + ConfigurationManager.AppSettings["companyName"] + "</span>");
             body.Append("</div>");
             message.Body = body.ToString();
 
@@ -128,10 +128,10 @@ namespace eshopUtilities
                 message.BodyEncoding = Encoding.UTF8;
                 StringBuilder body = new StringBuilder();
                 body.Append("<img src='" + ConfigurationManager.AppSettings["logoUrl"].ToString() + "' style='width:150px;margin-bottom:20px' /><br/>Poštovani,<br/><br/>Vaš korisnički nalog na web portalu <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'>" + ConfigurationManager.AppSettings["companyName"] + "</a> je uspešno kreiran.<br/><br/>");
-                body.Append("<br/>Za pristup portalu možete koristiti sledeće korisničke podatke:<br/><br/>Vaše korisničko ime je: <b>" + email + "</b><br>Vaša šifra je: <b>" + password+"</b><br/>");
+                body.Append("<br/>Za pristup portalu možete koristiti sledeće korisničke podatke:<br/><br/>Vaše korisničko ime je: <b>" + email + "</b><br>Vaša šifra je: <b>" + password + "</b><br/>");
                 body.Append("<br/>Za prijavu koristite stranicu <a href='" + ConfigurationManager.AppSettings["webShopLoginUrl"] + "'>Prijava</a>");
                 body.Append("<br/><br/>Vaša online prodavnica ");
-                body.Append("<span style='font-weight:bold;color:#d3232e'>Pinshop</span>");
+                body.Append("<span style='font-weight:bold;color:#d3232e'>" + ConfigurationManager.AppSettings["companyName"] + "</span>");
                 message.Body = body.ToString();
                 message.IsBodyHtml = true;
 
@@ -179,8 +179,8 @@ namespace eshopUtilities
             smtp.Credentials = networkCredential;
             smtp.Host = ConfigurationManager.AppSettings["smtp"].ToString();
             //smtp.Host = "mail.pinshop.co.rs";
-            smtp.Port = 25;
-            smtp.EnableSsl = false;
+            smtp.Port = int.Parse(ConfigurationManager.AppSettings["smtpPort"]);
+            smtp.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["smtpSsl"]);
 
             return smtp;
         }
@@ -207,11 +207,11 @@ namespace eshopUtilities
         public static void SendOrder()
         {
             MailMessage mail = new MailMessage();
-            mail.From = new MailAddress("office@pinservis.com");
-            mail.To.Add(new MailAddress("office@pinservis.com"));
+            mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"]);
+            mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
             mail.Subject = "Nova porudžbina";
             mail.BodyEncoding=Encoding.UTF8;
-            mail.Body="Imate novu porudžbinu sa sajta.<br/>Sve porudžbine možete videti na stranici <a href='http://www.pinservis.co.rs/administrator/orders.aspx'>www.pinservis.co.rs/administrator/orders.aspx</a>";
+            mail.Body="Imate novu porudžbinu sa sajta.<br/>Sve porudžbine možete videti na stranici <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/administrator/orders.aspx'>" + ConfigurationManager.AppSettings["webShopUrl"] + "/administrator/orders.aspx</a>";
             mail.IsBodyHtml=true;
 
             SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
@@ -340,12 +340,12 @@ namespace eshopUtilities
         {
             MailMessage mail = new MailMessage();
             mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
-            mail.To.Add(new MailAddress("office@pinshop.co.rs"));
+            mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
             mail.Subject = "Nova porudžbina";
             StringBuilder body = new StringBuilder();
-            body.Append("<strong>Nova porudžbina na sajtu www.pinshop.rs</strong>");
+            body.Append("<strong>Nova porudžbina na sajtu " + ConfigurationManager.AppSettings["webShopUrl"] + "</strong>");
             body.Append("<br/>");
-            body.Append("Porudžbinu možete pogledati na sledećoj stranici: <a href='http://pinshop.co.rs/administrator/order.aspx?orderID=" + orderID + "'>Porudžbine</a>");
+            body.Append("Porudžbinu možete pogledati na sledećoj stranici: <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/administrator/order.aspx?orderID=" + orderID + "'>Porudžbine</a>");
 
             body.Append("<br/><br/><table width='100%' border='0' cellspacing='0' style='font-family:verdana;font-size:0.9em'>");
             body.Append("<tr bgcolor='#cccccc'>");
@@ -357,7 +357,7 @@ namespace eshopUtilities
             {
                 ukupno += order.Items[i].UserPrice * order.Items[i].Quantity;
                 body.Append("<tr height='20px' valign='middle'>");
-                body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='http://www.pinshop.co.rs/" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
+                body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
                 body.Append("</tr>");
             }
             body.Append("</table>");
@@ -395,7 +395,7 @@ namespace eshopUtilities
         {
             MailMessage mail = new MailMessage();
             mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString());
-            mail.To.Add(new MailAddress("office@pinshop.co.rs"));
+            mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
             mail.Subject = email + " " + subject;
             mail.Body = body;
 
@@ -410,8 +410,8 @@ namespace eshopUtilities
             smtp.UseDefaultCredentials = false;
             smtp.Credentials = networkCredential;
             smtp.Host = ConfigurationManager.AppSettings["errorSmtp"].ToString();
-            smtp.Port = 26;
-            smtp.EnableSsl = false;
+            smtp.Port = int.Parse(ConfigurationManager.AppSettings["errorSmtpPort"]);
+            smtp.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["errorSmtpSsl"]);
 
             return smtp;
         }

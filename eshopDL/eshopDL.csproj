@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdminMenuDL.cs" />
     <Compile Include="AttributeDL.cs" />
     <Compile Include="BannerDL.cs" />
     <Compile Include="BrandDL.cs" />

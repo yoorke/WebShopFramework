@@ -15,7 +15,7 @@ namespace eshopBL
         {
             OrderDL orderDL = new OrderDL();
             int status = orderDL.SaveOrder(order);
-            Common.SendOrder();
+            //Common.SendOrder();
             return status;
         }
 

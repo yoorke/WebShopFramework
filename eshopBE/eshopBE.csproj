@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdminMenuItem.cs" />
     <Compile Include="Attribute.cs" />
     <Compile Include="AttributeValue.cs" />
     <Compile Include="BannerItem.cs" />

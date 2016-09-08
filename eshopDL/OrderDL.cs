@@ -46,7 +46,7 @@ namespace eshopDL
                             objComm.Parameters.Add("@statusID", SqlDbType.Int).Value = order.OrderStatus.OrderStatusID;
                             objComm.Parameters.Add("@zip", SqlDbType.NVarChar, 5).Value = order.Zip;
                             objComm.Parameters.Add("@comment", SqlDbType.NVarChar).Value = order.Comment;
-                            objComm.Parameters.Add("@cartID", SqlDbType.NVarChar, 32).Value = order.CartID;
+                            objComm.Parameters.Add("@cartID", SqlDbType.NVarChar, 50).Value = order.CartID;
                             
 
                             SqlParameter orderID = new SqlParameter("@orderID", SqlDbType.Int);
