@@ -310,7 +310,7 @@ namespace eshopBL
 
             if (product != null)
             {
-                product.Name = name;
+                product.Name = name != "none" ? name : product.Name;
                 product.Price = price;
                 product.WebPrice = price;
                 product.IsInStock = quantity > 0;
@@ -320,7 +320,7 @@ namespace eshopBL
             {
                 product = new Product();
                 product.Code = barcode;
-                product.Name = name;
+                product.Name = name != "none" ? name : "Nepoznat";
                 product.Price = price;
                 product.WebPrice = price;
 
