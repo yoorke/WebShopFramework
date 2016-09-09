@@ -316,11 +316,11 @@ namespace eshopBL
                 product.IsInStock = quantity > 0;
                 save = true;
             }
-            else if (insertIfNew)
+            else if (insertIfNew && name != "none")
             {
                 product = new Product();
                 product.Code = barcode;
-                product.Name = name != "none" ? name : "Nepoznat";
+                product.Name = name;
                 product.Price = price;
                 product.WebPrice = price;
 
@@ -330,7 +330,7 @@ namespace eshopBL
                 product.Description = string.Empty;
                 product.Ean = string.Empty;
                 product.Images = new List<string>();
-                product.Images.Add("000.jpg");
+                product.Images.Add("0.jpg");
                 product.IsActive = false;
                 product.IsApproved = false;
                 product.IsInStock = quantity > 0;
