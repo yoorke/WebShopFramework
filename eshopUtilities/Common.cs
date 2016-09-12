@@ -345,7 +345,7 @@ namespace eshopUtilities
             StringBuilder body = new StringBuilder();
             body.Append("<strong>Nova porudžbina na sajtu " + ConfigurationManager.AppSettings["webShopUrl"] + "</strong>");
             body.Append("<br/>");
-            body.Append("Porudžbinu možete pogledati na sledećoj stranici: <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/administrator/order.aspx?orderID=" + orderID + "'>Porudžbine</a>");
+            body.Append("Porudžbinu možete pogledati na sledećoj stranici: <a href='" + ConfigurationManager.AppSettings["webshopUrl"] + "/" + ConfigurationManager.AppSettings["webshopAdminUrl"] + "/order.aspx?orderID=" + orderID + "'>Porudžbine</a>");
 
             body.Append("<br/><br/><table width='100%' border='0' cellspacing='0' style='font-family:verdana;font-size:0.9em'>");
             body.Append("<tr bgcolor='#cccccc'>");
