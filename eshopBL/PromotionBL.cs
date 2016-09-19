@@ -16,7 +16,11 @@ namespace eshopBL
             if (promotion.PromotionID > 0)
                 return promotionDL.UpdatePromotion(promotion);
             else
-                return promotionDL.SavePromotion(promotion);
+            {
+                int status = promotionDL.SavePromotion(promotion);
+                new RoutesBL().RegisterRoutes();
+                return status;
+            }
         }
 
         public List<Promotion> GetPromotions(bool allSelection, bool? showOnFirstPage, bool? showOnMenu)

@@ -58,10 +58,13 @@ namespace eshopBL
             return orderDL.GetOrderItemsFull(orderID);
         }
 
-        public int UpdateOrderStatus(int orderID, int orderStatusID)
+        public int UpdateOrderStatus(int orderID, int orderStatusID, string email, string number, string name, string orderStatus, string date)
         {
             OrderDL orderDL = new OrderDL();
-            return orderDL.UpdateOrderStatus(orderID, orderStatusID);
+            int status = orderDL.UpdateOrderStatus(orderID, orderStatusID);
+            Common.SendOrderStatusUpdate(email, name, number, DateTime.Parse(date), orderStatus);
+
+            return status;
         }
 
         public int DeleteOrder(int orderID)

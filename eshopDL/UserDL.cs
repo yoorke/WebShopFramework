@@ -312,7 +312,7 @@ namespace eshopDL
             DataTable users = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT userID, firstName, lastName, username, email, address, city, phone FROM [user]", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT userID, firstName, lastName, username, email, address, city, phone FROM [user] WHERE userID > 42 ORDER BY userID", objConn))
                 {
                     objConn.Open();
                     using (SqlDataReader reader = objComm.ExecuteReader())

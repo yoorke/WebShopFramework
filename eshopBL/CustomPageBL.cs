@@ -15,7 +15,12 @@ namespace eshopBL
             if (customPage.CustomPageID > 0)
                 return customPageDL.Update(customPage);
             else
-                return customPageDL.Save(customPage);
+            {
+                int status = customPageDL.Save(customPage);
+                new RoutesBL().RegisterRoutes();
+                return status;
+            }
+            
         }
 
         public CustomPage GetCustomPage(int customPageID)

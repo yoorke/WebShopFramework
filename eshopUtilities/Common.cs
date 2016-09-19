@@ -87,7 +87,7 @@ namespace eshopUtilities
             body.Append("<br />");
             body.Append("Dostava: " + string.Format("{0:N2}", ukupno > 5000 ? 0 : 200));
             body.Append("<br />");
-            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno + ukupno > 5000 ? 0 : 200));
+            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno + (ukupno > 5000 ? 0 : 200)));
             body.Append("</div>");
             body.Append("<br/>");
             if(order.Lastname != string.Empty || order.Firstname != string.Empty)
@@ -414,6 +414,28 @@ namespace eshopUtilities
             smtp.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["errorSmtpSsl"]);
 
             return smtp;
+        }
+
+        public static void SendOrderStatusUpdate(string email, string name, string orderNumber, DateTime date, string status)
+        {
+            MailMessage mail = new MailMessage();
+            mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"], ConfigurationManager.AppSettings["companyName"]);
+            mail.To.Add(new MailAddress(email));
+            mail.Subject = ConfigurationManager.AppSettings["companyName"] + " - Status porudžbine";
+            StringBuilder body = new StringBuilder();
+            body.Append("<p>Poštovani, " + name + "</p>");
+            body.Append("<br/>");
+            body.Append("<p>Status vaše porudžbine sa brojem: <strong>" + orderNumber + "</strong> od: <strong>" + date.ToShortDateString() + "</strong> je izmenjen na: </p>");
+            body.Append("<br/>");
+            body.Append("<div style='width=100%;background-color:#f0f000;padding-top:0.5em;padding-bottom:0.5em;padding-left:0.5em;padding-right:0.5em;color:#333333;text-align:center;font-size:18px;margin:1em;height:2em'><strong>" + status.ToUpper() + "</strong></div>");
+            body.Append("<br/>");
+            body.Append("<p>Vaša online prodavnica <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'>" + ConfigurationManager.AppSettings["companyName"] + "</a></p>");
+
+            mail.IsBodyHtml = true;
+            mail.Body = body.ToString();
+
+            SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
+            smtp.Send(mail);
         }
     }
 }
