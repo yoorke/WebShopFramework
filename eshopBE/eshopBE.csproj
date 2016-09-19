@@ -76,6 +76,7 @@
     <Compile Include="PageSize.cs" />
     <Compile Include="Payment.cs" />
     <Compile Include="Product.cs" />
+    <Compile Include="ProductImage.cs" />
     <Compile Include="Promotion.cs" />
     <Compile Include="PromotionPrice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

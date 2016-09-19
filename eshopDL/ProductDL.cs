@@ -312,12 +312,12 @@ namespace eshopDL
                             product.Price = reader.GetDouble(4);
                             product.WebPrice = reader.GetDouble(5);
                             product.Brand = new Brand(-1, reader.GetString(6));
-                            product.Images = new List<string>();
+                            product.Images = new List<ProductImage>();
                             //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
                             //product.Images.Add("/images/" + reader.GetString(7));
                             //else
                             //product.Images.Add("/images/no-image.jpg");
-                            product.Images.Add(reader.GetString(7));
+                            product.Images.Add(new ProductImage(reader.GetString(7), 1));
                             if (!Convert.IsDBNull(reader[8]))
                             {
                                 if (reader.GetDateTime(10) < DateTime.UtcNow && reader.GetDateTime(11) > DateTime.UtcNow)
@@ -362,9 +362,9 @@ namespace eshopDL
                             product.Price = reader.GetDouble(4);
                             product.WebPrice = reader.GetDouble(5);
                             product.Brand = new Brand(-1, reader.GetString(6));
-                            product.Images = new List<string>();
+                            product.Images = new List<ProductImage>();
                             //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
-                                product.Images.Add(reader.GetString(7));
+                                product.Images.Add(new ProductImage(reader.GetString(7), 1));
                             //else
                                 //product.Images.Add("/images/no-image.jpg");
                             product.Promotion = new Promotion();
@@ -419,9 +419,9 @@ namespace eshopDL
                             product.Price = reader.GetDouble(4);
                             product.WebPrice = reader.GetDouble(5);
                             product.Brand = new Brand(-1, reader.GetString(6));
-                            product.Images = new List<string>();
+                            product.Images = new List<ProductImage>();
                             //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
-                                product.Images.Add(reader.GetString(7));
+                                product.Images.Add(new ProductImage(reader.GetString(7), 1));
                             //else
                                 //product.Images.Add("/images/no-image.jpg");
                             if (Convert.IsDBNull(reader[8]) == false)
@@ -628,7 +628,7 @@ namespace eshopDL
             return status;
         }
 
-        private int[] SaveProductImages(List<string> images, int productID)
+        private int[] SaveProductImages(List<ProductImage> images, int productID)
         {
             int[] status = new int[images.Count];
             DeleteProductImages(productID);
@@ -644,9 +644,9 @@ namespace eshopDL
                         {
                             objComm.Parameters.Clear();
                             objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
-                            objComm.Parameters.Add("@imageUrl", SqlDbType.NVarChar, 100).Value = (images[i].Contains("/images/")) ? images[i].Substring(8, images[i].Length - 8) : images[i];
-                            objComm.Parameters.Add("@sortOrder", SqlDbType.Int).Value = i + 1;
-                            objComm.Parameters.Add("@productImageUrlID", SqlDbType.Int).Value = int.Parse(images[i].Substring(0, images[i].LastIndexOf('.')));
+                            objComm.Parameters.Add("@imageUrl", SqlDbType.NVarChar, 100).Value = (images[i].ImageUrl.Contains("/images/")) ? images[i].ImageUrl.Substring(8, images[i].ImageUrl.Length - 8) : images[i].ImageUrl;
+                            objComm.Parameters.Add("@sortOrder", SqlDbType.Int).Value = images[i].SortOrder;
+                            objComm.Parameters.Add("@productImageUrlID", SqlDbType.Int).Value = int.Parse(images[i].ImageUrl.Substring(0, images[i].ImageUrl.LastIndexOf('.')));
 
                             status[i] = objComm.ExecuteNonQuery();
                         }
@@ -1079,12 +1079,12 @@ namespace eshopDL
             return attributes;
         }
 
-        public List<string> GetProductImages(int productID)
+        public List<ProductImage> GetProductImages(int productID)
         {
-            List<string> images = null;
+            List<ProductImage> images = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT imageUrl FROM productImageUrl WHERE productID=@productID ORDER BY sortOrder", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT imageUrl, sortOrder FROM productImageUrl WHERE productID=@productID ORDER BY sortOrder", objConn))
                 {
                     try
                     {
@@ -1093,11 +1093,11 @@ namespace eshopDL
                         using (SqlDataReader reader = objComm.ExecuteReader())
                         {
                             if (reader.HasRows)
-                                images = new List<string>();
+                                images = new List<ProductImage>();
                             while (reader.Read())
                             {
                                 //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(0))))
-                                    images.Add(reader.GetString(0));
+                                    images.Add(new ProductImage(reader.GetString(0), reader.GetInt32(1)));
                                 //else
                                     //images.Add("/images/no-image.jpg");
                             }
@@ -1383,7 +1383,7 @@ namespace eshopDL
                             product.Price = reader.GetDouble(4);
                             product.WebPrice = reader.GetDouble(5);
                             product.Brand = new Brand(reader.GetInt32(6), reader.GetString(7));
-                            product.Images = new List<string>();
+                            product.Images = new List<ProductImage>();
                             //string directory = createImageUrl(reader.GetString(8));
                             //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~" + directory)))
                             //{

@@ -132,7 +132,7 @@ namespace eshopBL
                 product.Description = ((Label)row.FindControl("lblDescription")).Text;
                 product.Price = calculatePrice(double.Parse(((Label)row.FindControl("lblPartnerPrice")).Text != string.Empty ? ((Label)row.FindControl("lblPartnerPrice")).Text : "0,00"), category.PricePercent);
                 product.WebPrice = calculatePrice(double.Parse(((Label)row.FindControl("lblPartnerPrice")).Text != string.Empty ? ((Label)row.FindControl("lblPartnerPrice")).Text : "0,00"), category.WebPricePercent);
-                product.Images = new List<string>();
+                product.Images = new List<ProductImage>();
                 product.Images.Add(saveProductImage(((Label)row.FindControl("lblImageUrl")).Text, product.Images != null ? product.Images.Count : 0));
                 product.Attributes = GetProductAttributes(product.Code, kimtecCategoryID);
                 product.Categories = new List<Category>();
@@ -199,7 +199,7 @@ namespace eshopBL
             product.WebPrice = calculatePrice(double.Parse(kimtecProduct.Rows[0]["partnerPrice"].ToString()), category.WebPricePercent);
             product.Ean = kimtecProduct.Rows[0]["barcodeValue"].ToString();
             product.SupplierPrice = double.Parse(kimtecProduct.Rows[0]["partnerPrice"].ToString());
-            product.Images = new List<string>();
+            product.Images = new List<ProductImage>();
             product.Images.Add(saveProductImage(kimtecProduct.Rows[0]["imageUrl"].ToString(), product.Images != null ? product.Images.Count : 0));
             product.Attributes = GetProductAttributes(code, kimtecCategoryID);
             product.Description = kimtecProduct.Rows[0]["marketingDescription"].ToString();
@@ -233,10 +233,10 @@ namespace eshopBL
             return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 100 * 100 - 10).ToString());
         }
 
-        private string saveProductImage(string url, int count)
+        private ProductImage saveProductImage(string url, int count)
         {
             if (url == string.Empty)
-                return "no-image.jpg";
+                return new ProductImage("no-image.jpg", 0);
             CertificateWebClient webClient = new CertificateWebClient();
             string filename = Path.GetFileName(url);
             string extension = filename.Substring(filename.LastIndexOf('.'));
@@ -268,7 +268,7 @@ namespace eshopBL
             //thumb = Common.CreateThumb(original, 50, 40);
             //thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-thumb.jpg");
             //}
-            return exists ? fullPath.Substring(fullPath.LastIndexOf('/') + 1) : string.Empty;
+            return exists ? new ProductImage((fullPath.Substring(fullPath.LastIndexOf('/') + 1)), count) : new ProductImage();
         }
 
         public int SaveProductSpecification()

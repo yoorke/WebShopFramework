@@ -329,8 +329,8 @@ namespace eshopBL
                 product.Categories.Add(new Category(0, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1));
                 product.Description = string.Empty;
                 product.Ean = string.Empty;
-                product.Images = new List<string>();
-                product.Images.Add("0.jpg");
+                product.Images = new List<ProductImage>();
+                product.Images.Add(new ProductImage("0.jpg", 1));
                 product.IsActive = false;
                 product.IsApproved = false;
                 product.IsInStock = quantity > 0;

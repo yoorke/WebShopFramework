@@ -15,7 +15,7 @@ namespace eshopBE
         private string _description;
         private double _price;
         private double _webPrice;
-        private List<string> _images;
+        private List<ProductImage> _images;
         private List<AttributeValue> _attributes;
         private List<Category> _categories;
         private int _supplierID;
@@ -79,7 +79,7 @@ namespace eshopBE
             set { _webPrice = value; }
         }
 
-        public List<string> Images
+        public List<ProductImage> Images
         {
             get { return _images; }
             set { _images = value; }

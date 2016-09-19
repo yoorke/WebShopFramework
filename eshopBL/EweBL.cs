@@ -14,6 +14,7 @@ using System.Web;
 using System.Drawing;
 using eshopUtilities;
 using System.Configuration;
+using System.Collections.Generic;
 
 namespace eshopBL
 {
@@ -258,13 +259,13 @@ namespace eshopBL
                                                 foreach (XmlNode xmlImageNode in xmlChildNode.ChildNodes)
                                                 {
                                                     if (product.Images == null)
-                                                        product.Images = new System.Collections.Generic.List<string>();
+                                                        product.Images = new List<ProductImage>();
                                                     if (xmlImageNode.Name == "image")
                                                     {
                                                         string imageUrl = saveImageFromUrl(xmlImageNode.InnerText.Trim(), product.Images != null ? product.Images.Count : 0);
                                                         if (imageUrl != string.Empty)
                                                             //product.Images.Add(Path.GetFileName(xmlImageNode.InnerText.Trim()));
-                                                            product.Images.Add(imageUrl);
+                                                            product.Images.Add(new ProductImage(imageUrl, product.Images.Count + 1));
                                                     }
                                                 }
                                                 //}
@@ -681,13 +682,13 @@ namespace eshopBL
             foreach (XmlNode xmlImageNode in xmlImagesNode.ChildNodes)
             {
                 if (product.Images == null)
-                    product.Images = new List<string>();
+                    product.Images = new List<ProductImage>();
                 if(xmlImageNode.Name == "image")
                 {
                     string imageUrl = saveImageFromUrl(xmlImageNode.InnerText.Trim(), product.Images != null ? product.Images.Count : 0);
                     if (imageUrl != string.Empty)
                         //product.Images.Add(Path.GetFileName(xmlImageNode.InnerText.Trim()));
-                        product.Images.Add(imageUrl);
+                        product.Images.Add(new ProductImage(imageUrl, product.Images.Count + 1));
                 }
             }
 
