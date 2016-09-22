@@ -328,7 +328,7 @@ namespace eshopDL
                                 }
                             }
                             product.Categories = new List<Category>();
-                            product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0));
+                            product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
                             product.Description = GetProductAttributeValues(product.ProductID, true);
                             products.Add(product);
                         }
@@ -371,7 +371,7 @@ namespace eshopDL
                             product.Promotion.Price = reader.GetDouble(8);
                             product.Promotion.ImageUrl = reader.GetString(9);
                             product.Categories = new List<Category>();
-                            product.Categories.Add(new Category(reader.GetInt32(11), reader.GetString(10), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0));
+                            product.Categories.Add(new Category(reader.GetInt32(11), reader.GetString(10), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
 
                             products.Add(product);
                         }
@@ -434,7 +434,7 @@ namespace eshopDL
                                 }
                             }
                             product.Categories = new List<Category>();
-                            product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0));
+                            product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
                             product.Description = GetProductAttributeValues(product.ProductID, true);
 
                             products.Add(product);
@@ -453,7 +453,7 @@ namespace eshopDL
         {
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("INSERT INTO product (code, supplierCode, brandID, name, description, price, webPrice, isApproved, isActive, supplierID, vatID, insertDate, updateDate, specification, isLocked, isInStock, ean, supplierPrice) VALUES (@code, @supplierCode, @brandID, @name, @description, @price, @webPrice, @isApproved, @isActive, @supplierID, @vatID, @insertDate, @updateDate, @specification, @isLocked, @isInStock, @ean, @supplierPrice); SELECT SCOPE_IDENTITY()", objConn))
+                using (SqlCommand objComm = new SqlCommand("INSERT INTO product (code, supplierCode, brandID, name, description, price, webPrice, isApproved, isActive, supplierID, vatID, insertDate, updateDate, specification, isLocked, isInStock, ean, supplierPrice, unitOfMeasureID) VALUES (@code, @supplierCode, @brandID, @name, @description, @price, @webPrice, @isApproved, @isActive, @supplierID, @vatID, @insertDate, @updateDate, @specification, @isLocked, @isInStock, @ean, @supplierPrice, @unitOfMeasureID); SELECT SCOPE_IDENTITY()", objConn))
                 {
                     try
                     {
@@ -478,6 +478,7 @@ namespace eshopDL
                         objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = product.IsInStock;
                         objComm.Parameters.Add("@ean", SqlDbType.NVarChar, 50).Value = product.Ean;
                         objComm.Parameters.Add("@supplierPrice", SqlDbType.Float).Value = product.SupplierPrice;
+                        objComm.Parameters.Add("@unitOfMeasureID", SqlDbType.Int).Value = product.UnitOfMeasure.UnitOfMeasureID;
 
                         product.ProductID = int.Parse(objComm.ExecuteScalar().ToString());
 
@@ -509,14 +510,14 @@ namespace eshopDL
             int status;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, specification=@specification, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPrice = @supplierPrice WHERE productID=@productID", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, specification=@specification, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPrice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID WHERE productID=@productID", objConn))
                 {
                     try
                     {
                         objConn.Open();
 
                         if (product.Specification == string.Empty || product.Specification == null)
-                            objComm.CommandText = "UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, isLocked=@isLocked, isInStock=@isInStock, ean=@ean WHERE productID=@productID";
+                            objComm.CommandText = "UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPRice = @supplierPrice, unitOfMeasure = @unitOfMeasure WHERE productID=@productID";
 
                         objComm.Parameters.Add("@code", SqlDbType.NVarChar, 50).Value = product.Code;
                         objComm.Parameters.Add("@supplierCode", SqlDbType.NVarChar, 50).Value = product.SupplierCode;
@@ -537,6 +538,7 @@ namespace eshopDL
                         objComm.Parameters.Add("@ean", SqlDbType.NVarChar, 50).Value = product.Ean;
                         objComm.Parameters.Add("@supplierPrice", SqlDbType.Float).Value = product.SupplierPrice;
                         objComm.Parameters.Add("@productID", SqlDbType.Int).Value = product.ProductID;
+                        objComm.Parameters.Add("@unitOfMeasureID", SqlDbType.Int).Value = product.UnitOfMeasure.UnitOfMeasureID;
 
                         status = objComm.ExecuteNonQuery();
 
@@ -932,7 +934,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT productID, code, supplierCode, brand.brandID, product.name, description, price, webPrice, brand.name, isApproved, isActive, insertDate, updateDate, vatID, supplierID, specification, isLocked, isInStock, ean, product.supplierPrice FROM product INNER JOIN brand ON product.brandID=brand.brandID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT productID, code, supplierCode, brand.brandID, product.name, description, price, webPrice, brand.name, isApproved, isActive, insertDate, updateDate, vatID, supplierID, specification, isLocked, isInStock, ean, product.supplierPrice, unitOfMeasureID FROM product INNER JOIN brand ON product.brandID=brand.brandID", objConn))
                 {
                     try
                     {
@@ -989,6 +991,7 @@ namespace eshopDL
                                     product.Description = GetProductAttributeValues(product.ProductID, true);
                                 if(!Convert.IsDBNull(reader[19]))
                                     product.SupplierPrice = reader.GetDouble(19);
+                                product.UnitOfMeasure = new UnitOfMeasureDL().GetUnitOfMeasure(reader.GetInt32(20));
 
                                 //if (product.Specification == string.Empty)
                                     //product.Specification = createProductSpecification(product.ProductID);
@@ -1033,7 +1036,7 @@ namespace eshopDL
                                 categories = new List<Category>();
                             while (reader.Read())
                             {
-                                categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), reader.GetString(4), reader.GetInt32(5), 0, 0, string.Empty, Convert.IsDBNull(reader[6]) ? false : reader.GetBoolean(6), 0));
+                                categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), reader.GetString(4), reader.GetInt32(5), 0, 0, string.Empty, Convert.IsDBNull(reader[6]) ? false : reader.GetBoolean(6), 0, false, false));
                             }
                         }
                     }

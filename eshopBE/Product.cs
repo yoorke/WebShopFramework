@@ -30,6 +30,7 @@ namespace eshopBE
         private string _ean;
         private Promotion _promotion;
         private double _supplierPrice;
+        private UnitOfMeasure _unitOfMeasure;
 
         public int ProductID
         {
@@ -171,6 +172,12 @@ namespace eshopBE
         public string FullName
         {
             get { return _brand.Name + " " + _name; }
+        }
+
+        public UnitOfMeasure UnitOfMeasure
+        {
+            get { return _unitOfMeasure; }
+            set { _unitOfMeasure = value; }
         }
 
         public static string CreateFriendlyUrl(string url)

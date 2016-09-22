@@ -83,6 +83,7 @@
     <Compile Include="Slider.cs" />
     <Compile Include="SliderItem.cs" />
     <Compile Include="Supplier.cs" />
+    <Compile Include="UnitOfMeasure.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserType.cs" />
     <Compile Include="Vat.cs" />

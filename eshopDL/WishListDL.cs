@@ -52,7 +52,7 @@ namespace eshopDL
                             product.WebPrice = reader.GetDouble(7);
                             product.Brand = new Brand(reader.GetInt32(3), reader.GetString(8));
                             product.Categories = new List<Category>();
-                            product.Categories.Add(new Category(reader.GetInt32(19), reader.GetString(20), null, reader.GetString(21), string.Empty, 0, 0, 0, string.Empty, true, 0));
+                            product.Categories.Add(new Category(reader.GetInt32(19), reader.GetString(20), null, reader.GetString(21), string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
                             product.Images = new ProductDL().GetProductImages(product.ProductID);
 
                             products.Add(product);

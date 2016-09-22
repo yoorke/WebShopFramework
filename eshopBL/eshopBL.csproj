@@ -95,6 +95,7 @@
     </Compile>
     <Compile Include="SliderBL.cs" />
     <Compile Include="SupplierBL.cs" />
+    <Compile Include="UnitOfMeasureBL.cs" />
     <Compile Include="UserBL.cs" />
     <Compile Include="VatBL.cs" />
     <Compile Include="Web References\rs.kimtec.b2b\Reference.cs">

@@ -25,12 +25,14 @@ namespace eshopBE
         private Slider _slider;
         private int _categoryBannerID;
         private List<CategoryExtraMenuCategory> _categoryExtraMenus;
+        private bool _updateProductsFromExternalApplication;
+        private bool _exportProducts;
 
         public Category()
         {
         }
 
-        public Category(int categoryID, string name, int? parentCategoryID, string url, string imageUrl, int sortOrder, double pricePercent, double webPricePercent, string description, bool active, int categoryBannerID, Slider slider = null)
+        public Category(int categoryID, string name, int? parentCategoryID, string url, string imageUrl, int sortOrder, double pricePercent, double webPricePercent, string description, bool active, int categoryBannerID, bool updateProductsFromExternalApplication, bool exportProducts, Slider slider = null)
         {
             _categoryID = categoryID;
             _name = name;
@@ -44,6 +46,8 @@ namespace eshopBE
             _active = active;
             _slider = slider;
             _categoryBannerID = categoryBannerID;
+            _updateProductsFromExternalApplication = updateProductsFromExternalApplication;
+            _exportProducts = exportProducts;
         }
 
         public int CategoryID
@@ -152,6 +156,18 @@ namespace eshopBE
         {
             get { return _categoryExtraMenus; }
             set { _categoryExtraMenus = value; }
+        }
+
+        public bool UpdateProductsFromExternalApplication
+        {
+            get { return _updateProductsFromExternalApplication; }
+            set { _updateProductsFromExternalApplication = value; }
+        }
+
+        public bool ExportProducts
+        {
+            get { return _exportProducts; }
+            set { _exportProducts = value; }
         }
     }
 }

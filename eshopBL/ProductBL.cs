@@ -326,7 +326,7 @@ namespace eshopBL
 
                 product.Brand = new Brand(0, "Nepoznat");
                 product.Categories = new List<Category>();
-                product.Categories.Add(new Category(0, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1));
+                product.Categories.Add(new Category(9999, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1, false, false));
                 product.Description = string.Empty;
                 product.Ean = string.Empty;
                 product.Images = new List<ProductImage>();
