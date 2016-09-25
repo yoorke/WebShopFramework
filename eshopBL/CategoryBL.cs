@@ -312,5 +312,10 @@ namespace eshopBL
         //{
             //return new CategoryDL().GetSubcategories(categoryID);
         //}
+ 
+        public List<Category> GetCategoriesForProductUpdate()
+        {
+            return new CategoryDL().GetCategoriesForProductUpdate();
+        }
     }
 }

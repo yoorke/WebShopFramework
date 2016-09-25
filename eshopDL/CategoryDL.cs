@@ -403,5 +403,24 @@ namespace eshopDL
             }
             return categories;
         }
+
+        public List<Category> GetCategoriesForProductUpdate()
+        {
+            List<Category> categories = new List<Category>();
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("category_getForProductUpdate", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), !Convert.IsDBNull(reader[4]) ? reader.GetString(4) : string.Empty, reader.GetInt32(5), reader.GetDouble(6), reader.GetDouble(7), !Convert.IsDBNull(reader[8]) ? reader.GetString(8) : string.Empty, reader.GetBoolean(9), !Convert.IsDBNull(reader[10]) ? reader.GetInt32(10) : -1, reader.GetBoolean(11), reader.GetBoolean(12), null));
+                    }
+                }
+            }
+            return categories;
+        }
     }
 }

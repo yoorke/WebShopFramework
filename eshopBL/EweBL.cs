@@ -609,6 +609,11 @@ namespace eshopBL
             return eweDL.GetEweCategoryForCategory(categoryID);
         }
 
+        public string[] GetFullEweCategoryForCategory(int categoryID)
+        {
+            return new EweDL().GetEweCategory(GetEweCategoryForCategory(categoryID));
+        }
+
         public int SaveEweCategoryForCategory(int categoryID, int eweCategoryID, bool isCategory)
         {
             EweDL eweDL = new EweDL();
@@ -727,6 +732,34 @@ namespace eshopBL
                 if (new ProductBL().SaveProduct(product) > 0)
                     return true;
             return false;
+        }
+
+        public int[] SaveEweProducts(DataTable products, string eweCategory, int categoryID)
+        {
+            new EweDL().SaveProducts(products, eweCategory);
+            ProductDL productDL = new ProductDL();
+            productDL.SetInStock(1, false, categoryID, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+            Category category = new CategoryDL().GetCategory(categoryID);
+            int updatedCount = 0;
+            int newCount = 0;
+
+            for(int i = 0; i < products.Rows.Count; i++)
+            {
+                int productID = 0;
+                if((productID = productDL.GetProductIDBySupplierCode(products.Rows[i]["code"].ToString())) > 0)
+                {
+                    if(!productDL.IsLocked(productID))
+                    {
+                        double price = calculatePrice(double.Parse(products.Rows[i]["price"].ToString()), category.PricePercent);
+                        double webPrice = calculatePrice(double.Parse(products.Rows[i]["price"].ToString()), category.WebPricePercent);
+                        updatedCount += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                    }
+                }
+
+            }
+            newCount = products.Rows.Count - updatedCount;
+
+            return new int[] { newCount, updatedCount };
         }
     }
 }

@@ -292,5 +292,28 @@ namespace eshopDL
             }
             return product;
         }
+
+        public string[] GetEweCategory(int eweCategoryID)
+        {
+            string[] eweCategory = new string[2] { "0", "0" };
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("eweCategory_select", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@eweCategoryID", SqlDbType.Int).Value = eweCategoryID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        { 
+                            eweCategory[0] = reader.GetInt32(0).ToString();
+                            eweCategory[1] = reader.GetString(1);
+                        }
+                    }
+                }
+            }
+            return eweCategory;
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace eshopBL
         public List<CategoryExtraMenu> GetCategoryExtraMenus(bool addSelect)
         {
             List<CategoryExtraMenu> categoryExtraMenus = new CategoryExtraMenuDL().GetCategoryExtraMenus();
-            if (addSelect)
+            if (addSelect && categoryExtraMenus != null)
                 categoryExtraMenus.Insert(0, new CategoryExtraMenu(-1, "Odaberi"));
             return categoryExtraMenus;
         }
