@@ -422,5 +422,40 @@ namespace eshopDL
             }
             return categories;
         }
+
+        public int GetMaxSortOrder(int parentCategoryID)
+        {
+            int sortOrder = 0;
+            using (SqlConnection objConn = new SqlConnection(ConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("category_getMaxSortOrder", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@parentCategoryID", SqlDbType.Int).Value = parentCategoryID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            sortOrder = !Convert.IsDBNull(reader[0]) ? reader.GetInt32(0) : 0;
+                    }
+                }
+            }
+            return sortOrder;
+        }
+
+        public void ReorderCategory(int categoryID, int direction)
+        {
+            using (SqlConnection objConn = new SqlConnection(ConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("category_reorder", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
+                    objComm.Parameters.Add("@direction", SqlDbType.Int).Value = direction;
+                    objComm.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

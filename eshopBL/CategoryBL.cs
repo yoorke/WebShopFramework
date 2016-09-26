@@ -170,6 +170,7 @@ namespace eshopBL
                 category.ImageUrl = row["imageUrl"].ToString();
                 category.SortOrder = (int)row["sortOrder"];
                 category.CategoryBannerID = (int)row["categoryBannerID"];
+                category.ParentCategoryID = (int)row["parentID"];
                 if (parentID == 1)
                     category.CategoryExtraMenus = new CategoryExtraMenuBL().GetCategoryExtraMenusForCategory(category.CategoryID);
                 else category.CategoryExtraMenus = new List<CategoryExtraMenuCategory>();
@@ -192,14 +193,25 @@ namespace eshopBL
             return GetCategoriesDataTable(categoriesDT, 2);
         }*/
 
-        public DataTable GetNestedCategoriesDataTable(bool showNotActive = false)
+        public DataTable GetNestedCategoriesDataTable(bool showNotActive = false, bool addHomeCategory = false)
         {
             List<Category> list = GetNestedCategoriesList(showNotActive);
             DataTable categoriesDT = new DataTable();
             categoriesDT.Columns.Add("categoryID", typeof(int));
             categoriesDT.Columns.Add("name", typeof(string));
             categoriesDT.Columns.Add("parentID", typeof(int));
+            categoriesDT.Columns.Add("sortOrder", typeof(int));
             DataRow newRow;
+
+            if(addHomeCategory)
+            {
+                newRow = categoriesDT.NewRow();
+                newRow["categoryID"] = 1;
+                newRow["name"] = "Home";
+                newRow["parentID"] = -1;
+                newRow["sortOrder"] = 1;
+                categoriesDT.Rows.Add(newRow);
+            }
 
             if (list != null)
             {
@@ -208,6 +220,8 @@ namespace eshopBL
                     newRow = categoriesDT.NewRow();
                     newRow["categoryID"] = category.CategoryID;
                     newRow["name"] = "--" + category.Name;
+                    newRow["sortOrder"] = category.SortOrder;
+                    newRow["parentID"] = category.ParentCategoryID != null ? category.ParentCategoryID : -1;
                     categoriesDT.Rows.Add(newRow);
                     if (category.SubCategory != null)
                     {
@@ -216,6 +230,8 @@ namespace eshopBL
                             newRow = categoriesDT.NewRow();
                             newRow["categoryID"] = childCategory.CategoryID;
                             newRow["name"] = "--------" + childCategory.Name;
+                            newRow["sortOrder"] = childCategory.SortOrder;
+                            newRow["parentID"] = childCategory.ParentCategoryID;
                             categoriesDT.Rows.Add(newRow);
                             if(childCategory.SubCategory != null)
                             {
@@ -224,6 +240,8 @@ namespace eshopBL
                                     newRow = categoriesDT.NewRow();
                                     newRow["categoryID"] = childSubCategory.CategoryID;
                                     newRow["name"] = "----------------" + childSubCategory.Name;
+                                    newRow["sortOrder"] = childSubCategory.SortOrder;
+                                    newRow["parentID"] = childSubCategory.ParentCategoryID;
                                     categoriesDT.Rows.Add(newRow);
                                 }
                             }
@@ -316,6 +334,16 @@ namespace eshopBL
         public List<Category> GetCategoriesForProductUpdate()
         {
             return new CategoryDL().GetCategoriesForProductUpdate();
+        }
+
+        public int GetMaxSortOrder(int parentCategoryID)
+        {
+            return new CategoryDL().GetMaxSortOrder(parentCategoryID);
+        }
+
+        public void ReorderCategory(int categoryID, int direction)
+        {
+            new CategoryDL().ReorderCategory(categoryID, direction);
         }
     }
 }
