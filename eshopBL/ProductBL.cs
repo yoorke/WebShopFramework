@@ -305,46 +305,47 @@ namespace eshopBL
 
         public bool SaveProductFromExternalApplication(string barcode, string name, double quantity, double price, bool insertIfNew)
         {
-            Product product = new ProductDL().GetProduct(-1, string.Empty, false, barcode);
-            bool save = false;
+            //Product product = new ProductDL().GetProduct(-1, string.Empty, false, barcode);
+            List<Product> products = new ProductDL().GetProductsByBarcode(barcode);
+            int status = 0;
+            
 
-            if (product != null)
+            if (products != null && products.Count > 0)
             {
-                product.Name = name != "none" ? name : product.Name;
-                product.Price = price;
-                product.WebPrice = price;
-                product.IsInStock = quantity > 0;
-                save = true;
+                foreach (Product product in products)
+                {
+                    product.Name = name != "none" && products.Count == 1 ? name : product.Name;
+                    product.Price = price;
+                    product.WebPrice = price;
+                    product.IsInStock = quantity > -1 ? (quantity > 0 ? true : false) : product.IsInStock;
+                    status = SaveProduct(product);        
+                }
             }
             else if (insertIfNew && name != "none")
             {
-                product = new Product();
-                product.Code = barcode;
-                product.Name = name;
-                product.Price = price;
-                product.WebPrice = price;
+                Product newProduct = new Product();
+                newProduct.Code = barcode;
+                newProduct.Name = name;
+                newProduct.Price = price;
+                newProduct.WebPrice = price;
 
-                product.Brand = new Brand(0, "Nepoznat");
-                product.Categories = new List<Category>();
-                product.Categories.Add(new Category(9999, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1, false, false));
-                product.Description = string.Empty;
-                product.Ean = string.Empty;
-                product.Images = new List<ProductImage>();
-                product.Images.Add(new ProductImage("0.jpg", 1));
-                product.IsActive = false;
-                product.IsApproved = false;
-                product.IsInStock = quantity > 0;
-                product.IsLocked = false;
-                product.Specification = string.Empty;
-                product.SupplierCode = string.Empty;
-                product.SupplierID = 0;
-                product.VatID = 4;
-                save = true;
+                newProduct.Brand = new Brand(0, "Nepoznat");
+                newProduct.Categories = new List<Category>();
+                newProduct.Categories.Add(new Category(9999, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1, false, false));
+                newProduct.Description = string.Empty;
+                newProduct.Ean = string.Empty;
+                newProduct.Images = new List<ProductImage>();
+                newProduct.Images.Add(new ProductImage("0.jpg", 1));
+                newProduct.IsActive = false;
+                newProduct.IsApproved = false;
+                newProduct.IsInStock = quantity > 0;
+                newProduct.IsLocked = false;
+                newProduct.Specification = string.Empty;
+                newProduct.SupplierCode = string.Empty;
+                newProduct.SupplierID = 0;
+                newProduct.VatID = 4;
+                status = SaveProduct(newProduct);
             }
-            int status = 0;
-            if (save)
-                status = SaveProduct(product);
-
             return status > 0;
         }
     }

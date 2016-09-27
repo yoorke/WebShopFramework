@@ -1202,7 +1202,7 @@ namespace eshopDL
                     {
                         while (reader.Read())
                         {
-                            if (attributeGroup != reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-")))
+                            if (reader.GetString(0).Contains("-") && attributeGroup != reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-")))
                             {
                                 specification += "<tr class='attributeGroup'><td colspan='2'>" + reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-")) + "</td></tr>";
                                 attributeGroup = reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-"));
@@ -1210,9 +1210,10 @@ namespace eshopDL
                             //else
                             //{
                                 specification += (i++ % 2 == 0) ? "<tr class='gridAltRow'>" : "<tr class='gridRow'>";
-                                specification += "<td class='attributeName'>" + reader.GetString(0).Substring(reader.GetString(0).IndexOf("-")+1) + "</td><td>" + reader.GetString(1) + "</td></tr>";
+                                specification += "<td class='attributeName'>" + (reader.GetString(0).Contains("-") ? reader.GetString(0).Substring(reader.GetString(0).IndexOf("-")+1) : reader.GetString(0)) + "</td><td>" + reader.GetString(1) + "</td></tr>";
                             //}
                         }
+                        
                         specification += "</table>  ";
                     }
                 }
@@ -1464,6 +1465,34 @@ namespace eshopDL
                 }
             }
             return id;
+        }
+
+        public List<int> GetProductIDsByBarcode(string code)
+        {
+            List<int> productIds = new List<int>();
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_getIdsByBarcode", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@code", SqlDbType.NVarChar, 50).Value = code;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            productIds.Add(reader.GetInt32(0));
+                    }
+                }
+            }
+            return productIds;
+        }
+
+        public List<Product> GetProductsByBarcode(string code)
+        {
+            List<Product> products = new List<Product>();
+            foreach (int productID in GetProductIDsByBarcode(code))
+                products.Add(GetProduct(productID, string.Empty, false, string.Empty));
+            return products;
         }
 
         #endregion GetProduct
