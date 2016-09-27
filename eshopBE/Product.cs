@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Configuration;
 
 namespace eshopBE
 {
@@ -166,7 +167,13 @@ namespace eshopBE
 
         public string Url
         {
-            get { return "/proizvodi/" + CreateFriendlyUrl(_categories[0].Name + "/" + _brand.Name + " " + _name.Replace('/','-') + "-" + _productID); }
+            get
+            {
+                string url = bool.Parse(ConfigurationManager.AppSettings["fullProductUrl"]) ? _categories[0].Name + "/" + _brand.Name + " " : string.Empty;
+                url += _name.Replace('/', '-') + "-" + _productID.ToString();
+                //return "/proizvodi/" + CreateFriendlyUrl(_categories[0].Name + "/" + _brand.Name + " " + _name.Replace('/','-') + "-" + _productID);
+                return "/proizvodi/" + CreateFriendlyUrl(url);
+            }
         }
 
         public string FullName
