@@ -303,11 +303,11 @@ namespace eshopBL
             return exist;
         }
 
-        public bool SaveProductFromExternalApplication(string barcode, string name, double quantity, double price, bool insertIfNew)
+        public int SaveProductFromExternalApplication(string barcode, string name, double quantity, double price, bool insertIfNew)
         {
             //Product product = new ProductDL().GetProduct(-1, string.Empty, false, barcode);
             List<Product> products = new ProductDL().GetProductsByBarcode(barcode);
-            int status = 0;
+            int status = -1;
             
 
             if (products != null && products.Count > 0)
@@ -318,7 +318,7 @@ namespace eshopBL
                     product.Price = price;
                     product.WebPrice = price;
                     product.IsInStock = quantity > -1 ? (quantity > 0 ? true : false) : product.IsInStock;
-                    status = SaveProduct(product);        
+                    status = SaveProduct(product) > 0 ? 2 : 0;
                 }
             }
             else if (insertIfNew && name != "none")
@@ -344,9 +344,9 @@ namespace eshopBL
                 newProduct.SupplierCode = string.Empty;
                 newProduct.SupplierID = 0;
                 newProduct.VatID = 4;
-                status = SaveProduct(newProduct);
+                status = SaveProduct(newProduct) > 0 ? 1 : 0;
             }
-            return status > 0;
+            return status;
         }
     }
 }

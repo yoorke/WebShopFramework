@@ -30,7 +30,7 @@ namespace eshopBL
             {
                 DataRow row = sliders.NewRow();
                 row[0] = 0;
-                row[1] = "Odaberi slider";
+                row[1] = "Odaberi";
                 row[2] = true;
                 sliders.Rows.InsertAt(row, 0);
             }

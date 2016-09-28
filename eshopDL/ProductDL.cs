@@ -101,6 +101,16 @@ namespace eshopDL
                                 objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
                             }
                         }
+                        else if(categoryID <= 0)
+                        {
+                            if (!whereExists)
+                            {
+                                objComm.CommandText += " WHERE isMainCategory = 1";
+                                whereExists = true;
+                            }
+                            else
+                                objComm.CommandText += " AND isMainCategory = 1";
+                        }
 
                         if (supplierID > -1)
                         {
@@ -403,6 +413,8 @@ namespace eshopDL
                         objComm.Parameters.Add("@brandID", SqlDbType.Int).Value = brandID;
                     }
                     objComm.CommandText += " AND isActive = 1 AND isApproved = 1 AND productImageUrl.sortOrder = 1";
+                    if (categoryID <= 0)
+                        objComm.CommandText += " AND isMainCategory = 1";
                     objComm.CommandText += " ORDER BY " + orderBy;
                     //objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
                     using (SqlDataReader reader = objComm.ExecuteReader())
@@ -605,7 +617,7 @@ namespace eshopDL
             DeleteProductCategories(productID);
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("INSERT INTO productCategory (productID, categoryID) VALUES (@productID, @categoryID)", objConn))
+                using (SqlCommand objComm = new SqlCommand("INSERT INTO productCategory (productID, categoryID, isMainCategory) VALUES (@productID, @categoryID, @isMainCategory)", objConn))
                 {
                     try
                     {
@@ -616,6 +628,7 @@ namespace eshopDL
                             objComm.Parameters.Clear();
                             objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
                             objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categories[i].CategoryID;
+                            objComm.Parameters.Add("@isMainCategory", SqlDbType.Bit).Value = i == 0 ? true : false;
 
                             status[i] = objComm.ExecuteNonQuery();
                         }
@@ -1024,7 +1037,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT category.categoryID, name, parentCategoryID, url, imageUrl, sortOrder, active FROM productCategory INNER JOIN category ON productCategory.categoryID=category.categoryID WHERE productID=@productID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT category.categoryID, name, parentCategoryID, url, imageUrl, sortOrder, active FROM productCategory INNER JOIN category ON productCategory.categoryID=category.categoryID WHERE productID=@productID ORDER BY isMainCategory DESC", objConn))
                 {
                     try
                     {
