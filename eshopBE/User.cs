@@ -20,13 +20,15 @@ namespace eshopBE
         private string _salt;
         private DateTime _insertDate;
         private string _zip;
+        private double _discount;
+        private int _discountTypeID;
 
 
         public User()
         {
         }
 
-        public User(int userID, string firstName, string lastName, string username, string password, string address, string city, string phone, UserType userType, string email, string salt, DateTime insertDate, string zip)
+        public User(int userID, string firstName, string lastName, string username, string password, string address, string city, string phone, UserType userType, string email, string salt, DateTime insertDate, string zip, double discount, int discountTypeID)
         {
             _userID = userID;
             _firstName = firstName;
@@ -41,6 +43,8 @@ namespace eshopBE
             _salt = salt;
             _insertDate = insertDate;
             _zip = zip;
+            _discount = discount;
+            _discountTypeID = discountTypeID;
         }
 
         public int UserID
@@ -119,6 +123,18 @@ namespace eshopBE
         {
             get { return _zip; }
             set { _zip = value; }
+        }
+
+        public double Discount
+        {
+            get { return _discount; }
+            set { _discount = value; }
+        }
+
+        public int DiscountTypeID
+        {
+            get { return _discountTypeID; }
+            set { _discountTypeID = value; }
         }
     }
 }

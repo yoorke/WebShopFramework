@@ -104,7 +104,7 @@ namespace eshopDL
                             {
                                 order.OrderID = orderID;
                                 order.Date = Common.ConvertToLocalTime(reader.GetDateTime(1));
-                                order.User = new User(reader.GetInt32(2), string.Empty, string.Empty, reader.GetString(3), string.Empty, string.Empty, string.Empty, string.Empty, null, string.Empty, string.Empty, DateTime.Now, string.Empty);
+                                order.User = new User(reader.GetInt32(2), string.Empty, string.Empty, reader.GetString(3), string.Empty, string.Empty, string.Empty, string.Empty, null, string.Empty, string.Empty, DateTime.Now, string.Empty, 0, 1);
                                 order.Firstname = reader.GetString(4);
                                 order.Lastname = reader.GetString(5);
                                 order.Address = reader.GetString(6);
