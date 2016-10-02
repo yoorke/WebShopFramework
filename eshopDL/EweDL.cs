@@ -208,7 +208,11 @@ namespace eshopDL
 
         public int SaveProducts(DataTable products, string category)
         {
-            deleteEweProducts(category);
+            //int i = 0;
+            //foreach (string subcategory in subcategories)
+            //{ 
+                deleteEweProducts(category);
+            //}
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
                 using (SqlBulkCopy sqlBulkCopy = new SqlBulkCopy(objConn))
@@ -243,6 +247,7 @@ namespace eshopDL
                     objConn.Open();
                     objComm.CommandType = CommandType.StoredProcedure;
                     objComm.Parameters.Add("@category", SqlDbType.NVarChar, 50).Value = category;
+                    //objComm.Parameters.Add("@subcategory", SqlDbType.NVarChar, 50).Value = subcategory;
                     objComm.ExecuteNonQuery();
                 }
             }
