@@ -29,6 +29,7 @@ namespace eshopBE
         /*private Payment _payment;*/
         private string _code;
         private string _cartID;
+        private double _userDiscountValue;
 
         public int OrderID
         {
@@ -154,6 +155,12 @@ namespace eshopBE
         {
             get { return _cartID; }
             set { _cartID = value; }
+        }
+
+        public double UserDiscountValue
+        {
+            get { return _userDiscountValue; }
+            set { _userDiscountValue = value; }
         }
     }
 }

@@ -47,6 +47,7 @@ namespace eshopDL
                             objComm.Parameters.Add("@zip", SqlDbType.NVarChar, 5).Value = order.Zip;
                             objComm.Parameters.Add("@comment", SqlDbType.NVarChar).Value = order.Comment;
                             objComm.Parameters.Add("@cartID", SqlDbType.NVarChar, 50).Value = order.CartID;
+                            objComm.Parameters.Add("@userDiscountValue", SqlDbType.Float).Value = order.UserDiscountValue;
                             
 
                             SqlParameter orderID = new SqlParameter("@orderID", SqlDbType.Int);
@@ -121,6 +122,7 @@ namespace eshopDL
                                 order.Coupon = new Coupon(reader.GetInt32(17), reader.GetString(18), reader.GetDouble(19), string.Empty, reader.GetDateTime(24), reader.GetDateTime(25), new CouponType(reader.GetInt32(26), string.Empty), null);
                                 order.OrderStatus = new OrderStatus(reader.GetInt32(20), reader.GetString(21));
                                 order.Code = reader.GetString(23);
+                                order.UserDiscountValue = reader.GetDouble(27);
 
                                 if (Convert.IsDBNull(reader[22]) == false)
                                     order.Comment = reader.GetString(22);
@@ -414,6 +416,24 @@ namespace eshopDL
                 }
             }
             return orders;
+        }
+
+        public int SetDiscount(int orderID, double userDiscountValue)
+        {
+            int status = 0;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("order_setDiscount", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@orderID", SqlDbType.Int).Value = orderID;
+                    objComm.Parameters.Add("@userDiscountValue", SqlDbType.Float).Value = userDiscountValue;
+
+                    status = objComm.ExecuteNonQuery();
+                }
+            }
+            return status;
         }
     }
 }

@@ -83,13 +83,21 @@ namespace eshopUtilities
             body.Append("</table>");
             body.Append("<div style='text-align:right;'>");
             body.Append("<br/>");
+
             body.Append("Ukupno: " + string.Format("{0:N2}", ukupno));
             body.Append("<br />");
-            body.Append("Dostava: " + string.Format("{0:N2}", ukupno > 5000 ? 0 : 200));
+            //double userDiscountValue = discountTypeID == 1 ? ukupno * userDiscount / 100 : userDiscount;
+            body.Append("Popust: " + string.Format("{0:N2}", order.UserDiscountValue));
             body.Append("<br />");
-            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno + (ukupno > 5000 ? 0 : 200)));
+            body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
+            body.Append("<br />");
+            body.Append("Dostava: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])));
+            body.Append("<br />");
+            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))));
             body.Append("</div>");
             body.Append("<br/>");
+            if(order.UserDiscountValue > 0)
+                body.Append("<p><strong>Odobren vam je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</strong></p>");
             if(order.Lastname != string.Empty || order.Firstname != string.Empty)
                 body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");
             else if (order.Name != string.Empty)
@@ -337,7 +345,7 @@ namespace eshopUtilities
         }
 
         public static void SendNewOrderNotification(string orderID, Order order)
-        {
+        {            
             MailMessage mail = new MailMessage();
             mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
             mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
@@ -363,12 +371,19 @@ namespace eshopUtilities
             body.Append("</table>");
             body.Append("<div style='text-align:right;'>");
             body.Append("<br/>");
-            body.Append("Ukupno: " + string.Format("{0:N2}", ukupno));
+            body.Append("Iznos: " + string.Format("{0:N2}", ukupno));
+            body.Append("<br />");
+            //double userDiscountValue = (discountTypeID == 1) ? ukupno * userDiscount / 100 : userDiscount;
+            body.Append("Popust: " + string.Format("{0:N2}", order.UserDiscountValue));
+            body.Append("<br/>");
+            body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
             body.Append("<br />");
             body.Append("Dostava: " + string.Format("{0:N2}", ukupno > 10000 ? 0 : 350));
             body.Append("<br />");
-            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno + (ukupno > 10000 ? 0 : 350)));
+            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > 10000 ? 0 : 350)));
             body.Append("</div>");
+            if(order.UserDiscountValue > 0)
+                body.Append("<p>Odobren je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</p");
             body.Append("<br/>");
             if (order.Lastname != string.Empty || order.Firstname != string.Empty)
                 body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");

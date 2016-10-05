@@ -218,5 +218,24 @@ namespace eshopDL
             }
             return status;
         }
+
+        public CouponType GetCouponType(int couponTypeID)
+        {
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("couponType_select", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@couponTypeID", SqlDbType.Int).Value = couponTypeID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            return new CouponType(reader.GetInt32(0), reader.GetString(1));
+                    }
+                }
+            }
+            return null;
+        }
     }
 }

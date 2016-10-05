@@ -46,5 +46,10 @@ namespace eshopBL
             return new CouponDL().DeleteCoupon(couponID);
         }
 
+        public CouponType GetCouponType(int couponTypeID)
+        {
+            return new CouponDL().GetCouponType(couponTypeID);
+        }
+
     }
 }
