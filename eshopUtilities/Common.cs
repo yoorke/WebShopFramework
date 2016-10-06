@@ -54,7 +54,7 @@ namespace eshopUtilities
         {
             MailMessage message = new MailMessage();
             //message.From = new MailAddress("office@pinservis.com");
-            message.From = new MailAddress(ConfigurationManager.AppSettings["orderEmail"]);
+            message.From = new MailAddress(ConfigurationManager.AppSettings["orderEmail"], ConfigurationManager.AppSettings["companyName"]);
             message.To.Add(new MailAddress(email));
             //message.CC.Add(new MailAddress("info@pinservis.co.rs.gladiolus.arvixe.com"));
             message.Subject = "Potvrda narudžbine - " + ConfigurationManager.AppSettings["companyName"];
@@ -443,6 +443,26 @@ namespace eshopUtilities
             body.Append("<p>Status vaše porudžbine sa brojem: <strong>" + orderNumber + "</strong> od: <strong>" + date.ToShortDateString() + "</strong> je izmenjen na: </p>");
             body.Append("<br/>");
             body.Append("<div style='width=100%;background-color:#f0f000;padding-top:0.5em;padding-bottom:0.5em;padding-left:0.5em;padding-right:0.5em;color:#333333;text-align:center;font-size:18px;margin:1em;height:2em'><strong>" + status.ToUpper() + "</strong></div>");
+            body.Append("<br/>");
+            body.Append("<p>Vaša online prodavnica <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'>" + ConfigurationManager.AppSettings["companyName"] + "</a></p>");
+
+            mail.IsBodyHtml = true;
+            mail.Body = body.ToString();
+
+            SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
+            smtp.Send(mail);
+        }
+
+        public static void SendOrderDiscountGrantedNotification(Order order)
+        {
+            MailMessage mail = new MailMessage();
+            mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"], ConfigurationManager.AppSettings["companyName"]);
+            mail.To.Add(new MailAddress(order.Email));
+            mail.Subject = "Odobren popust";
+            StringBuilder body = new StringBuilder();
+            body.Append("<p>Poštovani " + order.Firstname + " " + order.Lastname + "</p>");
+            body.Append("<br/>");
+            body.Append("<p>Odobren Vam je popust u iznosu od: <strong>" + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</strong> za porudžbinu broj: " + order.Code + " od " + order.Date + "</p>");
             body.Append("<br/>");
             body.Append("<p>Vaša online prodavnica <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'>" + ConfigurationManager.AppSettings["companyName"] + "</a></p>");
 

@@ -159,9 +159,11 @@ namespace eshopBL
             return new OrderDL().GetCategoryValue(dateFrom, dateTo);
         }
 
-        public int SetDiscount(int orderID, double userDiscountValue)
+        public int SetDiscount(Order order)
         {
-            return new OrderDL().SetDiscount(orderID, userDiscountValue);
+            int status = new OrderDL().SetDiscount(order.OrderID, order.UserDiscountValue);
+            Common.SendOrderDiscountGrantedNotification(order);
+            return status;
         }
     }
 }
