@@ -117,7 +117,7 @@ namespace eshopUtilities
             message.Body = body.ToString();
 
 
-            SmtpClient smtp = getSmtp(message.From.ToString(), "orderEmail");
+            SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
             smtp.Send(message);
 
             return 0;
