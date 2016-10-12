@@ -164,10 +164,10 @@ namespace eshopBL
 
         private string getSort(string sortName)
         {
-            string sort = " brand.name";
+            string sort = " product.name";
             switch (sortName)
             {
-                case "name": { sort = " brand.name"; break; }
+                case "name": { sort = " product.name"; break; }
                 case "priceDesc": { sort = " product.price DESC"; break; }
                 case "priceAsc": { sort = " product.price"; break; }
             }
