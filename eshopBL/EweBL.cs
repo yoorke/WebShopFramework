@@ -453,7 +453,7 @@ namespace eshopBL
                 }
             }
 
-            return new EweDL().SaveProducts(products, category);
+            return new EweDL().SaveProducts(products, category, -1);
             
         }
 
@@ -680,6 +680,8 @@ namespace eshopBL
             product.WebPrice = calculatePrice(double.Parse(eweProduct.Rows[0]["price"].ToString()), category.WebPricePercent);
             product.Ean = eweProduct.Rows[0]["ean"].ToString();
             product.SupplierPrice = double.Parse(eweProduct.Rows[0]["price"].ToString());
+            if(isNew)
+                product.UnitOfMeasure = new UnitOfMeasure(2, "Komad", "kom");
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(eweProduct.Rows[0]["images"].ToString());
@@ -736,7 +738,7 @@ namespace eshopBL
 
         public int[] SaveEweProducts(DataTable products, string eweCategory, int categoryID)
         {
-            new EweDL().SaveProducts(products, eweCategory);
+            new EweDL().SaveProducts(products, eweCategory, categoryID);
             ProductDL productDL = new ProductDL();
             productDL.SetInStock(1, false, categoryID, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
             Category category = new CategoryDL().GetCategory(categoryID);

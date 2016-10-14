@@ -206,12 +206,12 @@ namespace eshopDL
             return status;
         }
 
-        public int SaveProducts(DataTable products, string category)
+        public int SaveProducts(DataTable products, string eweCategory, int categoryID)
         {
             //int i = 0;
             //foreach (string subcategory in subcategories)
             //{ 
-                deleteEweProducts(category);
+                deleteEweProducts(eweCategory, categoryID);
             //}
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
@@ -238,7 +238,7 @@ namespace eshopDL
             return products.Rows.Count;
         }
 
-        private bool deleteEweProducts(string category)
+        private bool deleteEweProducts(string eweCategory, int categoryID)
         {
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
@@ -246,7 +246,7 @@ namespace eshopDL
                 {
                     objConn.Open();
                     objComm.CommandType = CommandType.StoredProcedure;
-                    objComm.Parameters.Add("@category", SqlDbType.NVarChar, 50).Value = category;
+                    objComm.Parameters.Add("@category", SqlDbType.NVarChar, 50).Value = eweCategory;
                     //objComm.Parameters.Add("@subcategory", SqlDbType.NVarChar, 50).Value = subcategory;
                     objComm.ExecuteNonQuery();
                 }
