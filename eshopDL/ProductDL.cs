@@ -1049,7 +1049,7 @@ namespace eshopDL
                                 categories = new List<Category>();
                             while (reader.Read())
                             {
-                                categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), reader.GetString(4), reader.GetInt32(5), 0, 0, string.Empty, Convert.IsDBNull(reader[6]) ? false : reader.GetBoolean(6), 0, false, false));
+                                categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, reader.GetString(3), reader.GetString(4), reader.GetInt32(5), 0, 0, string.Empty, Convert.IsDBNull(reader[6]) ? false : reader.GetBoolean(6), 0, false, false));
                             }
                         }
                     }
