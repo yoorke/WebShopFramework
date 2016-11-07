@@ -314,11 +314,14 @@ namespace eshopBL
             {
                 foreach (Product product in products)
                 {
-                    product.Name = name != "none" && products.Count == 1 ? name : product.Name;
-                    product.Price = price;
-                    product.WebPrice = price;
-                    product.IsInStock = quantity > -1 ? (quantity > 0 ? true : false) : product.IsInStock;
-                    status = SaveProduct(product) > 0 ? 2 : 0;
+                    if(product.Promotion == null)
+                    { 
+                        product.Name = name != "none" && products.Count == 1 ? name : product.Name;
+                        product.Price = price;
+                        product.WebPrice = price;
+                        product.IsInStock = quantity > -1 ? (quantity > 0 ? true : false) : product.IsInStock;
+                        status = SaveProduct(product) > 0 ? 2 : 0;
+                    }
                 }
             }
             else if (insertIfNew && name != "none")
