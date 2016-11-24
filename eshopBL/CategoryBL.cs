@@ -284,6 +284,11 @@ namespace eshopBL
             return categoryDL.GetCategory(name);
         }
 
+        public Category GetCategoryByExternalID(int externalID)
+        {
+            return new CategoryDL().GetCategoryByExternalID(externalID);
+        }
+
         public int DeleteCategory(int categoryID)
         {
             CategoryDL categoryDL = new CategoryDL();
@@ -344,6 +349,46 @@ namespace eshopBL
         public void ReorderCategory(int categoryID, int direction)
         {
             new CategoryDL().ReorderCategory(categoryID, direction);
+        }
+
+        public int SaveCategoryFromExternalApplication(int externalID, string name, int externalParentID)
+        {
+            int status = -1;
+
+            Category category = GetCategoryByExternalID(externalID);
+            if(category != null)
+            {
+                category.Name = name;
+                category.ParentCategoryID = externalParentID == 0 ? 1 : GetCategoryByExternalID(externalParentID).CategoryID;
+                status = SaveCategory(category) > 0 ? 2 : 0;
+            }
+            else
+            {
+                category = new Category();
+                category.Name = name;
+                category.Url = eshopUtilities.Common.CreateFriendlyUrl(name);
+                category.CategoryBannerID = -1;
+                category.Description = string.Empty;
+                category.ExportProducts = false;
+                category.firstPageOrderBy = string.Empty;
+                category.firstPageSortOrder = 0;
+                category.ImageUrl = string.Empty;
+                category.NumberOfProducts = 0;
+                category.PricePercent = 0;
+                category.ShowOnFirstPage = false;
+                category.SortOrder = 0;
+                category.WebPricePercent = 0;
+                category.ExternalID = externalID;
+                category.ParentCategoryID = externalParentID == 0 ? 1 : GetCategoryByExternalID(externalParentID).CategoryID;
+                category.ExternalParentID = externalParentID;
+                category.Active = true;
+
+                status = SaveCategory(category) > 0 ? 1 : 0;
+            }
+
+            
+
+            return status;
         }
     }
 }

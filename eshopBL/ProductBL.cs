@@ -303,7 +303,7 @@ namespace eshopBL
             return exist;
         }
 
-        public int SaveProductFromExternalApplication(string barcode, string name, double quantity, double price, bool insertIfNew)
+        public int SaveProductFromExternalApplication(string barcode, string name, double quantity, double price, int externalCategoryID, bool insertIfNew)
         {
             //Product product = new ProductDL().GetProduct(-1, string.Empty, false, barcode);
             List<Product> products = new ProductDL().GetProductsByBarcode(barcode);
@@ -320,6 +320,12 @@ namespace eshopBL
                         product.Price = price;
                         product.WebPrice = price;
                         product.IsInStock = quantity > -1 ? (quantity > 0 ? true : false) : product.IsInStock;
+                        if(externalCategoryID > 0)
+                        {
+                            Category category = new CategoryBL().GetCategoryByExternalID(externalCategoryID);
+                            product.Categories = new List<Category>();
+                            product.Categories.Add(category);
+                        }
                         status = SaveProduct(product) > 0 ? 2 : 0;
                     }
                 }
@@ -334,19 +340,22 @@ namespace eshopBL
 
                 newProduct.Brand = new Brand(0, "Nepoznat");
                 newProduct.Categories = new List<Category>();
-                newProduct.Categories.Add(new Category(9999, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1, false, false));
+                if (externalCategoryID <= 0)
+                    newProduct.Categories.Add(new Category(9999, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1, false, false));
+                else newProduct.Categories.Add(new CategoryBL().GetCategoryByExternalID(externalCategoryID));
                 newProduct.Description = string.Empty;
                 newProduct.Ean = string.Empty;
                 newProduct.Images = new List<ProductImage>();
                 newProduct.Images.Add(new ProductImage("0.jpg", 1));
-                newProduct.IsActive = false;
-                newProduct.IsApproved = false;
+                newProduct.IsActive = true;
+                newProduct.IsApproved = true;
                 newProduct.IsInStock = quantity > 0;
                 newProduct.IsLocked = false;
                 newProduct.Specification = string.Empty;
                 newProduct.SupplierCode = string.Empty;
                 newProduct.SupplierID = 0;
                 newProduct.VatID = 4;
+                newProduct.UnitOfMeasure = new UnitOfMeasure(1, "Nepoznata", "NN");
                 status = SaveProduct(newProduct) > 0 ? 1 : 0;
             }
             return status;
