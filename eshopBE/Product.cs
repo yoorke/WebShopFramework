@@ -190,8 +190,8 @@ namespace eshopBE
         public static string CreateFriendlyUrl(string url)
         {
             url = url.ToLower();
-            char[] notAllwed = { 'š', 'ć', 'č', 'ž', ',', '.', '"', ' ', '(', ')', '&', '+', '%', '$' };
-            char[] replacement = { 's', 'c', 'c', 'z', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-' };
+            char[] notAllwed = { 'š', 'ć', 'č', 'ž', ',', '.', '"', ' ', '(', ')', '&', '+', '%', '$', '*' };
+            char[] replacement = { 's', 'c', 'c', 'z', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-' };
 
             url = url.Replace("\n", "-");
             url = url.Replace("\r", "-");
