@@ -27,6 +27,8 @@ namespace eshopBE
         private List<CategoryExtraMenuCategory> _categoryExtraMenus;
         private bool _updateProductsFromExternalApplication;
         private bool _exportProducts;
+        private int _externalID;
+        private int _externalParentID;
 
         public Category()
         {
@@ -168,6 +170,18 @@ namespace eshopBE
         {
             get { return _exportProducts; }
             set { _exportProducts = value; }
+        }
+
+        public int ExternalID
+        {
+            get { return _externalID; }
+            set { _externalID = value; }
+        }
+
+        public int ExternalParentID
+        {
+            get { return _externalParentID; }
+            set { _externalParentID = value; }
         }
     }
 }

@@ -210,7 +210,7 @@ namespace eshopDL
             int tableIndex;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, promotion.dateFrom, promotion.dateTo, category.name FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN productCategory ON product.productID=productCategory.productID LEFT JOIN promotionProduct ON product.productID=promotionProduct.productID LEFT JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN category ON productCategory.categoryID=category.categoryID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, promotion.dateFrom, promotion.dateTo, category.name, product.isInStock FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN productCategory ON product.productID=productCategory.productID LEFT JOIN promotionProduct ON product.productID=promotionProduct.productID LEFT JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN category ON productCategory.categoryID=category.categoryID", objConn))
                 {
                     if(attributeValues.Count > 0)
                     {
@@ -340,6 +340,7 @@ namespace eshopDL
                             product.Categories = new List<Category>();
                             product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
                             product.Description = GetProductAttributeValues(product.ProductID, true);
+                            product.IsInStock = reader.GetBoolean(13);
                             products.Add(product);
                         }
                     }
@@ -354,7 +355,7 @@ namespace eshopDL
             Product product=null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, product.code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, category.name, category.categoryID FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN promotionProduct ON product.productID=promotionProduct.productID INNER JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN productCategory ON productCategory.productID=product.productID INNER JOIN category ON productCategory.categoryID=category.categoryID WHERE promotion.promotionID=@promotionID AND isActive=1 AND isApproved=1 AND productImageUrl.sortOrder=1 and isMainCategory = 1 ORDER BY product.name", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, product.code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, category.name, category.categoryID, product.isInStock FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN promotionProduct ON product.productID=promotionProduct.productID INNER JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN productCategory ON productCategory.productID=product.productID INNER JOIN category ON productCategory.categoryID=category.categoryID WHERE promotion.promotionID=@promotionID AND isActive=1 AND isApproved=1 AND productImageUrl.sortOrder=1 and isMainCategory = 1 ORDER BY product.name", objConn))
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@promotionID", SqlDbType.Int).Value = promotionID;
@@ -382,6 +383,7 @@ namespace eshopDL
                             product.Promotion.ImageUrl = reader.GetString(9);
                             product.Categories = new List<Category>();
                             product.Categories.Add(new Category(reader.GetInt32(11), reader.GetString(10), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
+                            product.IsInStock = reader.GetBoolean(12);
 
                             products.Add(product);
                         }
@@ -398,7 +400,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT TOP " + numberOfProducts.ToString() + " product.productID, product.code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, promotion.dateFrom, promotion.dateTo, category.name FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID LEFT JOIN promotionProduct ON product.productID=promotionProduct.productID LEFT JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN productCategory ON product.productID=productCategory.productID INNER JOIN category ON productCategory.categoryID=category.categoryID ", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT TOP " + numberOfProducts.ToString() + " product.productID, product.code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, promotion.dateFrom, promotion.dateTo, category.name, product.isInStock FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID LEFT JOIN promotionProduct ON product.productID=promotionProduct.productID LEFT JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN productCategory ON product.productID=productCategory.productID INNER JOIN category ON productCategory.categoryID=category.categoryID ", objConn))
                 {
                     objConn.Open();
                     bool exist = false;
@@ -448,6 +450,7 @@ namespace eshopDL
                             product.Categories = new List<Category>();
                             product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
                             product.Description = GetProductAttributeValues(product.ProductID, true);
+                            product.IsInStock = reader.GetBoolean(13);
 
                             products.Add(product);
                         }
@@ -1049,7 +1052,7 @@ namespace eshopDL
                                 categories = new List<Category>();
                             while (reader.Read())
                             {
-                                categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), reader.GetString(4), reader.GetInt32(5), 0, 0, string.Empty, Convert.IsDBNull(reader[6]) ? false : reader.GetBoolean(6), 0, false, false));
+                                categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, reader.GetString(3), reader.GetString(4), reader.GetInt32(5), 0, 0, string.Empty, Convert.IsDBNull(reader[6]) ? false : reader.GetBoolean(6), 0, false, false));
                             }
                         }
                     }

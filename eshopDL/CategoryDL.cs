@@ -73,7 +73,7 @@ namespace eshopDL
             int status;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             { 
-                using (SqlCommand objComm = new SqlCommand("INSERT INTO category (name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts) VALUES (@name, @parentCategoryID, @url, @imageUrl, @sortOrder, @pricePercent, @webPricePercent, @showOnFirstPage, @numberOfProducts, @firstPageSortOrder, @firstPageOrderBy, @description, @active, @sliderID, @categoryBannerID, @updateProductsFromExternalApplication, @exportProducts)"))
+                using (SqlCommand objComm = new SqlCommand("INSERT INTO category (name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID) VALUES (@name, @parentCategoryID, @url, @imageUrl, @sortOrder, @pricePercent, @webPricePercent, @showOnFirstPage, @numberOfProducts, @firstPageSortOrder, @firstPageOrderBy, @description, @active, @sliderID, @categoryBannerID, @updateProductsFromExternalApplication, @exportProducts, @externalID, @externalParentID)"))
                 {
                     try
                     {
@@ -97,6 +97,8 @@ namespace eshopDL
                         objComm.Parameters.Add("categoryBannerID", SqlDbType.Int).Value = category.CategoryBannerID;
                         objComm.Parameters.Add("@updateProductsFromExternalApplication", SqlDbType.Bit).Value = category.UpdateProductsFromExternalApplication;
                         objComm.Parameters.Add("@exportProducts", SqlDbType.Bit).Value = category.ExportProducts;
+                        objComm.Parameters.Add("@externalID", SqlDbType.Int).Value = category.ExternalID;
+                        objComm.Parameters.Add("@externalParentID", SqlDbType.Int).Value = category.ExternalParentID;
 
                         status = objComm.ExecuteNonQuery();
                     }
@@ -114,7 +116,7 @@ namespace eshopDL
         {
             int status;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
-                using (SqlCommand objComm = new SqlCommand("UPDATE category SET name=@name, parentCategoryID=@parentCategoryID, url=@url, imageUrl=@imageUrl, sortOrder=@sortOrder, pricePercent=@pricePercent, webPricePercent=@webPricePercent, showOnFirstPage=@showOnFirstPage, numberOfProducts=@numberOfProducts, firstPageSortOrder=@firstPageSortOrder, firstPageOrderBy=@firstPageOrderBy, description=@description, active = @active, sliderID = @sliderID, categoryBannerID = @categoryBannerID, updateProductsFromExternalApplication = @updateProductsFromExternalApplication, exportProducts = @exportProducts WHERE categoryID=@categoryID"))
+                using (SqlCommand objComm = new SqlCommand("UPDATE category SET name=@name, parentCategoryID=@parentCategoryID, url=@url, imageUrl=@imageUrl, sortOrder=@sortOrder, pricePercent=@pricePercent, webPricePercent=@webPricePercent, showOnFirstPage=@showOnFirstPage, numberOfProducts=@numberOfProducts, firstPageSortOrder=@firstPageSortOrder, firstPageOrderBy=@firstPageOrderBy, description=@description, active = @active, sliderID = @sliderID, categoryBannerID = @categoryBannerID, updateProductsFromExternalApplication = @updateProductsFromExternalApplication, exportProducts = @exportProducts, externalID = @externalID, externalParentID = @externalParentID WHERE categoryID=@categoryID"))
                 {
                     try
                     {
@@ -139,6 +141,8 @@ namespace eshopDL
                         objComm.Parameters.Add("@categoryBannerID", SqlDbType.Int).Value = category.CategoryBannerID;
                         objComm.Parameters.Add("@updateProductsFromExternalApplication", SqlDbType.Bit).Value = category.UpdateProductsFromExternalApplication;
                         objComm.Parameters.Add("@exportProducts", SqlDbType.Bit).Value = category.ExportProducts;
+                        objComm.Parameters.Add("@externalID", SqlDbType.Int).Value = category.ExternalID;
+                        objComm.Parameters.Add("@externalParentID", SqlDbType.Int).Value = category.ExternalParentID;
 
                         status = objComm.ExecuteNonQuery();
                     }
@@ -151,12 +155,12 @@ namespace eshopDL
             return status;
         }
 
-        private Category GetCategory(int categoryID, string name)
+        private Category GetCategory(int categoryID, string name, int externalID)
         {
             Category category = null;
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
-                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts FROM category"))
+                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID FROM category"))
                 {
                     try
                     {
@@ -172,6 +176,11 @@ namespace eshopDL
                         {
                             objComm.CommandText += " WHERE url=@name";
                             objComm.Parameters.Add("@name", SqlDbType.NVarChar,50).Value = name;
+                        }
+                        else if(externalID > 0)
+                        {
+                            objComm.CommandText += " WHERE externalID = @externalID";
+                            objComm.Parameters.Add("@externalID", SqlDbType.Int).Value = externalID;
                         }
 
                         using (SqlDataReader reader = objComm.ExecuteReader())
@@ -208,6 +217,8 @@ namespace eshopDL
                                     category.CategoryBannerID = reader.GetInt32(15);
                                 category.UpdateProductsFromExternalApplication = reader.GetBoolean(16);
                                 category.ExportProducts = reader.GetBoolean(17);
+                                category.ExternalID = (!Convert.IsDBNull(reader[18])) ? reader.GetInt32(18) : -1;
+                                category.ExternalParentID = !Convert.IsDBNull(reader[19]) ? reader.GetInt32(19) : -1;
                             }
                         }
                     }
@@ -222,12 +233,17 @@ namespace eshopDL
 
         public Category GetCategory(int categoryID)
         {
-            return GetCategory(categoryID, string.Empty);
+            return GetCategory(categoryID, string.Empty, -1);
         }
 
         public Category GetCategory(string name)
         {
-            return GetCategory(-1, name);
+            return GetCategory(-1, name, -1);
+        }
+
+        public Category GetCategoryByExternalID(int externalID)
+        {
+            return GetCategory(-1, string.Empty, externalID);
         }
 
         public Category GetCategoryByUrl(string categoryUrl)
