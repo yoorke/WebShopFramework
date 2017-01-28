@@ -411,7 +411,7 @@ namespace eshopBL
             return products;
         }
 
-        public int ParseProductsForSaving(string category, string[] subcategories)
+        public int ParseProductsForSaving(string category, string[] subcategories, int categoryID, int eweCategoryID)
         {
             DataTable products = new DataTable();
             products.Columns.Add("code");
@@ -453,7 +453,7 @@ namespace eshopBL
                 }
             }
 
-            return new EweDL().SaveProducts(products, category, -1);
+            return new EweDL().SaveProducts(products, category, categoryID, eweCategoryID);
             
         }
 
@@ -495,6 +495,8 @@ namespace eshopBL
 
         private string saveImageFromUrl(string url, int count)
         {
+            try
+            { 
             bool exists = true;
             WebClient webClient = new WebClient();
             string filename = Path.GetFileName(url);
@@ -505,35 +507,44 @@ namespace eshopBL
             //if (!File.Exists(path + filename))
             //{
                 ErrorLog.LogMessage(path + filename);
-            //webClient.DownloadFile(url, path + filename);
+                //webClient.DownloadFile(url, path + filename);
+                if (File.Exists(fullPath))
+                    File.Delete(fullPath);
             webClient.DownloadFile(url, fullPath);
 
             exists = new ProductBL().CreateProductImages(fullPath);
                 //if (File.Exists(path + filename))
                 //if(File.Exists(fullPath))
                 //{
-                    //exists = true;
+                //exists = true;
                 //Image original = Image.FromFile(HttpContext.Current.Server.MapPath("~") + "/images/" + filename);
                 //Image original = Image.FromFile(fullPath);
-                    
-                    //Image thumb = original.GetThumbnailImage(290, 232, null, IntPtr.Zero);
-                    //Image thumb = Common.CreateThumb(original, 290, 232);
+
+                //Image thumb = original.GetThumbnailImage(290, 232, null, IntPtr.Zero);
+                //Image thumb = Common.CreateThumb(original, 290, 232);
                 //thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-main.jpg");
                 //thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-main" + extension);
 
-                    //thumb = original.GetThumbnailImage(110, 75, null, IntPtr.Zero);
-                    //thumb = Common.CreateThumb(original, 160, 110);
+                //thumb = original.GetThumbnailImage(110, 75, null, IntPtr.Zero);
+                //thumb = Common.CreateThumb(original, 160, 110);
                 //thumb.Save(path + filename.Substring(0, filename.IndexOf(".")) + "-list.jpg");
                 //thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-list" + extension);
 
-                    //thumb = original.GetThumbnailImage(30, 24, null, IntPtr.Zero);
-                    //thumb = Common.CreateThumb(original, 50, 40);
+                //thumb = original.GetThumbnailImage(30, 24, null, IntPtr.Zero);
+                //thumb = Common.CreateThumb(original, 50, 40);
                 //thumb.Save(path + filename.Substring(0, filename.IndexOf(".jpg")) + "-thumb.jpg");
                 //thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-thumb" + extension);
                 //}
-            //}
+                //}
 
-            return exists ? fullPath.Substring(fullPath.LastIndexOf('/') + 1) : string.Empty;
+                return exists ? fullPath.Substring(fullPath.LastIndexOf('/') + 1) : string.Empty;
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+
+            
         }
 
         public DataTable GetEweCategories(int? parentCategoryID, int? categoryID)
@@ -680,8 +691,7 @@ namespace eshopBL
             product.WebPrice = calculatePrice(double.Parse(eweProduct.Rows[0]["price"].ToString()), category.WebPricePercent);
             product.Ean = eweProduct.Rows[0]["ean"].ToString();
             product.SupplierPrice = double.Parse(eweProduct.Rows[0]["price"].ToString());
-            if(isNew)
-                product.UnitOfMeasure = new UnitOfMeasure(2, "Komad", "kom");
+            product.UnitOfMeasure = new UnitOfMeasure(2, "Komad", "kom");
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(eweProduct.Rows[0]["images"].ToString());
@@ -736,9 +746,9 @@ namespace eshopBL
             return false;
         }
 
-        public int[] SaveEweProducts(DataTable products, string eweCategory, int categoryID)
+        public int[] SaveEweProducts(DataTable products, string eweCategory, int categoryID, int eweCategoryID)
         {
-            new EweDL().SaveProducts(products, eweCategory, categoryID);
+            new EweDL().SaveProducts(products, eweCategory, categoryID, eweCategoryID);
             ProductDL productDL = new ProductDL();
             productDL.SetInStock(1, false, categoryID, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
             Category category = new CategoryDL().GetCategory(categoryID);
