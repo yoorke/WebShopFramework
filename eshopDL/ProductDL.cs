@@ -1511,6 +1511,57 @@ namespace eshopDL
             return products;
         }
 
+        public DataTable GetProductsForExport()
+        {
+            DataTable products = new DataTable();
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_getForExport", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                            products.Load(reader);
+                    }
+                }
+            }
+            return products;
+        }
+
+        public string GetProductSpecificationText(int productID)
+        {
+            string specification = string.Empty;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_getAttributes", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        //specification = "<br/>";
+                        string attributeGroup = string.Empty;
+                        while(reader.Read())
+                        {
+                            //specification += "<br/>";
+                            if (reader.GetString(0).Contains("-") && reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-")) != attributeGroup)
+                            { 
+                                specification += "<br/>" + reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-")) + "<br/>";
+                                attributeGroup = reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-"));
+                            }
+                            specification += (reader.GetString(0).Contains("-") ? reader.GetString(0).Substring(reader.GetString(0).IndexOf("-") + 1) : reader.GetString(0)) + ": " + reader.GetString(1);
+                            specification += "<br/>";
+                        }
+                    }
+                }
+            }
+            
+            return specification;
+        }
+
         #endregion GetProduct
 
 

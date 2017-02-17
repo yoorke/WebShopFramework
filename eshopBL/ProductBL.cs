@@ -360,5 +360,10 @@ namespace eshopBL
             }
             return status;
         }
+
+        public string GetProductSpecificationText(int productID)
+        {
+            return new ProductDL().GetProductSpecificationText(productID);
+        }
     }
 }

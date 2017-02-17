@@ -78,6 +78,7 @@
     <Compile Include="CustomRoleProvider.cs" />
     <Compile Include="EweBL.cs" />
     <Compile Include="KimtecBL.cs" />
+    <Compile Include="kupindoBL.cs" />
     <Compile Include="OrderBL.cs" />
     <Compile Include="ProductBL.cs" />
     <Compile Include="PromotionBL.cs" />

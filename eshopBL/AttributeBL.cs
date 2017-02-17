@@ -16,10 +16,16 @@ namespace eshopBL
             return attributeDL.GetAttributes();
         }
 
-        public List<eshopBE.Attribute> GetAttributesForCategory(int categoryID)
+        public List<eshopBE.Attribute> GetAttributesForCategory(int categoryID, bool addSelect = false)
         {
             AttributeDL attributeDL = new AttributeDL();
-            return attributeDL.GetAttributesForCategory(categoryID);
+            List<eshopBE.Attribute> attributes = attributeDL.GetAttributesForCategory(categoryID);
+
+            if(addSelect)
+            {
+                attributes.Insert(0, new eshopBE.Attribute(-1, "Odaberi", false, false, 0));
+            }
+            return attributes;
         }
 
         public eshopBE.Attribute GetAttribute(string name)
