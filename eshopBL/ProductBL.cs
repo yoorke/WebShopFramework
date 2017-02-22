@@ -365,5 +365,15 @@ namespace eshopBL
         {
             return new ProductDL().GetProductSpecificationText(productID);
         }
+
+        public DataTable GetProductsBarcodes()
+        {
+            return new ProductDL().GetProductsBarcodes();
+        }
+
+        public int SaveProductCategory(int productID, int categoryID)
+        {
+            return new ProductDL().SaveProductCategory(productID, categoryID);
+        }
     }
 }

@@ -460,6 +460,25 @@ namespace eshopDL
             return products;
         }
 
+        public DataTable GetProductsBarcodes()
+        {
+            DataTable barcodes = new DataTable();
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using(SqlCommand objComm = new SqlCommand("product_getBarcodes", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                            barcodes.Load(reader);
+                    }
+                }
+            }
+            return barcodes;
+        }
+
         #endregion
 
         #region SaveProduct
@@ -818,6 +837,24 @@ namespace eshopDL
                     objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = isIsInStock;
                     objComm.Parameters.Add("@webPrice", SqlDbType.Float).Value = webPrice;
                     objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+
+                    status = objComm.ExecuteNonQuery();
+                }
+            }
+            return status;
+        }
+
+        public int SaveProductCategory(int productID, int categoryID)
+        {
+            int status = 0;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_saveCategory", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
 
                     status = objComm.ExecuteNonQuery();
                 }
