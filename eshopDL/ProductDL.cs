@@ -855,6 +855,7 @@ namespace eshopDL
                     objComm.CommandType = CommandType.StoredProcedure;
                     objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
                     objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
+                    objComm.Parameters.Add("@isMainCategory", SqlDbType.Bit).Value = false;
 
                     status = objComm.ExecuteNonQuery();
                 }
