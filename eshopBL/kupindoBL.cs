@@ -14,9 +14,9 @@ namespace eshopBL
 {
     public class kupindoBL
     {
-        public XmlDocument GetProducts()
+        public XmlDocument GetProducts(int type)
         {
-            DataTable products = new ProductDL().GetProductsForExport();
+            DataTable products = new ProductDL().GetProductsForExport(type);
             XmlDocument xmlDoc = new XmlDocument();
             XmlTextWriter xmlWriter = new XmlTextWriter(HttpContext.Current.Server.MapPath("~/xml/products.xml"), Encoding.UTF8);
             xmlWriter.Formatting = Formatting.Indented;
@@ -38,6 +38,8 @@ namespace eshopBL
                 xmlRoot.AppendChild(xmlInfo);
 
                 XmlElement xmlPredmeti = xmlDoc.CreateElement("Predmeti");
+
+                DataTable settings = new KupindoDL().LoadSettings();
 
                     foreach(DataRow product in products.Rows)
                     {
@@ -64,7 +66,7 @@ namespace eshopBL
                             xmlProduct.AppendChild(xmlDuzinaGarancije);
 
                             XmlElement xmlNov = xmlDoc.CreateElement("Nov");
-                            xmlNov.InnerText = "0";
+                            xmlNov.InnerText = "1";
                             xmlProduct.AppendChild(xmlNov);
 
                             XmlElement xmlCena = xmlDoc.CreateElement("Cena");
@@ -88,13 +90,32 @@ namespace eshopBL
                             xmlCategory.InnerText = product["category"].ToString();
                             xmlProduct.AppendChild(xmlCategory);
 
+                            //XmlElement xmlAttributes = xmlDoc.CreateElement("Karakteristike");
+                            //xmlAttributes.InnerText = product["attributes"].ToString();
+                            //xmlProduct.AppendChild(xmlAttributes);
+
+                            XmlElement xmlKataloskiBroj = xmlDoc.CreateElement("KataloskiBroj");
+                            xmlKataloskiBroj.InnerText = product["ean"].ToString();
+                            xmlProduct.AppendChild(xmlKataloskiBroj);
+
                             XmlElement xmlAttribute = xmlDoc.CreateElement("Karakteristike");
-                            xmlAttribute.InnerText = product["brandID"].ToString();
+                            xmlAttribute.InnerText = product["brandID"].ToString() + (product["attributes"].ToString() != string.Empty ? "," + product["attributes"].ToString() : string.Empty);
                             xmlProduct.AppendChild(xmlAttribute);
 
                             XmlElement xmlLager = xmlDoc.CreateElement("Lager");
-                            xmlLager.InnerText = "2";
+                            xmlLager.InnerText = settings.Rows[12]["value"].ToString();
                             xmlProduct.AppendChild(xmlLager);
+
+                            XmlElement xmlLagerVarijante = xmlDoc.CreateElement("LagerVarijanteIzabrane");
+                                XmlElement xmlLagerVarijanta = xmlDoc.CreateElement("LagerVarijanta");
+                                    XmlElement xmlLagerPolja = xmlDoc.CreateElement("LagerPolja");
+                                    xmlLagerPolja.InnerText = "3807";
+                                    xmlLagerVarijanta.AppendChild(xmlLagerPolja);
+                                    XmlElement xmlLagerKolicina = xmlDoc.CreateElement("LagerKolicina");
+                                    xmlLagerKolicina.InnerText = "1";
+                                    xmlLagerVarijanta.AppendChild(xmlLagerKolicina);
+                                xmlLagerVarijante.AppendChild(xmlLagerVarijanta);
+                            xmlProduct.AppendChild(xmlLagerVarijante);
 
                             XmlElement xmlAktivan = xmlDoc.CreateElement("Aktivan");
                             xmlAktivan.InnerText = bool.Parse(product["isActive"].ToString()) ? "1" : "0";
@@ -102,23 +123,23 @@ namespace eshopBL
 
                             XmlElement xmlNacinPlacanja = xmlDoc.CreateElement("NaciniPlacanja");
                                 XmlElement xmlLimundoCash = xmlDoc.CreateElement("LimundoCash");
-                                xmlLimundoCash.InnerText = "1";
+                                xmlLimundoCash.InnerText = bool.Parse(settings.Rows[0]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlLimundoCash);
 
                                 XmlElement xmlSlanjePosleUplate = xmlDoc.CreateElement("SlanjePosleUplate");
-                                xmlSlanjePosleUplate.InnerText = "1";
+                                xmlSlanjePosleUplate.InnerText = bool.Parse(settings.Rows[1]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlSlanjePosleUplate);
 
                                 XmlElement xmlSlanjePreUplate = xmlDoc.CreateElement("SlanjePreUplate");
-                                xmlSlanjePreUplate.InnerText = "0";
+                                xmlSlanjePreUplate.InnerText = bool.Parse(settings.Rows[2]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlSlanjePreUplate);
 
                                 XmlElement xmlSlanjePouzecem = xmlDoc.CreateElement("SlanjePouzecem");
-                                xmlSlanjePouzecem.InnerText = "1";
+                                xmlSlanjePouzecem.InnerText = bool.Parse(settings.Rows[3]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlSlanjePouzecem);
 
                                 XmlElement xmlLicnoPreuzimanje = xmlDoc.CreateElement("LicnoPreuzimanje");
-                                xmlLicnoPreuzimanje.InnerText = "1";
+                                xmlLicnoPreuzimanje.InnerText = bool.Parse(settings.Rows[4]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlLicnoPreuzimanje);
 
                             
@@ -126,31 +147,35 @@ namespace eshopBL
 
                             XmlElement xmlNacinSlanja = xmlDoc.CreateElement("NaciniSlanja");
                                 XmlElement xmlNacinSlanjaLicnoPreuzimanje = xmlDoc.CreateElement("LicnoPreuzimanje");
-                                xmlNacinSlanjaLicnoPreuzimanje.InnerText = "1";
+                                xmlNacinSlanjaLicnoPreuzimanje.InnerText = bool.Parse(settings.Rows[4]["value"].ToString()) ? "1" : "0";
                                 xmlNacinSlanja.AppendChild(xmlNacinSlanjaLicnoPreuzimanje);
 
                                 XmlElement xmlPosta = xmlDoc.CreateElement("Posta");
-                                xmlPosta.InnerText = "1";
+                                xmlPosta.InnerText = bool.Parse(settings.Rows[5]["value"].ToString()) ? "1" : "0";
                                 xmlNacinSlanja.AppendChild(xmlPosta);
 
                                 XmlElement xmlAKS = xmlDoc.CreateElement("AKS");
-                                xmlAKS.InnerText = "1";
+                                xmlAKS.InnerText = bool.Parse(settings.Rows[6]["value"].ToString()) ? "1" : "0";
                                 xmlNacinSlanja.AppendChild(xmlAKS);
 
                                 XmlElement xmlCityExpress = xmlDoc.CreateElement("CityExpress");
-                                xmlCityExpress.InnerText = "1";
+                                xmlCityExpress.InnerText = bool.Parse(settings.Rows[7]["value"].ToString()) ? "1" : "0";
                                 xmlNacinSlanja.AppendChild(xmlCityExpress);
 
                                 XmlElement xmlPostExpress = xmlDoc.CreateElement("PostExpress");
-                                xmlPostExpress.InnerText = "1";
+                                xmlPostExpress.InnerText = bool.Parse(settings.Rows[8]["value"].ToString()) ? "1" : "0";
                                 xmlNacinSlanja.AppendChild(xmlPostExpress);
 
                                 XmlElement xmlDailyExpress = xmlDoc.CreateElement("DailyExpress");
-                                xmlDailyExpress.InnerText = "1";
+                                xmlDailyExpress.InnerText = bool.Parse(settings.Rows[9]["value"].ToString()) ? "1" : "0";
                                 xmlNacinSlanja.AppendChild(xmlDailyExpress);
 
+                                XmlElement xmlBex = xmlDoc.CreateElement("Bex");
+                                xmlBex.InnerText = bool.Parse(settings.Rows[10]["value"].ToString()) ? "1" : "0";
+                                xmlNacinSlanja.AppendChild(xmlBex);
+
                                 XmlElement xmlOrganizovanTransport = xmlDoc.CreateElement("OrganizovaniTransport");
-                                xmlOrganizovanTransport.InnerText = "1";
+                                xmlOrganizovanTransport.InnerText = bool.Parse(settings.Rows[11]["value"].ToString()) ? "1" : "0";
                                 xmlNacinSlanja.AppendChild(xmlOrganizovanTransport);
 
                             xmlProduct.AppendChild(xmlNacinSlanja);
@@ -201,9 +226,9 @@ namespace eshopBL
             return new KupindoDL().GetKupindoCategoryForCategory(categoryID);
         }
 
-        public DataTable GetKupindoAttributes(int kupindoCategoryID)
+        public DataTable GetKupindoAttributes(int kupindoCategoryID, int categoryID)
         {
-            return new KupindoDL().GetKupindoAttributes(kupindoCategoryID);
+            return new KupindoDL().GetKupindoAttributes(kupindoCategoryID, categoryID);
         }
 
         public int SaveKupindoAttributeForAttribute(int attributeID, int kupindoAttributeID)

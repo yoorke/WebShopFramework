@@ -451,6 +451,7 @@ namespace eshopDL
                             product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
                             product.Description = GetProductAttributeValues(product.ProductID, true);
                             product.IsInStock = reader.GetBoolean(13);
+                            product.Attributes = GetProductAttributes(product.ProductID);
 
                             products.Add(product);
                         }
@@ -1072,7 +1073,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT productAttributeValue.attributeValueID, value, attribute.attributeID FROM productAttributeValue INNER JOIN attributeValue ON productAttributeValue.attributeValueID=attributeValue.attributeValueID INNER JOIN attribute ON attributeValue.attributeID=attribute.attributeID WHERE productID=@productID ORDER BY name", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT productAttributeValue.attributeValueID, value, attribute.attributeID FROM productAttributeValue INNER JOIN attributeValue ON productAttributeValue.attributeValueID=attributeValue.attributeValueID INNER JOIN attribute ON attributeValue.attributeID=attribute.attributeID INNER JOIN categoryAttribute ON attribute.attributeID = categoryAttribute.attributeID WHERE productID=@productID ORDER BY position, name", objConn))
                 {
                     try
                     {
@@ -1511,7 +1512,7 @@ namespace eshopDL
             return products;
         }
 
-        public DataTable GetProductsForExport()
+        public DataTable GetProductsForExport(int type)
         {
             DataTable products = new DataTable();
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
@@ -1520,6 +1521,7 @@ namespace eshopDL
                 {
                     objConn.Open();
                     objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@insertToKupindoAccess", SqlDbType.Bit).Value = type;
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         if (reader.HasRows)
