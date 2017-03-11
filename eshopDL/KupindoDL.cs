@@ -86,7 +86,7 @@ namespace eshopDL
             return category;
         }
 
-        public DataTable GetKupindoAttributes(int kupindoCategoryID)
+        public DataTable GetKupindoAttributes(int kupindoCategoryID, int categoryID)
         {
             DataTable attributes = new DataTable();
             using (SqlConnection objConn = new SqlConnection(ConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
@@ -96,6 +96,7 @@ namespace eshopDL
                     objConn.Open();
                     objComm.CommandType = CommandType.StoredProcedure;
                     objComm.Parameters.Add("@kupindoCategoryID", SqlDbType.Int).Value = kupindoCategoryID;
+                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         if (reader.HasRows)
