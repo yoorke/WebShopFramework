@@ -255,7 +255,7 @@ namespace eshopBL
 
         public void SetPromotionPrice(int productID, double price, double value, int promotionID)
         {
-            double promotionPrice = ((int)(price / (value / 100 + 1))) / 100 * 100 - 10;
+            double promotionPrice = value > 0 ? ((int)(price / (value / 100 + 1))) / 100 * 100 - 10 : price;
             new ProductDL().SetPromotionPrice(productID, promotionID, promotionPrice);
         }
 
@@ -364,6 +364,16 @@ namespace eshopBL
         public string GetProductSpecificationText(int productID)
         {
             return new ProductDL().GetProductSpecificationText(productID);
+        }
+
+        public DataTable GetProductsBarcodes()
+        {
+            return new ProductDL().GetProductsBarcodes();
+        }
+
+        public int SaveProductCategory(int productID, int categoryID)
+        {
+            return new ProductDL().SaveProductCategory(productID, categoryID);
         }
     }
 }
