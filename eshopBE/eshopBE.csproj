@@ -87,6 +87,7 @@
     <Compile Include="UnitOfMeasure.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserType.cs" />
+    <Compile Include="ProductVariation.cs" />
     <Compile Include="Vat.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

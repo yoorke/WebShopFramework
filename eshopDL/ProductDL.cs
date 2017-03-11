@@ -863,6 +863,11 @@ namespace eshopDL
             return status;
         }
 
+        public int SaveProductVariation(int productID, int variationID, string value, string color)
+        {
+
+        }
+
         #endregion SaveProduct
 
         #region DeleteProduct
