@@ -866,7 +866,7 @@ namespace eshopDL
 
         public int SaveProductVariation(int productID, int variationID, string value, string color)
         {
-
+            return 0;
         }
 
         #endregion SaveProduct

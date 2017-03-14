@@ -54,7 +54,7 @@ namespace eshopBL
 
                             XmlElement xmlOpis = xmlDoc.CreateElement("Opis");
                             //xmlOpis.InnerText = product["description"].ToString();
-                            xmlOpis.InnerText = new ProductBL().GetProductSpecificationText(int.Parse(product["productID"].ToString()));
+                            xmlOpis.InnerText = encodeText(product["brandName"].ToString() + " " + product["name"].ToString()) + "<br/><br/>" + new ProductBL().GetProductSpecificationText(int.Parse(product["productID"].ToString())) + "<br/><br/>" + product["code"].ToString();
                             xmlProduct.AppendChild(xmlOpis);
                 
                             XmlElement xmlGarancija = xmlDoc.CreateElement("Garancija");
