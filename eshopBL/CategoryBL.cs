@@ -206,7 +206,7 @@ namespace eshopBL
             if(addHomeCategory)
             {
                 newRow = categoriesDT.NewRow();
-                newRow["categoryID"] = 1;
+                newRow["categoryID"] = -1;
                 newRow["name"] = "Home";
                 newRow["parentID"] = -1;
                 newRow["sortOrder"] = 1;
