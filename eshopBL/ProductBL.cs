@@ -79,10 +79,10 @@ namespace eshopBL
             return productDL.GetProductIDBySupplierCode(supplierCode);
         }
 
-        public List<Product> GetProducts(int categoryID, int supplierID, string isApprovedName, string isActiveName, int? brandID, int? promotionID)
+        public List<Product> GetProducts(int categoryID, int supplierID, string isApprovedName, string isActiveName, int? brandID, int? promotionID, string sort = "brand.name, product.name")
         {
             ProductDL productDL = new ProductDL();
-            return productDL.GetProducts(categoryID, supplierID, getApproved(isApprovedName), getActive(isActiveName), brandID, promotionID);
+            return productDL.GetProducts(categoryID, supplierID, getApproved(isApprovedName), getActive(isActiveName), brandID, promotionID, sort);
         }
 
         private bool? getApproved(string isApprovedName)
@@ -255,7 +255,7 @@ namespace eshopBL
 
         public void SetPromotionPrice(int productID, double price, double value, int promotionID)
         {
-            double promotionPrice = value > 0 ? ((int)(price / (value / 100 + 1))) / 100 * 100 - 10 : price;
+            double promotionPrice = value > 0 ? bool.Parse(ConfigurationManager.AppSettings["roundPromotionPrice"]) ? ((int)(price * (1 - value / 100))) / 100 * 100 - 10 : price * (1 - value / 100) : price;
             new ProductDL().SetPromotionPrice(productID, promotionID, promotionPrice);
         }
 
@@ -347,8 +347,8 @@ namespace eshopBL
                 newProduct.Ean = string.Empty;
                 newProduct.Images = new List<ProductImage>();
                 newProduct.Images.Add(new ProductImage("0.jpg", 1));
-                newProduct.IsActive = true;
-                newProduct.IsApproved = true;
+                newProduct.IsActive = false;
+                newProduct.IsApproved = false;
                 newProduct.IsInStock = quantity > 0;
                 newProduct.IsLocked = false;
                 newProduct.Specification = string.Empty;

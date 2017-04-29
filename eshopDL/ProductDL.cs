@@ -23,7 +23,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, supplierCode, brand.brandID, product.name, description, product.price, webPrice, brand.name, isApproved, isActive, isLocked, isInStock, ISNULL((SELECT TOP 1 price FROM promotionProduct WHERE productID = product.productID), 0) as promotionPrice FROM product INNER JOIN brand ON product.brandID=brand.brandID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, supplierCode, brand.brandID, product.name, description, product.price, webPrice, brand.name, isApproved, isActive, isLocked, isInStock, ISNULL((SELECT TOP 1 price FROM promotionProduct WHERE productID = product.productID), 0) as promotionPrice, insertDate FROM product INNER JOIN brand ON product.brandID=brand.brandID", objConn))
                 {
                     try
                     {
@@ -103,13 +103,13 @@ namespace eshopDL
                         }
                         else if(categoryID <= 0)
                         {
-                            if (!whereExists)
-                            {
-                                objComm.CommandText += " WHERE isMainCategory = 1";
-                                whereExists = true;
-                            }
-                            else
-                                objComm.CommandText += " AND isMainCategory = 1";
+                            //if (!whereExists)
+                            //{
+                                //objComm.CommandText += " WHERE isMainCategory = 1";
+                                //whereExists = true;
+                            //}
+                            //else
+                                //objComm.CommandText += " AND isMainCategory = 1";
                         }
 
                         if (supplierID > -1)
@@ -167,6 +167,7 @@ namespace eshopDL
                                 product.Promotion = new Promotion(-1, string.Empty, 0, string.Empty, reader.GetDouble(13), false, DateTime.Now, DateTime.Now, string.Empty, false);
                                 product.Categories = new List<Category>();
                                 product.Categories.Add(new CategoryDL().GetCategory(categoryID));
+                                product.InsertDate = Common.ConvertToLocalTime(reader.GetDateTime(14));
 
                                 products.Add(product);
                             }
@@ -198,9 +199,9 @@ namespace eshopDL
             return GetProducts(-1, string.Empty, string.Empty, null, categoryID, -1, isApproved,  isActive, null, null);
         }
 
-        public List<Product> GetProducts(int categoryID, int supplierID, bool? isApproved, bool? isActive, int? brandID, int? promotionID)
+        public List<Product> GetProducts(int categoryID, int supplierID, bool? isApproved, bool? isActive, int? brandID, int? promotionID, string sort = "brand.name, product.name")
         {
-            return GetProducts(-1, string.Empty, string.Empty, null, categoryID, supplierID, isApproved, isActive, brandID, promotionID);
+            return GetProducts(-1, string.Empty, string.Empty, null, categoryID, supplierID, isApproved, isActive, brandID, promotionID, sort);
         }
 
         public List<Product> GetProducts(int categoryID, List<string> brandsID, List<AttributeValue> attributeValues, string sort, double priceFrom, double priceTo, bool includeChildrenCategoriesProducts = false)
@@ -355,7 +356,7 @@ namespace eshopDL
             Product product=null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, product.code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, category.name, category.categoryID, product.isInStock FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN promotionProduct ON product.productID=promotionProduct.productID INNER JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN productCategory ON productCategory.productID=product.productID INNER JOIN category ON productCategory.categoryID=category.categoryID WHERE promotion.promotionID=@promotionID AND isActive=1 AND isApproved=1 AND productImageUrl.sortOrder=1 and isMainCategory = 1 ORDER BY product.name", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, product.code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, category.name, category.categoryID, product.isInStock, promotion.value FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN promotionProduct ON product.productID=promotionProduct.productID INNER JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN productCategory ON productCategory.productID=product.productID INNER JOIN category ON productCategory.categoryID=category.categoryID WHERE promotion.promotionID=@promotionID AND isActive=1 AND isApproved=1 AND productImageUrl.sortOrder=1 and isMainCategory = 1 ORDER BY product.name", objConn))
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@promotionID", SqlDbType.Int).Value = promotionID;
@@ -381,6 +382,7 @@ namespace eshopDL
                             product.Promotion = new Promotion();
                             product.Promotion.Price = reader.GetDouble(8);
                             product.Promotion.ImageUrl = reader.GetString(9);
+                            product.Promotion.Value = reader.GetDouble(13);                            
                             product.Categories = new List<Category>();
                             product.Categories.Add(new Category(reader.GetInt32(11), reader.GetString(10), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
                             product.IsInStock = reader.GetBoolean(12);
