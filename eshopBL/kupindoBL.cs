@@ -54,8 +54,11 @@ namespace eshopBL
 
                             XmlElement xmlOpis = xmlDoc.CreateElement("Opis");
                             //xmlOpis.InnerText = product["description"].ToString();
-                            xmlOpis.InnerText = encodeText(product["brandName"].ToString() + " " + product["name"].ToString()) + "<br/><br/>" + new ProductBL().GetProductSpecificationText(int.Parse(product["productID"].ToString())) + "<br/><br/>" + product["code"].ToString();
+                            xmlOpis.InnerXml = encodeText(product["brandName"].ToString() + " " + product["name"].ToString()) + "<br/><br/>" + new ProductBL().GetProductSpecificationText(int.Parse(product["productID"].ToString())) + "<br/><br/>" + product["code"].ToString();
+                            //xmlOpis.InnerText = xmlDoc.CreateCDataSection(product["name"].ToString()).OuterXml;
                             xmlProduct.AppendChild(xmlOpis);
+
+                            
                 
                             XmlElement xmlGarancija = xmlDoc.CreateElement("Garancija");
                             xmlGarancija.InnerText = product["garanty"].ToString() != string.Empty ? "1" : "0";
@@ -185,7 +188,16 @@ namespace eshopBL
 
                 xmlRoot.AppendChild(xmlPredmeti);
 
+            //XmlWriterSettings xmlsettings = new XmlWriterSettings();
+            //xmlsettings.Encoding = Encoding.UTF8;
+            //xmlsettings.Indent = true;
+            //XmlWriter writer = XmlWriter.Create(HttpContext.Current.Server.MapPath("~/xml/products.xml"));
+
+
             xmlDoc.Save(HttpContext.Current.Server.MapPath("~/xml/products.xml"));
+            //xmlDoc.Save(writer);
+            //XmlTextWriter writer = new XmlTextWriter(HttpContext.Current.Server.MapPath("~/xml/products.xml"), System.Text.Encoding.UTF8);
+            //xmlDoc.WriteTo(writer);
 
             return xmlDoc;
         }
@@ -208,7 +220,7 @@ namespace eshopBL
         private string encodeText(string text)
         {
             string[] chars = new string[] { "&", "<", ">", "\"", "'"};
-            string[] replace = new string[] { "&amp;", "&lt;", "&gt;", "&quot;", "&apos;" };
+            string[] replace = new string[] { "", "", "", "", ""};
 
             Regex regex;
             for(int i = 0; i < chars.Length; i++)

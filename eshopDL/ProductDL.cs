@@ -8,7 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Web.Configuration;
 using System.Web;
-using System.Text;
+using System.Text.RegularExpressions;
 
 namespace eshopDL
 {
@@ -1594,10 +1594,10 @@ namespace eshopDL
                             //specification += "<br/>";
                             if (reader.GetString(0).Contains("-") && reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-")) != attributeGroup)
                             { 
-                                specification += "<br/>" + reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-")) + "<br/>";
+                                specification += "<br/>" + encodeText(reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-"))) + "<br/>";
                                 attributeGroup = reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-"));
                             }
-                            specification += (reader.GetString(0).Contains("-") ? reader.GetString(0).Substring(reader.GetString(0).IndexOf("-") + 1) : reader.GetString(0)) + ": " + reader.GetString(1);
+                            specification += (reader.GetString(0).Contains("-") ? encodeText(reader.GetString(0).Substring(reader.GetString(0).IndexOf("-") + 1)) : encodeText(reader.GetString(0))) + ": " + encodeText(reader.GetString(1));
                             specification += "<br/>";
                         }
                     }
@@ -1605,6 +1605,21 @@ namespace eshopDL
             }
             
             return specification;
+        }
+
+        private string encodeText(string text)
+        {
+            string[] chars = new string[] { "&", "<", ">", "\"", "'"};
+            string[] replace = new string[] { "&amp;", "&lt;", "&gt;", "&quot;", "&apos;" };
+
+            Regex regex;
+            for(int i = 0; i < chars.Length; i ++)
+            {
+                regex = new Regex(chars[i]);
+                text = regex.Replace(text, replace[i]);
+            }
+
+            return text;
         }
 
         #endregion GetProduct
