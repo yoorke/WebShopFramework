@@ -133,6 +133,18 @@ namespace eshopBL
                                 xmlSlanjePosleUplate.InnerText = bool.Parse(settings.Rows[1]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlSlanjePosleUplate);
 
+                                XmlElement xmlPlacanjePreSlanjaTekuciRacun = xmlDoc.CreateElement("PlacanjePreSlanjaTekuciRacun");
+                                xmlPlacanjePreSlanjaTekuciRacun.InnerText = bool.Parse(settings.Rows[12].ToString()) ? "1" : "0";
+                                xmlNacinPlacanja.AppendChild(xmlPlacanjePreSlanjaTekuciRacun);
+
+                                XmlElement xmlPlacanjePreSlanjaPostNet = xmlDoc.CreateElement("PlacanjePreSlanjaPostNet");
+                                xmlPlacanjePreSlanjaPostNet.InnerText = bool.Parse(settings.Rows[13].ToString()) ? "1" : "0";
+                                xmlNacinPlacanja.AppendChild(xmlPlacanjePreSlanjaPostNet);
+
+                                XmlElement xmlPlacanjePreSlanjaOstalo = xmlDoc.CreateElement("PlacanjePreSlanjaOstalo");
+                                xmlPlacanjePreSlanjaOstalo.InnerText = bool.Parse(settings.Rows[14].ToString()) ? "1" : "0";
+                                xmlNacinPlacanja.AppendChild(xmlPlacanjePreSlanjaOstalo);
+
                                 XmlElement xmlSlanjePreUplate = xmlDoc.CreateElement("SlanjePreUplate");
                                 xmlSlanjePreUplate.InnerText = bool.Parse(settings.Rows[2]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlSlanjePreUplate);
