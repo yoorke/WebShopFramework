@@ -288,17 +288,26 @@ namespace eshopBL
             bool exist = false;
             if(File.Exists(fullPath))
             {
-                exist = true;
-                string extension = fullPath.Substring(fullPath.LastIndexOf('.'));
-                Image original = Image.FromFile(fullPath);
-                Image thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["mainWidth"]), int.Parse(ConfigurationManager.AppSettings["mainHeight"]));
-                thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["mainName"] + extension);
+                FileInfo fileInfo = new FileInfo(fullPath);
+                if(fileInfo.Length > 0)
+                    try
+                    { 
+                        exist = true;
+                        string extension = fullPath.Substring(fullPath.LastIndexOf('.'));
+                        Image original = Image.FromFile(fullPath);
+                        Image thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["mainWidth"]), int.Parse(ConfigurationManager.AppSettings["mainHeight"]));
+                        thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["mainName"] + extension);
 
-                thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["listWidth"]), int.Parse(ConfigurationManager.AppSettings["listHeight"]));
-                thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["listName"] + extension);
+                        thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["listWidth"]), int.Parse(ConfigurationManager.AppSettings["listHeight"]));
+                        thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["listName"] + extension);
 
-                thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["thumbWidth"]), int.Parse(ConfigurationManager.AppSettings["thumbHeight"]));
-                thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["thumbName"] + extension);
+                        thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["thumbWidth"]), int.Parse(ConfigurationManager.AppSettings["thumbHeight"]));
+                        thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["thumbName"] + extension);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
             }
             return exist;
         }

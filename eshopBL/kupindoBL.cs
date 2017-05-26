@@ -129,20 +129,20 @@ namespace eshopBL
                                 xmlLimundoCash.InnerText = bool.Parse(settings.Rows[0]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlLimundoCash);
 
-                                XmlElement xmlSlanjePosleUplate = xmlDoc.CreateElement("SlanjePosleUplate");
-                                xmlSlanjePosleUplate.InnerText = bool.Parse(settings.Rows[1]["value"].ToString()) ? "1" : "0";
-                                xmlNacinPlacanja.AppendChild(xmlSlanjePosleUplate);
+                                //XmlElement xmlSlanjePosleUplate = xmlDoc.CreateElement("SlanjePosleUplate");
+                                //xmlSlanjePosleUplate.InnerText = bool.Parse(settings.Rows[1]["value"].ToString()) ? "1" : "0";
+                                //xmlNacinPlacanja.AppendChild(xmlSlanjePosleUplate);
 
                                 XmlElement xmlPlacanjePreSlanjaTekuciRacun = xmlDoc.CreateElement("PlacanjePreSlanjaTekuciRacun");
-                                xmlPlacanjePreSlanjaTekuciRacun.InnerText = bool.Parse(settings.Rows[12].ToString()) ? "1" : "0";
+                                xmlPlacanjePreSlanjaTekuciRacun.InnerText = bool.Parse(settings.Rows[14]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlPlacanjePreSlanjaTekuciRacun);
 
                                 XmlElement xmlPlacanjePreSlanjaPostNet = xmlDoc.CreateElement("PlacanjePreSlanjaPostNet");
-                                xmlPlacanjePreSlanjaPostNet.InnerText = bool.Parse(settings.Rows[13].ToString()) ? "1" : "0";
+                                xmlPlacanjePreSlanjaPostNet.InnerText = bool.Parse(settings.Rows[15]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlPlacanjePreSlanjaPostNet);
 
                                 XmlElement xmlPlacanjePreSlanjaOstalo = xmlDoc.CreateElement("PlacanjePreSlanjaOstalo");
-                                xmlPlacanjePreSlanjaOstalo.InnerText = bool.Parse(settings.Rows[14].ToString()) ? "1" : "0";
+                                xmlPlacanjePreSlanjaOstalo.InnerText = bool.Parse(settings.Rows[16]["value"].ToString()) ? "1" : "0";
                                 xmlNacinPlacanja.AppendChild(xmlPlacanjePreSlanjaOstalo);
 
                                 XmlElement xmlSlanjePreUplate = xmlDoc.CreateElement("SlanjePreUplate");
