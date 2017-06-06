@@ -1469,6 +1469,7 @@ namespace eshopDL
                             }
                             product.Categories = new List<Category>();
                             product.Categories.Add(new CategoryDL().GetCategory(reader.GetInt32(13)));
+                            product.IsInStock = reader.GetBoolean(14);
                             products.Add(product);
                         }
                     }

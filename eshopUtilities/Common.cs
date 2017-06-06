@@ -91,9 +91,9 @@ namespace eshopUtilities
             body.Append("<br />");
             body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
             body.Append("<br />");
-            body.Append("Dostava: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])));
+            body.Append("Dostava: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])) : " Po cenovniku kurirske službe"));
             body.Append("<br />");
-            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))));
+            body.Append("Ukupno sa dostavom: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))) : (string.Format("{0:N2}", ukupno - order.UserDiscountValue) + " + cena dostave")));
             body.Append("</div>");
             body.Append("<br/>");
             if(order.UserDiscountValue > 0)
@@ -196,8 +196,8 @@ namespace eshopUtilities
         public static string CreateFriendlyUrl(string url)
         {
             url = url.ToLower();
-            char[] notAllwed = { 'š', 'ć', 'č', 'ž', ',', '.', '"', ' ', '(', ')' };
-            char[] replacement = { 's', 'c', 'c', 'z', '-', '-', '-', '-', '-', '-' };
+            char[] notAllwed = { 'š', 'ć', 'č', 'ž', ',', '.', '"', ' ', '(', ')', '*' };
+            char[] replacement = { 's', 'c', 'c', 'z', '-', '-', '-', '-', '-', '-', '-' };
 
             url = url.Replace("\n", "-");
             for (int i = 0; i < notAllwed.Length; i++)
@@ -411,6 +411,7 @@ namespace eshopUtilities
             MailMessage mail = new MailMessage();
             mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString());
             mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
+            mail.ReplyTo = new MailAddress(email);
             mail.Subject = email + " " + subject;
             mail.Body = body;
 
