@@ -497,22 +497,22 @@ namespace eshopBL
         {
             try
             { 
-            bool exists = true;
-            WebClient webClient = new WebClient();
-            string filename = Path.GetFileName(url);
-            string extension = filename.Substring(filename.LastIndexOf('.'));
-            //string path = HttpContext.Current.Server.MapPath("~") + "images/";
-            string fullPath = HttpContext.Current.Server.MapPath("~") + new ProductBL().CreateNewImageName(count) + extension;
-            string path = fullPath.Substring(0, fullPath.LastIndexOf('/'));
-            //if (!File.Exists(path + filename))
-            //{
+                bool exists = true;
+                WebClient webClient = new WebClient();
+                string filename = Path.GetFileName(url);
+                string extension = filename.Substring(filename.LastIndexOf('.'));
+                //string path = HttpContext.Current.Server.MapPath("~") + "images/";
+                string fullPath = HttpContext.Current.Server.MapPath("~") + new ProductBL().CreateNewImageName(count) + extension;
+                string path = fullPath.Substring(0, fullPath.LastIndexOf('/'));
+                //if (!File.Exists(path + filename))
+                //{
                 ErrorLog.LogMessage(path + filename);
                 //webClient.DownloadFile(url, path + filename);
-                if (File.Exists(fullPath))
-                    File.Delete(fullPath);
-            webClient.DownloadFile(url, fullPath);
+                //if (File.Exists(fullPath))
+                    //File.Delete(fullPath);
+                webClient.DownloadFile(url, fullPath);
 
-            exists = new ProductBL().CreateProductImages(fullPath);
+                exists = new ProductBL().CreateProductImages(fullPath);
                 //if (File.Exists(path + filename))
                 //if(File.Exists(fullPath))
                 //{
