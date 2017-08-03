@@ -335,7 +335,7 @@ namespace eshopDL
                     {
                         objConn.Open();
                         objComm.Parameters.Add("@attributeID", SqlDbType.Int).Value = attributeValue.AttributeID;
-                        objComm.Parameters.Add("@value", SqlDbType.NVarChar, 100).Value = attributeValue.Value;
+                        objComm.Parameters.Add("@value", SqlDbType.NVarChar, 200).Value = attributeValue.Value;
                         objComm.Parameters.Add("@kimtecValue", SqlDbType.NVarChar, 200);
                         objComm.Parameters[2].Value = isKimtec ? (object)attributeValue.Value : DBNull.Value;
 
