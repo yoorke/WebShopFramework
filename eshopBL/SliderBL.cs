@@ -26,7 +26,7 @@ namespace eshopBL
         {
             SliderDL sliderDL = new SliderDL();
             DataTable sliders = sliderDL.GetSliders();
-            if(addSelect)
+            if(sliders != null && addSelect)
             {
                 DataRow row = sliders.NewRow();
                 row[0] = 0;

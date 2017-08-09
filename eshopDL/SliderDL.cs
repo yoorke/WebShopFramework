@@ -135,7 +135,10 @@ namespace eshopDL
 
         public DataTable GetSliders()
         {
-            DataTable sliders = null;
+            DataTable sliders = new DataTable();
+            sliders.Columns.Add("sliderID", typeof(int));
+            sliders.Columns.Add("name", typeof(string));
+            sliders.Columns.Add("active", typeof(bool));
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
                 using (SqlCommand objComm = new SqlCommand("getSliders", objConn))
@@ -146,7 +149,7 @@ namespace eshopDL
                     {
                         if (reader.HasRows)
                         {
-                            sliders = new DataTable();
+                            //sliders = new DataTable();
                             sliders.Load(reader);
                         }
                     }
