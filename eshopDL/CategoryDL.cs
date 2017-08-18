@@ -93,7 +93,10 @@ namespace eshopDL
                         objComm.Parameters.Add("@firstPageOrderBy", SqlDbType.NVarChar, 50).Value = category.firstPageOrderBy;
                         objComm.Parameters.Add("@description", SqlDbType.NVarChar, 2000).Value = category.Description != null ? category.Description : string.Empty;
                         objComm.Parameters.Add("@active", SqlDbType.Bit).Value = category.Active;
-                        objComm.Parameters.Add("@sliderID", SqlDbType.Int).Value = category.Slider != null ? category.Slider.SliderID : -1;
+                        if (category.Slider != null && category.Slider.SliderID > 0)
+                            objComm.Parameters.Add("@sliderID", SqlDbType.Int).Value = category.Slider.SliderID;
+                        else
+                            objComm.Parameters.AddWithValue("sliderID", DBNull.Value);
                         objComm.Parameters.Add("categoryBannerID", SqlDbType.Int).Value = category.CategoryBannerID;
                         objComm.Parameters.Add("@updateProductsFromExternalApplication", SqlDbType.Bit).Value = category.UpdateProductsFromExternalApplication;
                         objComm.Parameters.Add("@exportProducts", SqlDbType.Bit).Value = category.ExportProducts;
@@ -137,7 +140,10 @@ namespace eshopDL
                         objComm.Parameters.Add("@firstPageOrderBy", SqlDbType.NVarChar, 50).Value = category.firstPageOrderBy;
                         objComm.Parameters.Add("@description", SqlDbType.NVarChar, 2000).Value = category.Description != null ? category.Description : string.Empty;
                         objComm.Parameters.Add("@active", SqlDbType.Bit).Value = category.Active;
-                        objComm.Parameters.Add("@sliderID", SqlDbType.Int).Value = category.Slider.SliderID;
+                        if (category.Slider != null && category.Slider.SliderID > 0)
+                            objComm.Parameters.Add("@sliderID", SqlDbType.Int).Value = category.Slider.SliderID;
+                        else
+                            objComm.Parameters.AddWithValue("sliderID", DBNull.Value);
                         objComm.Parameters.Add("@categoryBannerID", SqlDbType.Int).Value = category.CategoryBannerID;
                         objComm.Parameters.Add("@updateProductsFromExternalApplication", SqlDbType.Bit).Value = category.UpdateProductsFromExternalApplication;
                         objComm.Parameters.Add("@exportProducts", SqlDbType.Bit).Value = category.ExportProducts;

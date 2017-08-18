@@ -237,7 +237,7 @@ namespace eshopDL
 
         public List<CustomPage> GetCustomPages()
         {
-            List<CustomPage> customPages = null;
+            List<CustomPage> customPages = new List<CustomPage>();
             CustomPage customPage=null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
@@ -247,8 +247,8 @@ namespace eshopDL
                     objComm.CommandType = CommandType.StoredProcedure;
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
-                        if (reader.HasRows)
-                            customPages = new List<CustomPage>();
+                        //if (reader.HasRows)
+                            //customPages = new List<CustomPage>();
                         while (reader.Read())
                         {
                             customPage = new CustomPage();
