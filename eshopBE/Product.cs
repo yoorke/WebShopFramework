@@ -169,10 +169,31 @@ namespace eshopBE
         {
             get
             {
-                string url = bool.Parse(ConfigurationManager.AppSettings["fullProductUrl"]) ? _categories[0].Name + "/" + _brand.Name + " " : string.Empty;
-                url += _name.Replace('/', '-') + "-" + _productID.ToString();
-                //return "/proizvodi/" + CreateFriendlyUrl(_categories[0].Name + "/" + _brand.Name + " " + _name.Replace('/','-') + "-" + _productID);
-                return "/proizvodi/" + CreateFriendlyUrl(url);
+                if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["productUrlDefinition"]))
+                {
+                    string[] properties = ConfigurationManager.AppSettings["productUrlDefinition"].Split(',');
+                    StringBuilder url = new StringBuilder();
+                    url.Append(_categories[0].Name + "/");
+                    foreach (string property in properties)
+                    {
+                        if (property.Contains("."))
+                        {
+                            object value = this.GetType().GetProperty(property.Substring(0, property.IndexOf('.'))).GetValue(this, null);
+                            url.Append(value.GetType().GetProperty(property.Substring(property.IndexOf('.') + 1)).GetValue(value, null).ToString() + "-");
+                        }
+                        else
+                            url.Append(this.GetType().GetProperty(property).GetValue(this, null) + "-");
+                    }
+                    url.Append("-" + _productID.ToString());
+                    return "/proizvodi/" + CreateFriendlyUrl(url.ToString());
+                }
+                else
+                {
+                    string url = bool.Parse(ConfigurationManager.AppSettings["fullProductUrl"]) ? _categories[0].Name + "/" + _brand.Name + " " : string.Empty;
+                    url += _name.Replace('/', '-') + "-" + _productID.ToString();
+                    //return "/proizvodi/" + CreateFriendlyUrl(_categories[0].Name + "/" + _brand.Name + " " + _name.Replace('/','-') + "-" + _productID);
+                    return "/proizvodi/" + CreateFriendlyUrl(url);
+                }
             }
         }
 
@@ -190,8 +211,8 @@ namespace eshopBE
         public static string CreateFriendlyUrl(string url)
         {
             url = url.ToLower();
-            char[] notAllwed = { 'š', 'ć', 'č', 'ž', ',', '.', '"', ' ', '(', ')', '&', '+', '%', '$', '*' };
-            char[] replacement = { 's', 'c', 'c', 'z', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-' };
+            char[] notAllwed = { 'š', 'ć', 'č', 'ž', ',', '.', '"', ' ', '(', ')', '&', '+', '%', '$', '*', '<', '>' };
+            char[] replacement = { 's', 'c', 'c', 'z', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-' };
 
             url = url.Replace("\n", "-");
             url = url.Replace("\r", "-");
