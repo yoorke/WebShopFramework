@@ -1053,7 +1053,8 @@ namespace eshopDL
                                     product.Description = GetProductAttributeValues(product.ProductID, true);
                                 if(!Convert.IsDBNull(reader[19]))
                                     product.SupplierPrice = reader.GetDouble(19);
-                                product.UnitOfMeasure = new UnitOfMeasureDL().GetUnitOfMeasure(reader.GetInt32(20));
+                                if(!Convert.IsDBNull(reader[20]))
+                                    product.UnitOfMeasure = new UnitOfMeasureDL().GetUnitOfMeasure(reader.GetInt32(20));
 
                                 //if (product.Specification == string.Empty)
                                     //product.Specification = createProductSpecification(product.ProductID);
