@@ -1254,7 +1254,7 @@ namespace eshopDL
             string specification = string.Empty;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT attribute.name, attributeValue.value FROM attribute INNER JOIN attributeValue ON attribute.attributeID=attributeValue.attributeID INNER JOIN productAttributeValue ON attributeValue.attributeValueID=productAttributeValue.attributeValueID INNER JOIN categoryAttribute ON attribute.attributeID=categoryAttribute.attributeID WHERE productAttributeValue.productID=@productID AND attributeValue.value<>'NP' ORDER BY position, attribute.name", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT attribute.name, attributeValue.value FROM attribute INNER JOIN attributeValue ON attribute.attributeID=attributeValue.attributeID INNER JOIN productAttributeValue ON attributeValue.attributeValueID=productAttributeValue.attributeValueID INNER JOIN categoryAttribute ON attribute.attributeID=categoryAttribute.attributeID WHERE productAttributeValue.productID=@productID AND attributeValue.value<>'NP' AND categoryAttribute.categoryID = (SELECT categoryID FROM productCategory WHERE productID = @productID) ORDER BY position, attribute.name", objConn))
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
