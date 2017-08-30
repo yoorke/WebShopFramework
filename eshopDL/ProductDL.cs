@@ -350,6 +350,26 @@ namespace eshopDL
             return products;
         }
 
+        public double GetActualPrice(int productID)
+        {
+            double price = 0;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_getActualPrice", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            price = reader.GetDouble(0);
+                    }
+                }
+            }
+            return price;
+        }
+
         public List<Product> GetProductsForPromotion(int promotionID)
         {
             List<Product> products = null;

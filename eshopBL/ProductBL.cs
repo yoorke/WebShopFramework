@@ -384,5 +384,10 @@ namespace eshopBL
         {
             return new ProductDL().SaveProductCategory(productID, categoryID);
         }
+
+        public double GetActualPrice(int productID)
+        {
+            return new ProductDL().GetActualPrice(productID);
+        }
     }
 }
