@@ -69,6 +69,7 @@
     <Compile Include="CategoryBannerDL.cs" />
     <Compile Include="CategoryDL.cs" />
     <Compile Include="CategoryExtraMenuDL.cs" />
+    <Compile Include="CityDL.cs" />
     <Compile Include="CouponDL.cs" />
     <Compile Include="CustomPageDL.cs" />
     <Compile Include="EweDL.cs" />
@@ -83,6 +84,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="RetailDL.cs" />
     <Compile Include="Service References\b2b\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
