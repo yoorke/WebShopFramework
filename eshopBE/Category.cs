@@ -29,6 +29,7 @@ namespace eshopBE
         private bool _exportProducts;
         private int _externalID;
         private int _externalParentID;
+        private bool _showInFooter;
 
         public Category()
         {
@@ -182,6 +183,12 @@ namespace eshopBE
         {
             get { return _externalParentID; }
             set { _externalParentID = value; }
+        }
+
+        public bool ShowInFooter
+        {
+            get { return _showInFooter; }
+            set { _showInFooter = value; }
         }
     }
 }

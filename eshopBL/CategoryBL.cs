@@ -390,5 +390,10 @@ namespace eshopBL
 
             return status;
         }
+
+        public List<Category> GetCategoriesForFooter()
+        {
+            return new CategoryDL().GetCategoriesForFooter();
+        }
     }
 }
