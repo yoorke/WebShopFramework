@@ -41,6 +41,7 @@ namespace eshopDL
 
                         objComm.Parameters.Add("@customPageCategoryID", SqlDbType.Int).Value = customPage.CustomPageCategoryID;
                         objComm.Parameters.Add("@isActive", SqlDbType.Bit).Value = customPage.IsActive;
+                        objComm.Parameters.Add("@footer", SqlDbType.NVarChar, 2000).Value = customPage.Footer;
 
                         status = objComm.ExecuteNonQuery();
 
@@ -77,6 +78,7 @@ namespace eshopDL
                     objComm.Parameters.Add("@imageUrl", SqlDbType.NVarChar, 50).Value = customPage.ImageUrl;
                     objComm.Parameters.Add("@customPageCategoryID", SqlDbType.Int).Value = customPage.CustomPageCategoryID;
                     objComm.Parameters.Add("@isActive", SqlDbType.Bit).Value = customPage.IsActive;
+                    objComm.Parameters.Add("@footer", SqlDbType.NVarChar, 2000).Value = customPage.Footer;
 
                     status = objComm.ExecuteNonQuery();
                 }
@@ -113,6 +115,7 @@ namespace eshopDL
                             customPage.ImageUrl = reader.GetString(9);
                             customPage.CustomPageCategoryID = reader.GetInt32(11);
                             customPage.IsActive = reader.GetBoolean(12);
+                            customPage.Footer = reader.GetString(13);
                         }
                     }
                 }
@@ -149,6 +152,7 @@ namespace eshopDL
                             customPage.ImageUrl = reader.GetString(9);
                             customPage.CustomPageCategoryID = reader.GetInt32(11);
                             customPage.IsActive = reader.GetBoolean(12);
+                            customPage.Footer = reader.GetString(13);
                         }
                     }
                 }
@@ -187,6 +191,7 @@ namespace eshopDL
                             customPage.ImageUrl = reader.GetString(9);
                             customPage.CustomPageCategoryID = reader.GetInt32(10);
                             customPage.IsActive = reader.GetBoolean(12);
+                            customPage.Footer = reader.GetString(13);
 
                             customPages.Add(customPage);
                         }
@@ -265,6 +270,7 @@ namespace eshopDL
                             customPage.CustomPageCategoryID = reader.GetInt32(10);
                             customPage.ImageUrl = reader.GetString(11);
                             customPage.IsActive = reader.GetBoolean(12);
+                            customPage.Footer = reader.GetString(13);
 
                             customPages.Add(customPage);
                         }

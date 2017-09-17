@@ -22,6 +22,7 @@ namespace eshopBE
         private int _sortIndex;
         private string _imageUrl;
         private bool _isActive;
+        private string _footer;
 
         public int CustomPageID
         {
@@ -111,6 +112,12 @@ namespace eshopBE
         {
             get { return _isActive; }
             set { _isActive = value; }
+        }
+
+        public string Footer
+        {
+            get { return _footer; }
+            set { _footer = value; }
         }
     }
 }
