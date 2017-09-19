@@ -132,16 +132,29 @@ namespace eshopDL
             return values;
         }
 
-        public List<AttributeValue> GetAttributeValuesForFilter(int attributeID)
+        public List<AttributeValue> GetAttributeValuesForFilter(int attributeID, string categoryUrl)
         {
             List<AttributeValue> attributeValues = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT attributeValue.attributeValueID, attributeValue.value, attributeValue.attributeID, COUNT(*), sort FROM attributeValue INNER JOIN productAttributeValue ON attributeValue.attributeValueID=productAttributeValue.attributeValueID WHERE attributeID=@attributeID AND value<>'NP' GROUP BY attributeValue.attributeValueID, attributeValue.value, attributeValue.attributeID, sort HAVING COUNT(*)>0 ORDER BY sort, attributeValue.value", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT attributeValue.attributeValueID, attributeValue.value, attributeValue.attributeID, COUNT(*), sort " +
+                    " FROM attributeValue INNER JOIN productAttributeValue ON attributeValue.attributeValueID=productAttributeValue.attributeValueID " +
+                    //"INNER JOIN [attribute] ON attributeValue.attributeID = [attribute].attributeID " +
+                    //"INNER JOIN categoryAttribute ON attribute.attributeID = categoryAttribute.attributeID " + 
+                    //"INNER JOIN category ON categoryAttribute.categoryID = category.categoryID " +
+                    "INNER JOIN product ON productAttributeValue.productID = product.productID " +
+                    "INNER JOIN productCategory ON product.productID = productCategory.productID " +
+                    "INNER JOIN category ON productCategory.categoryID = category.categoryID " +
+                    "WHERE attributeValue.attributeID=@attributeID " + 
+                    "AND category.url = @url " +
+                    "AND value<>'NP' " +
+                    "GROUP BY attributeValue.attributeValueID, attributeValue.value, attributeValue.attributeID, sort " +
+                    "HAVING COUNT(*)>0 " + "ORDER BY sort, attributeValue.value", objConn))
                 {
                     objConn.Open();
                     
                     objComm.Parameters.Add("@attributeID", SqlDbType.Int).Value = attributeID;
+                    objComm.Parameters.Add("@url", SqlDbType.NVarChar, 50).Value = categoryUrl;
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         if (reader.HasRows)
@@ -462,7 +475,7 @@ namespace eshopDL
                             attribute.AttributeID = reader.GetInt32(0);
                             attribute.Name = reader.GetString(1);
                             attribute.Filter = true;
-                            attribute.Values = GetAttributeValuesForFilter(attribute.AttributeID);
+                            attribute.Values = GetAttributeValuesForFilter(attribute.AttributeID, categoryUrl);
 
                             attributes.Add(attribute);
                         }
