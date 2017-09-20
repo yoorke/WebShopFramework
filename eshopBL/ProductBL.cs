@@ -170,6 +170,7 @@ namespace eshopBL
                 case "name": { sort = " product.name" + (bool.Parse(ConfigurationManager.AppSettings["sortProductsByDescriptionAlso"].ToString()) ? ", product.Description" : string.Empty) ; break; }
                 case "priceDesc": { sort = " product.price DESC"; break; }
                 case "priceAsc": { sort = " product.price"; break; }
+                case "sortIndex": { sort = " sortIndex"; break; }
             }
             return sort;
         }
