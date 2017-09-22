@@ -148,6 +148,7 @@ namespace eshopDL
                     "WHERE attributeValue.attributeID=@attributeID " + 
                     "AND category.url = @url " +
                     "AND value<>'NP' " +
+                    "AND product.isActive = 1 AND product.isApproved = 1" +
                     "GROUP BY attributeValue.attributeValueID, attributeValue.value, attributeValue.attributeID, sort " +
                     "HAVING COUNT(*)>0 " + "ORDER BY sort, attributeValue.value", objConn))
                 {
