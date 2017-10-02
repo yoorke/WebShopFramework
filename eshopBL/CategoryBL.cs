@@ -177,6 +177,10 @@ namespace eshopBL
 
                 category.SubCategory = GetCategoriesList(categoriesDT, (int)row["categoryID"]);
 
+                category.ImageUrlSource = (int)row["imageUrlSource"];
+                category.ImageUrlPositionX = (int)row["imageUrlPositionX"];
+                category.ImageUrlPositionY = (int)row["imageUrlPositionY"];
+
                 //foreach (Category childCategory in subCategory)
                     //childCategory.ParentCategoryID = category.CategoryID;
 

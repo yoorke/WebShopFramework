@@ -30,12 +30,15 @@ namespace eshopBE
         private int _externalID;
         private int _externalParentID;
         private bool _showInFooter;
+        private int _imageUrlSource;
+        private int _imageUrlPositionX;
+        private int _imageUrlPositionY;
 
         public Category()
         {
         }
 
-        public Category(int categoryID, string name, int? parentCategoryID, string url, string imageUrl, int sortOrder, double pricePercent, double webPricePercent, string description, bool active, int categoryBannerID, bool updateProductsFromExternalApplication, bool exportProducts, Slider slider = null)
+        public Category(int categoryID, string name, int? parentCategoryID, string url, string imageUrl, int sortOrder, double pricePercent, double webPricePercent, string description, bool active, int categoryBannerID, bool updateProductsFromExternalApplication, bool exportProducts, int imageUrlSource, int imageUrlPositionX, int imageUrlPositionY, Slider slider = null)
         {
             _categoryID = categoryID;
             _name = name;
@@ -51,6 +54,9 @@ namespace eshopBE
             _categoryBannerID = categoryBannerID;
             _updateProductsFromExternalApplication = updateProductsFromExternalApplication;
             _exportProducts = exportProducts;
+            _imageUrlSource = imageUrlSource;
+            _imageUrlPositionX = imageUrlPositionX;
+            _imageUrlPositionY = imageUrlPositionY;
         }
 
         public int CategoryID
@@ -189,6 +195,24 @@ namespace eshopBE
         {
             get { return _showInFooter; }
             set { _showInFooter = value; }
+        }
+
+        public int ImageUrlSource
+        {
+            get { return _imageUrlSource; }
+            set { _imageUrlSource = value; }
+        }
+
+        public int ImageUrlPositionX
+        {
+            get { return _imageUrlPositionX; }
+            set { _imageUrlPositionX = value; }
+        }
+
+        public int ImageUrlPositionY
+        {
+            get { return _imageUrlPositionY; }
+            set { _imageUrlPositionY = value; }
         }
     }
 }

@@ -351,7 +351,7 @@ namespace eshopBL
                 newProduct.Brand = new Brand(0, "Nepoznat");
                 newProduct.Categories = new List<Category>();
                 if (externalCategoryID <= 0)
-                    newProduct.Categories.Add(new Category(9999, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1, false, false));
+                    newProduct.Categories.Add(new Category(9999, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1, false, false, 0, 0, 0));
                 else newProduct.Categories.Add(new CategoryBL().GetCategoryByExternalID(externalCategoryID));
                 newProduct.Description = string.Empty;
                 newProduct.Ean = string.Empty;

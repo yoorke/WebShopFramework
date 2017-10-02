@@ -339,7 +339,7 @@ namespace eshopDL
                                 }
                             }
                             product.Categories = new List<Category>();
-                            product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
+                            product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false, 0, 0, 0));
                             product.Description = GetProductAttributeValues(product.ProductID, true);
                             product.IsInStock = reader.GetBoolean(13);
                             products.Add(product);
@@ -404,7 +404,7 @@ namespace eshopDL
                             product.Promotion.ImageUrl = reader.GetString(9);
                             product.Promotion.Value = reader.GetDouble(13);                            
                             product.Categories = new List<Category>();
-                            product.Categories.Add(new Category(reader.GetInt32(11), reader.GetString(10), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
+                            product.Categories.Add(new Category(reader.GetInt32(11), reader.GetString(10), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false, 0, 0, 0));
                             product.IsInStock = reader.GetBoolean(12);
 
                             products.Add(product);
@@ -470,7 +470,7 @@ namespace eshopDL
                                 }
                             }
                             product.Categories = new List<Category>();
-                            product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false));
+                            product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false, 0, 0, 0));
                             product.Description = GetProductAttributeValues(product.ProductID, true);
                             product.IsInStock = reader.GetBoolean(13);
                             product.Attributes = GetProductAttributes(product.ProductID);
@@ -1119,7 +1119,7 @@ namespace eshopDL
                                 categories = new List<Category>();
                             while (reader.Read())
                             {
-                                categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, reader.GetString(3), reader.GetString(4), reader.GetInt32(5), 0, 0, string.Empty, Convert.IsDBNull(reader[6]) ? false : reader.GetBoolean(6), 0, false, false));
+                                categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, reader.GetString(3), reader.GetString(4), reader.GetInt32(5), 0, 0, string.Empty, Convert.IsDBNull(reader[6]) ? false : reader.GetBoolean(6), 0, false, false, 0, 0, 0));
                             }
                         }
                     }
