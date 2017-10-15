@@ -502,6 +502,46 @@ namespace eshopDL
             return barcodes;
         }
 
+        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, bool? isActive, bool? isApproved, string search)
+        {
+            DataTable products = new DataTable();
+            //products.Columns.Add("productID", typeof(int));
+            //products.Columns.Add("code", typeof(string));
+            //products.Columns.Add("name", typeof(string));
+            //products.Columns.Add("imageUrl", typeof(string));
+            //products.Columns.Add("price", typeof(double));
+            //products.Columns.Add("webPrice", typeof(double));
+            //products.Columns.Add("promotionPrice", typeof(double));
+            //products.Columns.Add("isActive", typeof(bool));
+            //products.Columns.Add("isApproved", typeof(bool));
+            //products.Columns.Add("isLocked", typeof(bool));
+            //products.Columns.Add("isInStock", typeof(bool));
+            //products.Columns.Add("brandName", typeof(string));
+            //products.Columns.Add("insertDate", typeof(DateTime));
+
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_get", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
+                    objComm.Parameters.Add("@supplierID", SqlDbType.Int).Value = supplierID;
+                    objComm.Parameters.Add("@promotionID", SqlDbType.Int).Value = promotionID;
+                    objComm.Parameters.Add("@brandID", SqlDbType.Int).Value = brandID;
+                    objComm.Parameters.Add("@isActive", SqlDbType.Bit).Value = isActive;
+                    objComm.Parameters.Add("@isApproved", SqlDbType.Bit).Value = isApproved;
+                    objComm.Parameters.Add("@search", SqlDbType.NVarChar, 200).Value = search;
+
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        products.Load(reader);
+                    }
+                }
+            }
+            return products;
+        }
+
         #endregion
 
         #region SaveProduct

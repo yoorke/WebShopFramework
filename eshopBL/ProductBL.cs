@@ -390,5 +390,10 @@ namespace eshopBL
         {
             return new ProductDL().GetActualPrice(productID);
         }
+
+        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, string isActiveName, string isApprovedName, string search)
+        {
+            return new ProductDL().GetProductsDataTable(categoryID, supplierID, promotionID, brandID, getActive(isActiveName), getApproved(isApprovedName), search);
+        }
     }
 }
