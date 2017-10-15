@@ -378,9 +378,9 @@ namespace eshopUtilities
             body.Append("<br/>");
             body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
             body.Append("<br />");
-            body.Append("Dostava: " + string.Format("{0:N2}", ukupno > 10000 ? 0 : 350));
+            body.Append("Dostava: " + string.Format("{0:N2}", ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])));
             body.Append("<br />");
-            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > 10000 ? 0 : 350)));
+            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))));
             body.Append("</div>");
             if(order.UserDiscountValue > 0)
                 body.Append("<p>Odobren je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</p");
