@@ -46,6 +46,9 @@ namespace eshopDL
                         status = objComm.ExecuteNonQuery();
 
                         customPage.CustomPageID = int.Parse(objComm.Parameters["@customPageID"].Value.ToString());
+
+                        if (customPage.CustomPageID > 0)
+                            saveCustomPageProducts(customPage.Products, customPage.CustomPageID);
                     }
                 }
             }
@@ -81,6 +84,8 @@ namespace eshopDL
                     objComm.Parameters.Add("@footer", SqlDbType.NVarChar, 2000).Value = customPage.Footer;
 
                     status = objComm.ExecuteNonQuery();
+
+                    saveCustomPageProducts(customPage.Products, customPage.CustomPageID);
                 }
             }
             return customPage.CustomPageID; ;
@@ -120,6 +125,8 @@ namespace eshopDL
                     }
                 }
             }
+
+            customPage.Products = getCustomPageProducts(customPage.CustomPageID);
             return customPage;
         }
 
@@ -157,6 +164,7 @@ namespace eshopDL
                     }
                 }
             }
+            customPage.Products = getCustomPageProducts(customPage.CustomPageID);
             return customPage;
         }
 
@@ -278,6 +286,52 @@ namespace eshopDL
                 }
             }
             return customPages;
+        }
+
+        private void saveCustomPageProducts(List<Product> products, int customPageID)
+        {
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("customPageProduct_insert", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+
+                    foreach (Product product in products)
+                    {
+                        objComm.Parameters.Clear();
+                        objComm.Parameters.Add("@customPageID", SqlDbType.Int).Value = customPageID;
+                        objComm.Parameters.Add("@productID", SqlDbType.Int).Value = product.ProductID;
+
+                        objComm.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        private List<Product> getCustomPageProducts(int customPageID)
+        {
+            List<Product> products = new List<Product>();
+
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("customPageProduct_get", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@customPageID", SqlDbType.Int).Value = customPageID;
+
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            products.Add(new ProductDL().GetProduct(reader.GetInt32(1), string.Empty, false, string.Empty));
+                        }
+                    }
+                }
+
+            }
+            return products;
         }
     }
 }

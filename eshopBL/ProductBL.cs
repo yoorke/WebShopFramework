@@ -395,5 +395,10 @@ namespace eshopBL
         {
             return new ProductDL().GetProductsDataTable(categoryID, supplierID, promotionID, brandID, getActive(isActiveName), getApproved(isApprovedName), search);
         }
+
+        public DataTable GetProductsDataTable()
+        {
+            return new ProductDL().GetProductsDataTable();
+        }
     }
 }

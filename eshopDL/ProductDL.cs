@@ -436,7 +436,7 @@ namespace eshopDL
                         objComm.CommandText += ((exist) ? " AND " : " WHERE ") + " brand.brandID = @brandID";
                         objComm.Parameters.Add("@brandID", SqlDbType.Int).Value = brandID;
                     }
-                    objComm.CommandText += " AND isActive = 1 AND isApproved = 1 AND productImageUrl.sortOrder = 1";
+                    objComm.CommandText += " AND isActive = 1 AND isApproved = 1 AND productImageUrl.sortOrder = 1 AND isInStock = 1";
                     if (categoryID <= 0)
                         objComm.CommandText += " AND isMainCategory = 1";
                     objComm.CommandText += " ORDER BY " + orderBy;
@@ -1684,6 +1684,24 @@ namespace eshopDL
             }
 
             return text;
+        }
+
+        public DataTable GetProductsDataTable()
+        {
+            DataTable products = new DataTable();
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_getAll", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        products.Load(reader);
+                    }
+                }
+            }
+            return products;
         }
 
         #endregion GetProduct
