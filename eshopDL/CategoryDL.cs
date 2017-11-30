@@ -535,5 +535,28 @@ namespace eshopDL
             }
             return categories;
         }
+
+        public List<Category> GetFirstLevelSubcategories(int categoryID)
+        {
+            List<Category> categories = new List<Category>();
+            using (SqlConnection objConn = new SqlConnection(ConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("category_getFirstLevelSubcategories", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("categoryID", SqlDbType.Int).Value = categoryID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), categoryID, reader.GetString(2), reader.GetString(3), 0, 0, 0, string.Empty, true, 0, false, false, 0, 0, 0));
+                        }
+                    }
+                }
+                    
+            }
+            return categories;
+        }
     }
 }

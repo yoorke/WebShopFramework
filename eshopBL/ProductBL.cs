@@ -400,5 +400,10 @@ namespace eshopBL
         {
             return new ProductDL().GetProductsDataTable();
         }
+
+        public List<Product> GetProductsForSitemap(int categoryID)
+        {
+            return new ProductDL().GetProductForSiteMap(categoryID);
+        }
     }
 }

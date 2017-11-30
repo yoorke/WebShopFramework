@@ -71,6 +71,7 @@
     <Compile Include="CouponType.cs" />
     <Compile Include="CustomPage.cs" />
     <Compile Include="CustomPageCategory.cs" />
+    <Compile Include="CustomPageProduct.cs" />
     <Compile Include="Delivery.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="OrderItem.cs" />

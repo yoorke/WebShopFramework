@@ -542,6 +542,36 @@ namespace eshopDL
             return products;
         }
 
+        public List<Product> GetProductForSiteMap(int categoryID)
+        {
+            List<Product> products = new List<Product>();
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_getForSitemap", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
+
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            Product product = new Product();
+                            product.ProductID = reader.GetInt32(0);
+                            product.Categories = new List<Category>();
+                            product.Categories.Add(new Category(-1, reader.GetString(3), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, 0, false, false, 0, 0, 0));
+                            product.Name = reader.GetString(1);
+                            product.Brand = new Brand(-1, reader.GetString(2));
+
+                            products.Add(product);
+                        }
+                    }
+                }
+            }
+            return products;
+        }
+
         #endregion
 
         #region SaveProduct

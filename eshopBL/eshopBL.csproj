@@ -96,6 +96,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="SitemapBL.cs" />
     <Compile Include="SliderBL.cs" />
     <Compile Include="SupplierBL.cs" />
     <Compile Include="UnitOfMeasureBL.cs" />
@@ -106,6 +107,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="WebSitemapBL.cs" />
     <Compile Include="WishListBL.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -399,5 +399,10 @@ namespace eshopBL
         {
             return new CategoryDL().GetCategoriesForFooter();
         }
+
+        public List<Category> GetFirstLevelSubcategories(int categoryID)
+        {
+            return new CategoryDL().GetFirstLevelSubcategories(categoryID);
+        }
     }
 }

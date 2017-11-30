@@ -288,7 +288,7 @@ namespace eshopDL
             return customPages;
         }
 
-        private void saveCustomPageProducts(List<Product> products, int customPageID)
+        private void saveCustomPageProducts(List<CustomPageProduct> products, int customPageID)
         {
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
@@ -297,7 +297,7 @@ namespace eshopDL
                     objConn.Open();
                     objComm.CommandType = CommandType.StoredProcedure;
 
-                    foreach (Product product in products)
+                    foreach (CustomPageProduct product in products)
                     {
                         objComm.Parameters.Clear();
                         objComm.Parameters.Add("@customPageID", SqlDbType.Int).Value = customPageID;
@@ -309,9 +309,9 @@ namespace eshopDL
             }
         }
 
-        private List<Product> getCustomPageProducts(int customPageID)
+        private List<CustomPageProduct> getCustomPageProducts(int customPageID)
         {
-            List<Product> products = new List<Product>();
+            List<CustomPageProduct> products = new List<CustomPageProduct>();
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
@@ -325,7 +325,8 @@ namespace eshopDL
                     {
                         while(reader.Read())
                         {
-                            products.Add(new ProductDL().GetProduct(reader.GetInt32(1), string.Empty, false, string.Empty));
+                            Product product = new ProductDL().GetProduct(reader.GetInt32(2), string.Empty, false, string.Empty);
+                            products.Add(new CustomPageProduct(product.ProductID, product.FullName));
                         }
                     }
                 }

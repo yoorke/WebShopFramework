@@ -14,6 +14,7 @@ namespace eshopBE
         private string _phone;
         private string _mobilePhone;
         private string _location;
+        private bool _isActive;
 
         public int RetailID
         {
@@ -57,12 +58,18 @@ namespace eshopBE
             set { _location = value; }
         }
 
+        public bool IsActive
+        {
+            get { return _isActive; }
+            set { _isActive = value; }
+        }
+
         public Retail()
         {
 
         }
 
-        public Retail(int retailID, City city, string addres, string phone, string mobilePhone, string location, string name)
+        public Retail(int retailID, City city, string addres, string phone, string mobilePhone, string location, string name, bool isActive)
         {
             this._retailID = retailID;
             this._city = city;
@@ -71,6 +78,7 @@ namespace eshopBE
             this._mobilePhone = mobilePhone;
             this._location = location;
             this._name = name;
+            this._isActive = isActive;
         }
     }
 }

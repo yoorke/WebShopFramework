@@ -23,7 +23,7 @@ namespace eshopBE
         private string _imageUrl;
         private bool _isActive;
         private string _footer;
-        private List<Product> _products;
+        private List<CustomPageProduct> _products;
 
         public int CustomPageID
         {
@@ -121,7 +121,7 @@ namespace eshopBE
             set { _footer = value; }
         }
 
-        public List<Product> Products
+        public List<CustomPageProduct> Products
         {
             get { return _products; }
             set { _products = value; }
