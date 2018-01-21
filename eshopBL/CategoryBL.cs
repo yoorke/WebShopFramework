@@ -180,6 +180,7 @@ namespace eshopBL
                 category.ImageUrlSource = (int)row["imageUrlSource"];
                 category.ImageUrlPositionX = (int)row["imageUrlPositionX"];
                 category.ImageUrlPositionY = (int)row["imageUrlPositionY"];
+                category.Icon = (string)row["icon"];
 
                 //foreach (Category childCategory in subCategory)
                     //childCategory.ParentCategoryID = category.CategoryID;

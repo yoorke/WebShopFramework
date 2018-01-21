@@ -26,10 +26,11 @@ namespace eshopDL
             categoriesDT.Columns.Add("imageUrlSource", typeof(int));
             categoriesDT.Columns.Add("imageUrlPositionX", typeof(int));
             categoriesDT.Columns.Add("imageUrlPositionY", typeof(int));
+            categoriesDT.Columns.Add("icon", typeof(string));
 
             //loading flattened datatable category without nested categories
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
-                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, categoryBannerID, imageUrlSource, imageUrlPositionX, imageUrlPositionY FROM category"))
+                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, categoryBannerID, imageUrlSource, imageUrlPositionX, imageUrlPositionY, icon FROM category"))
                 {
                     try
                     {
@@ -59,6 +60,7 @@ namespace eshopDL
                                 newRow[7] = !Convert.IsDBNull(reader[7]) ? reader.GetInt32(7) : 0;
                                 newRow[8] = !Convert.IsDBNull(reader[8]) ? reader.GetInt32(8) : 0;
                                 newRow[9] = !Convert.IsDBNull(reader[9]) ? reader.GetInt32(9) : 0;
+                                newRow[10] = !Convert.IsDBNull(reader[10]) ? reader.GetString(10) : string.Empty;
 
                                 categoriesDT.Rows.Add(newRow);
                             }
@@ -76,10 +78,10 @@ namespace eshopDL
 
         public int SaveCategory(Category category)
         {
-            int status;
+            int status = 0;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             { 
-                using (SqlCommand objComm = new SqlCommand("INSERT INTO category (name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID, showInFooter, imageUrlSource, imageUrlPositionX, imageUrlPositionY) VALUES (@name, @parentCategoryID, @url, @imageUrl, @sortOrder, @pricePercent, @webPricePercent, @showOnFirstPage, @numberOfProducts, @firstPageSortOrder, @firstPageOrderBy, @description, @active, @sliderID, @categoryBannerID, @updateProductsFromExternalApplication, @exportProducts, @externalID, @externalParentID, @showInFooter, @imageUrlSource, @imageUrlPositionX, @imageUrlPositionY)"))
+                using (SqlCommand objComm = new SqlCommand("INSERT INTO category (name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID, showInFooter, imageUrlSource, imageUrlPositionX, imageUrlPositionY, icon) VALUES (@name, @parentCategoryID, @url, @imageUrl, @sortOrder, @pricePercent, @webPricePercent, @showOnFirstPage, @numberOfProducts, @firstPageSortOrder, @firstPageOrderBy, @description, @active, @sliderID, @categoryBannerID, @updateProductsFromExternalApplication, @exportProducts, @externalID, @externalParentID, @showInFooter, @imageUrlSource, @imageUrlPositionX, @imageUrlPositionY, @icon);SELECT SCOPE_IDENTITY()"))
                 {
                     try
                     {
@@ -112,8 +114,14 @@ namespace eshopDL
                         objComm.Parameters.Add("@imageUrlSource", SqlDbType.Int).Value = category.ImageUrlSource;
                         objComm.Parameters.Add("@imageUrlPositionX", SqlDbType.Int).Value = category.ImageUrlPositionX;
                         objComm.Parameters.Add("@imageUrlPositionY", SqlDbType.Int).Value = category.ImageUrlPositionY;
+                        objComm.Parameters.Add("@icon", SqlDbType.VarChar, 50).Value = category.Icon;
 
-                        status = objComm.ExecuteNonQuery();
+                        //status = objComm.ExecuteNonQuery();
+                        using (SqlDataReader reader = objComm.ExecuteReader())
+                        {
+                            while (reader.Read())
+                                status = reader.GetInt32(0);
+                        }
                     }
                     catch (SqlException ex)
                     {
@@ -129,7 +137,7 @@ namespace eshopDL
         {
             int status;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
-                using (SqlCommand objComm = new SqlCommand("UPDATE category SET name=@name, parentCategoryID=@parentCategoryID, url=@url, imageUrl=@imageUrl, sortOrder=@sortOrder, pricePercent=@pricePercent, webPricePercent=@webPricePercent, showOnFirstPage=@showOnFirstPage, numberOfProducts=@numberOfProducts, firstPageSortOrder=@firstPageSortOrder, firstPageOrderBy=@firstPageOrderBy, description=@description, active = @active, sliderID = @sliderID, categoryBannerID = @categoryBannerID, updateProductsFromExternalApplication = @updateProductsFromExternalApplication, exportProducts = @exportProducts, externalID = @externalID, externalParentID = @externalParentID, showInFooter = @showInFooter, imageUrlSource = @imageUrlSource, imageUrlPositionX = @imageUrlPositionX, imageUrlPositionY = @imageUrlPositionY WHERE categoryID=@categoryID"))
+                using (SqlCommand objComm = new SqlCommand("UPDATE category SET name=@name, parentCategoryID=@parentCategoryID, url=@url, imageUrl=@imageUrl, sortOrder=@sortOrder, pricePercent=@pricePercent, webPricePercent=@webPricePercent, showOnFirstPage=@showOnFirstPage, numberOfProducts=@numberOfProducts, firstPageSortOrder=@firstPageSortOrder, firstPageOrderBy=@firstPageOrderBy, description=@description, active = @active, sliderID = @sliderID, categoryBannerID = @categoryBannerID, updateProductsFromExternalApplication = @updateProductsFromExternalApplication, exportProducts = @exportProducts, externalID = @externalID, externalParentID = @externalParentID, showInFooter = @showInFooter, imageUrlSource = @imageUrlSource, imageUrlPositionX = @imageUrlPositionX, imageUrlPositionY = @imageUrlPositionY, icon = @icon WHERE categoryID=@categoryID"))
                 {
                     try
                     {
@@ -163,6 +171,7 @@ namespace eshopDL
                         objComm.Parameters.Add("@imageUrlSource", SqlDbType.Int).Value = category.ImageUrlSource;
                         objComm.Parameters.Add("@imageUrlPositionX", SqlDbType.Int).Value = category.ImageUrlPositionX;
                         objComm.Parameters.Add("@imageUrlPositionY", SqlDbType.Int).Value = category.ImageUrlPositionY;
+                        objComm.Parameters.Add("@icon", SqlDbType.VarChar, 50).Value = category.Icon;
 
                         status = objComm.ExecuteNonQuery();
                     }
@@ -172,7 +181,7 @@ namespace eshopDL
                         throw new DLException("Error while updating category", ex);
                     }
                 }
-            return status;
+            return category.CategoryID;
         }
 
         private Category GetCategory(int categoryID, string name, int externalID)
@@ -180,7 +189,7 @@ namespace eshopDL
             Category category = null;
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
-                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID, showInFooter, imageUrlSource, imageUrlPositionX, imageUrlPositionY FROM category"))
+                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID, showInFooter, imageUrlSource, imageUrlPositionX, imageUrlPositionY, icon FROM category"))
                 {
                     try
                     {
@@ -243,6 +252,7 @@ namespace eshopDL
                                 category.ImageUrlSource = !Convert.IsDBNull(reader[21]) ? reader.GetInt32(21) : 0;
                                 category.ImageUrlPositionX = !Convert.IsDBNull(reader[22]) ? reader.GetInt32(22) : 0;
                                 category.ImageUrlPositionY = !Convert.IsDBNull(reader[23]) ? reader.GetInt32(23) : 0;
+                                category.Icon = !Convert.IsDBNull(reader[24]) ? reader.GetString(24) : string.Empty;
                             }
                         }
                     }

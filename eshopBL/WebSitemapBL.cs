@@ -33,7 +33,7 @@ namespace eshopBL
             root.AppendChild(createElement(webShopUrl + "/porucivanje", xmlDoc));
             root.AppendChild(createElement(webShopUrl + "/kontakt", xmlDoc));
             root.AppendChild(createElement(webShopUrl + "/prijava", xmlDoc));
-            root.AppendChild(createElement(webShopUrl + "/registrcija", xmlDoc));
+            root.AppendChild(createElement(webShopUrl + "/registracija", xmlDoc));
 
             if (bool.Parse(ConfigurationManager.AppSettings["hasRetails"]))
                 root.AppendChild(createElement(webShopUrl + "/prodajna-mesta", xmlDoc));

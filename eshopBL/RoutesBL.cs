@@ -31,7 +31,7 @@ namespace eshopBL
                 routes.MapPageRoute("izmena-sifre", "izmena-sifre", "~/passwordChange.aspx");
                 routes.MapPageRoute("pretraga", "pretraga", "~/search.aspx");
                 routes.MapPageRoute("porudzbina-uspesna", "porudzbina-uspesna", "~/orderSuccessful.aspx");
-                routes.MapPageRoute("stampaProizvoda", "stampa-proizvoda/{productID}", "~/reportTemplates/product/productPrint.aspx");
+                routes.MapPageRoute("stampaProizvoda", "stampa-proizvoda/{productID}", "~/reports/reportTemplates/product/productPrint.aspx");
 
 
                 foreach (CustomPage customPage in new CustomPageBL().GetCustomPages())

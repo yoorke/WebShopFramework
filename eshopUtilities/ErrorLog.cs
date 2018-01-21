@@ -7,6 +7,7 @@ using System.Web;
 using System.Data.SqlClient;
 using System.Net.Mail;
 using System.Configuration;
+using System.Threading;
 
 namespace eshopUtilities
 {
@@ -21,13 +22,23 @@ namespace eshopUtilities
                 code = ((SqlException)ex).Number;
             message = getMessage(ex);
 
-            using (StreamWriter sw = new StreamWriter(HttpContext.Current.Server.MapPath("/log/error.log"), true))
-                sw.WriteLine(DateTime.Now.ToUniversalTime().ToString() + " - " + code.ToString() + " - " + message + " " + Environment.NewLine + rawUrl +  Environment.NewLine + userHostAddress + Environment.NewLine + url);
-            sendMail(message, rawUrl, userHostAddress, url);
+            try { 
+                using (StreamWriter sw = new StreamWriter(HttpContext.Current.Server.MapPath("/log/error.log"), true))
+                    sw.WriteLine(DateTime.Now.ToUniversalTime().ToString() + " - " + code.ToString() + " - " + message + " " + Environment.NewLine + rawUrl +  Environment.NewLine + userHostAddress + Environment.NewLine + url);
+                sendMail(message, rawUrl, userHostAddress, url);
+            }
+            catch(Exception exx)
+            {
+                if(exx is IOException)
+                { 
+                    Thread.Sleep(1000);
+                    LogError(ex, rawUrl, userHostAddress, url);
+                }
+            }
 
 
             //if (ex.InnerException != null)
-                //LogError(ex.InnerException);
+            //LogError(ex.InnerException);
         }
 
         public static void LogMessage(string message)

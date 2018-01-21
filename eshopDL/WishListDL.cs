@@ -54,6 +54,7 @@ namespace eshopDL
                             product.Categories = new List<Category>();
                             product.Categories.Add(new Category(reader.GetInt32(19), reader.GetString(20), null, reader.GetString(21), string.Empty, 0, 0, 0, string.Empty, true, 0, false, false, 0, 0, 0));
                             product.Images = new ProductDL().GetProductImages(product.ProductID);
+                            product.IsInStock = !Convert.IsDBNull(reader[17]) ? reader.GetBoolean(17) : false;
 
                             products.Add(product);
                         }

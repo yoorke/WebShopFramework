@@ -33,6 +33,7 @@ namespace eshopBE
         private int _imageUrlSource;
         private int _imageUrlPositionX;
         private int _imageUrlPositionY;
+        private string _icon;
 
         public Category()
         {
@@ -213,6 +214,12 @@ namespace eshopBE
         {
             get { return _imageUrlPositionY; }
             set { _imageUrlPositionY = value; }
+        }
+
+        public string Icon
+        {
+            get { return _icon; }
+            set { _icon = value; }
         }
     }
 }
