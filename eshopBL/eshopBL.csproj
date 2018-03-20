@@ -96,6 +96,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="SettingsBL.cs" />
     <Compile Include="SitemapBL.cs" />
     <Compile Include="SliderBL.cs" />
     <Compile Include="SupplierBL.cs" />

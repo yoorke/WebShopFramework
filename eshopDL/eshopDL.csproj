@@ -90,6 +90,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="SettingsDL.cs" />
     <Compile Include="SliderDL.cs" />
     <Compile Include="SupplierDL.cs" />
     <Compile Include="UnitOfMeasureDL.cs" />

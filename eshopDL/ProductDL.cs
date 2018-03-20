@@ -211,7 +211,7 @@ namespace eshopDL
             int tableIndex;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, promotion.dateFrom, promotion.dateTo, category.name, product.isInStock FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN productCategory ON product.productID=productCategory.productID LEFT JOIN promotionProduct ON product.productID=promotionProduct.productID LEFT JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN category ON productCategory.categoryID=category.categoryID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, promotion.dateFrom, promotion.dateTo, category.name, product.isInStock, insertDate FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN productCategory ON product.productID=productCategory.productID LEFT JOIN promotionProduct ON product.productID=promotionProduct.productID LEFT JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN category ON productCategory.categoryID=category.categoryID", objConn))
                 {
                     if(attributeValues.Count > 0)
                     {
@@ -342,6 +342,7 @@ namespace eshopDL
                             product.Categories.Add(new Category(categoryID, reader.GetString(12), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, true, 0, false, false, 0, 0, 0));
                             product.Description = GetProductAttributeValues(product.ProductID, true);
                             product.IsInStock = reader.GetBoolean(13);
+                            product.InsertDate = !Convert.IsDBNull(reader[14]) ? reader.GetDateTime(14) : DateTime.MinValue;
                             products.Add(product);
                         }
                     }
@@ -504,7 +505,7 @@ namespace eshopDL
             return barcodes;
         }
 
-        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, bool? isActive, bool? isApproved, string search)
+        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, bool? isActive, bool? isApproved, string search, string sort, string reverse)
         {
             DataTable products = new DataTable();
             //products.Columns.Add("productID", typeof(int));
@@ -534,6 +535,8 @@ namespace eshopDL
                     objComm.Parameters.Add("@isActive", SqlDbType.Bit).Value = isActive;
                     objComm.Parameters.Add("@isApproved", SqlDbType.Bit).Value = isApproved;
                     objComm.Parameters.Add("@search", SqlDbType.NVarChar, 200).Value = search;
+                    objComm.Parameters.Add("@sort", SqlDbType.NVarChar, 200).Value = sort;
+                    objComm.Parameters.Add("@reverse", SqlDbType.NVarChar, 200).Value = reverse;
 
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {

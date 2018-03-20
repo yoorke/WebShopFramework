@@ -444,7 +444,7 @@ namespace eshopBL
                     newRow["vat"] = xmlNode.SelectSingleNode("vat").InnerText.Trim();
                     newRow["category"] = xmlNode.SelectSingleNode("category").InnerText.Trim();
                     newRow["ean"] = xmlNode.SelectSingleNode("ean").InnerText.Trim();
-                    newRow["images"] = xmlNode.SelectSingleNode("images").OuterXml.Trim();
+                    newRow["images"] = xmlNode.SelectSingleNode("images") != null ? xmlNode.SelectSingleNode("images").OuterXml.Trim() : string.Empty;
                     newRow["specification"] = xmlNode.SelectSingleNode("specifications") != null ? xmlNode.SelectSingleNode("specifications").OuterXml.Trim() : string.Empty;
                     newRow["subcategory"] = xmlNode.SelectSingleNode("subcategory").InnerText.Trim();
                     if(xmlNode.SelectSingleNode("subcategory").InnerText.Trim() != string.Empty)
