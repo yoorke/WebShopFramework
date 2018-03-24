@@ -91,9 +91,9 @@ namespace eshopUtilities
             body.Append("<br />");
             body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
             body.Append("<br />");
-            body.Append("Dostava: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])) : " Po cenovniku kurirske službe"));
+            body.Append("Dostava: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])) : ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? "0,00" : " Po cenovniku kurirske službe"));
             body.Append("<br />");
-            body.Append("Ukupno sa dostavom: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))) : (string.Format("{0:N2}", ukupno - order.UserDiscountValue) + " + cena dostave")));
+            body.Append("Ukupno sa dostavom: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))) : (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? "" : " + cena dostave")));
             body.Append("</div>");
             body.Append("<br/>");
             if(order.UserDiscountValue > 0)
