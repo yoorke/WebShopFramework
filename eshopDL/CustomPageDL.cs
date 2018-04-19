@@ -47,7 +47,7 @@ namespace eshopDL
 
                         customPage.CustomPageID = int.Parse(objComm.Parameters["@customPageID"].Value.ToString());
 
-                        if (customPage.CustomPageID > 0)
+                        if (customPage.CustomPageID > 0 && customPage.Products != null)
                             saveCustomPageProducts(customPage.Products, customPage.CustomPageID);
                     }
                 }
@@ -85,7 +85,8 @@ namespace eshopDL
 
                     status = objComm.ExecuteNonQuery();
 
-                    saveCustomPageProducts(customPage.Products, customPage.CustomPageID);
+                    if(customPage.Products != null)
+                        saveCustomPageProducts(customPage.Products, customPage.CustomPageID);
                 }
             }
             return customPage.CustomPageID; ;
