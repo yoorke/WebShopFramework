@@ -594,11 +594,14 @@ namespace eshopBL
             XmlDocument xmlDoc = eweDL.GetXml(string.Empty, string.Empty, false, false);
 
             DeleteEweCategories();
-            XmlNodeList nodeList = xmlDoc.DocumentElement.SelectNodes("product");
-            foreach (XmlNode xmlNode in nodeList)
-            {
-                eweDL.SaveCategory(xmlNode.SelectSingleNode("category").InnerText.Trim(), null);
-                eweDL.SaveCategory(xmlNode.SelectSingleNode("subcategory").InnerText.Trim(), xmlNode.SelectSingleNode("category").InnerText.Trim());
+            if (xmlDoc.DocumentElement != null)
+            { 
+                XmlNodeList nodeList = xmlDoc.DocumentElement.SelectNodes("product");
+                foreach (XmlNode xmlNode in nodeList)
+                {
+                    eweDL.SaveCategory(xmlNode.SelectSingleNode("category").InnerText.Trim(), null);
+                    eweDL.SaveCategory(xmlNode.SelectSingleNode("subcategory").InnerText.Trim(), xmlNode.SelectSingleNode("category").InnerText.Trim());
+                }
             }
         }
 
@@ -694,19 +697,31 @@ namespace eshopBL
             product.UnitOfMeasure = new UnitOfMeasure(2, "Komad", "kom");
 
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(eweProduct.Rows[0]["images"].ToString());
-            XmlNode xmlImagesNode = xmlDoc.SelectSingleNode("images");
-            foreach (XmlNode xmlImageNode in xmlImagesNode.ChildNodes)
+            bool hasImages = false;
+            
+
+            if(eweProduct.Rows[0]["images"] != null && eweProduct.Rows[0]["images"].ToString() != string.Empty)
             {
-                if (product.Images == null)
-                    product.Images = new List<ProductImage>();
-                if(xmlImageNode.Name == "image")
+                hasImages = true;
+                xmlDoc.LoadXml(eweProduct.Rows[0]["images"].ToString());
+                XmlNode xmlImagesNode = xmlDoc.SelectSingleNode("images");
+                foreach (XmlNode xmlImageNode in xmlImagesNode.ChildNodes)
                 {
-                    string imageUrl = saveImageFromUrl(xmlImageNode.InnerText.Trim(), product.Images != null ? product.Images.Count : 0);
-                    if (imageUrl != string.Empty)
-                        //product.Images.Add(Path.GetFileName(xmlImageNode.InnerText.Trim()));
-                        product.Images.Add(new ProductImage(imageUrl, product.Images.Count + 1));
+                    if (product.Images == null)
+                        product.Images = new List<ProductImage>();
+                    if(xmlImageNode.Name == "image")
+                    {
+                        string imageUrl = saveImageFromUrl(xmlImageNode.InnerText.Trim(), product.Images != null ? product.Images.Count : 0);
+                        if (imageUrl != string.Empty)
+                            //product.Images.Add(Path.GetFileName(xmlImageNode.InnerText.Trim()));
+                            product.Images.Add(new ProductImage(imageUrl, product.Images.Count + 1));
+                    }
                 }
+            }
+            else
+            {
+                if (!bool.Parse(ConfigurationManager.AppSettings["saveProductWithoutImage"]))
+                    throw new Exception("No images");
             }
 
             int attributeID;
@@ -740,7 +755,7 @@ namespace eshopBL
                 }
             }
 
-            if (!isLocked)
+            if (!isLocked && (bool.Parse(ConfigurationManager.AppSettings["saveProductWithoutImage"]) || hasImages))
                 if (new ProductBL().SaveProduct(product) > 0)
                     return true;
             return false;

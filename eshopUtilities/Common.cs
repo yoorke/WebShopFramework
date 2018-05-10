@@ -52,75 +52,82 @@ namespace eshopUtilities
 
         public static int SendOrderConfirmationMail(string email, string name, Order order)
         {
-            MailMessage message = new MailMessage();
-            //message.From = new MailAddress("office@pinservis.com");
-            message.From = new MailAddress(ConfigurationManager.AppSettings["orderEmail"], ConfigurationManager.AppSettings["companyName"]);
-            message.To.Add(new MailAddress(email));
-            //message.CC.Add(new MailAddress("info@pinservis.co.rs.gladiolus.arvixe.com"));
-            message.Subject = "Potvrda narudžbine - " + ConfigurationManager.AppSettings["companyName"];
-            message.BodyEncoding=Encoding.UTF8;
-            message.IsBodyHtml = true;
-            StringBuilder body = new StringBuilder();
-            body.Append("<div style='font-family:verdana;font-size:0.9em'>");
-            body.Append("<img src='" + ConfigurationManager.AppSettings["logoUrl"].ToString() + "' style='width:50px;margin-bottom:20px' />");
-            body.Append("<h1 style='font-size:1em;width:100%;text-align:center'>Potvrda porudžbine</h1>");
-            body.Append("<br/><strong>Poštovani " + name + "</strong><br><br>Vaša porudžbina je uspešno prosleđena.");
-            body.Append("<br/><br/>U nastavku možete videti detalje Vaše narudžbine");
-            body.Append("<br/><br/>");
-            body.Append("<table width='100%' border='0' cellspacing='0' style='font-family:verdana;font-size:0.9em'>");
-            body.Append("<tr bgcolor='#cccccc'>");
-            body.Append("<th align='center' style='width:50px'>Rbr</th><th>Naziv</th><th style='width:100px'>Količina</th><th style='width:100px'>Cena</th><th style='width:100px'>Ukupno</th>");
-            body.Append("</tr>");
-            double ukupno=0;
-            
-            for(int i=0;i<order.Items.Count;i++)
-            {
-                ukupno += order.Items[i].UserPrice * order.Items[i].Quantity;
-                body.Append("<tr height='20px' valign='middle'>");
-                body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + ", " + order.Items[i].Product.Description + ", " + order.Items[i].Product.Code + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
+            try
+            { 
+                MailMessage message = new MailMessage();
+                //message.From = new MailAddress("office@pinservis.com");
+                message.From = new MailAddress(ConfigurationManager.AppSettings["orderEmail"], ConfigurationManager.AppSettings["companyName"]);
+                message.To.Add(new MailAddress(email));
+                //message.CC.Add(new MailAddress("info@pinservis.co.rs.gladiolus.arvixe.com"));
+                message.Subject = "Potvrda narudžbine - " + ConfigurationManager.AppSettings["companyName"];
+                message.BodyEncoding=Encoding.UTF8;
+                message.IsBodyHtml = true;
+                StringBuilder body = new StringBuilder();
+                body.Append("<div style='font-family:verdana;font-size:0.9em'>");
+                body.Append("<img src='" + ConfigurationManager.AppSettings["logoUrl"].ToString() + "' style='width:50px;margin-bottom:20px' />");
+                body.Append("<h1 style='font-size:1em;width:100%;text-align:center'>Potvrda porudžbine</h1>");
+                body.Append("<br/><strong>Poštovani " + name + "</strong><br><br>Vaša porudžbina je uspešno prosleđena.");
+                body.Append("<br/><br/>U nastavku možete videti detalje Vaše narudžbine");
+                body.Append("<br/><br/>");
+                body.Append("<table width='100%' border='0' cellspacing='0' style='font-family:verdana;font-size:0.9em'>");
+                body.Append("<tr bgcolor='#cccccc'>");
+                body.Append("<th align='center' style='width:50px'>Rbr</th><th>Naziv</th><th style='width:100px'>Količina</th><th style='width:100px'>Cena</th><th style='width:100px'>Ukupno</th>");
                 body.Append("</tr>");
-            }
-            body.Append("</table>");
-            body.Append("<div style='text-align:right;'>");
-            body.Append("<br/>");
-
-            body.Append("Ukupno: " + string.Format("{0:N2}", ukupno));
-            body.Append("<br />");
-            //double userDiscountValue = discountTypeID == 1 ? ukupno * userDiscount / 100 : userDiscount;
-            body.Append("Popust: " + string.Format("{0:N2}", order.UserDiscountValue));
-            body.Append("<br />");
-            body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
-            body.Append("<br />");
-            body.Append("Dostava: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])) : ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? "0,00" : " Po cenovniku kurirske službe"));
-            body.Append("<br />");
-            body.Append("Ukupno sa dostavom: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))) : (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? "" : " + cena dostave")));
-            body.Append("</div>");
-            body.Append("<br/>");
-            if(order.UserDiscountValue > 0)
-                body.Append("<p><strong>Odobren vam je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</strong></p>");
-            if(order.Lastname != string.Empty || order.Firstname != string.Empty)
-                body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");
-            else if (order.Name != string.Empty)
-            {
-                body.Append("<p><strong>Naziv: </strong>" + order.Name + "</p>");
-                body.Append("<p><strong>PIB: </strong>" + order.Pib + "</p>");
-            }
-            body.Append("<p><strong>Adresa: </strong>" + order.Address + " " + order.Code + " " + order.City + " " + order.Zip + "</p>");
-            body.Append("<p><strong>Telefon: </strong>" + order.Phone + "</p>");
-            body.Append("<p><strong>Način plaćanja: </strong>" + order.Payment.Name + "</p>");
-            body.Append("<p><strong>Način preuzimanja: </strong>" + order.Delivery.Name + "</p>");
-            body.Append("<p><strong>Napomena: </strong>" + order.Comment + "</p>");
+                double ukupno=0;
             
-            body.Append("<br/><br/>Vaša online prodavnica ");
-            body.Append("<span style='font-weight:bold;color:#174e87'>" + ConfigurationManager.AppSettings["companyName"] + "</span>");
-            body.Append("</div>");
-            message.Body = body.ToString();
+                for(int i=0;i<order.Items.Count;i++)
+                {
+                    ukupno += order.Items[i].UserPrice * order.Items[i].Quantity;
+                    body.Append("<tr height='20px' valign='middle'>");
+                    body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + ", " + order.Items[i].Product.Description + ", " + order.Items[i].Product.Code + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
+                    body.Append("</tr>");
+                }
+                body.Append("</table>");
+                body.Append("<div style='text-align:right;'>");
+                body.Append("<br/>");
+
+                body.Append("Ukupno: " + string.Format("{0:N2}", ukupno));
+                body.Append("<br />");
+                //double userDiscountValue = discountTypeID == 1 ? ukupno * userDiscount / 100 : userDiscount;
+                body.Append("Popust: " + string.Format("{0:N2}", order.UserDiscountValue));
+                body.Append("<br />");
+                body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
+                body.Append("<br />");
+                body.Append("Dostava: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])) : ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? "0,00" : " Po cenovniku kurirske službe"));
+                body.Append("<br />");
+                body.Append("Ukupno sa dostavom: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))) : (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? "" : " + cena dostave")));
+                body.Append("</div>");
+                body.Append("<br/>");
+                if(order.UserDiscountValue > 0)
+                    body.Append("<p><strong>Odobren vam je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</strong></p>");
+                if(order.Lastname != string.Empty || order.Firstname != string.Empty)
+                    body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");
+                else if (order.Name != string.Empty)
+                {
+                    body.Append("<p><strong>Naziv: </strong>" + order.Name + "</p>");
+                    body.Append("<p><strong>PIB: </strong>" + order.Pib + "</p>");
+                }
+                body.Append("<p><strong>Adresa: </strong>" + order.Address + " " + order.Code + " " + order.City + " " + order.Zip + "</p>");
+                body.Append("<p><strong>Telefon: </strong>" + order.Phone + "</p>");
+                body.Append("<p><strong>Način plaćanja: </strong>" + order.Payment.Name + "</p>");
+                body.Append("<p><strong>Način preuzimanja: </strong>" + order.Delivery.Name + "</p>");
+                body.Append("<p><strong>Napomena: </strong>" + order.Comment + "</p>");
+            
+                body.Append("<br/><br/>Vaša online prodavnica ");
+                body.Append("<span style='font-weight:bold;color:#174e87'>" + ConfigurationManager.AppSettings["companyName"] + "</span>");
+                body.Append("</div>");
+                message.Body = body.ToString();
 
 
-            SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
-            smtp.Send(message);
+                SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
+                smtp.Send(message);
 
-            return 0;
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                throw new BLException("Nije moguće poslati mail", ex);
+            }
         }
 
         public static int SendUserCreatedConfirmationMail(string email, string password)
@@ -172,8 +179,9 @@ namespace eshopUtilities
                 smtp.Send(message);
                 return true;
             }
-            catch
+            catch(Exception ex)
             {
+                throw new BLException("Nije moguće poslati mail", ex);
                 return false;
             }
         }
@@ -214,16 +222,23 @@ namespace eshopUtilities
 
         public static void SendOrder()
         {
-            MailMessage mail = new MailMessage();
-            mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"]);
-            mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
-            mail.Subject = "Nova porudžbina";
-            mail.BodyEncoding=Encoding.UTF8;
-            mail.Body="Imate novu porudžbinu sa sajta.<br/>Sve porudžbine možete videti na stranici <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/administrator/orders.aspx'>" + ConfigurationManager.AppSettings["webShopUrl"] + "/administrator/orders.aspx</a>";
-            mail.IsBodyHtml=true;
+            try
+            { 
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"]);
+                mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
+                mail.Subject = "Nova porudžbina";
+                mail.BodyEncoding=Encoding.UTF8;
+                mail.Body="Imate novu porudžbinu sa sajta.<br/>Sve porudžbine možete videti na stranici <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/administrator/orders.aspx'>" + ConfigurationManager.AppSettings["webShopUrl"] + "/administrator/orders.aspx</a>";
+                mail.IsBodyHtml=true;
 
-            SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
-            smtp.Send(mail);
+                SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
+                smtp.Send(mail);
+            }
+            catch(Exception ex)
+            {
+                throw new BLException("Nije moguće poslati mail", ex);
+            }
         }
 
         public static void AddUrlRewrite(string url, string page)
@@ -345,78 +360,92 @@ namespace eshopUtilities
         }
 
         public static void SendNewOrderNotification(string orderID, Order order)
-        {            
-            MailMessage mail = new MailMessage();
-            mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
-            mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
-            mail.Subject = "Nova porudžbina";
-            StringBuilder body = new StringBuilder();
-            body.Append("<strong>Nova porudžbina na sajtu " + ConfigurationManager.AppSettings["webShopUrl"] + "</strong>");
-            body.Append("<br/>");
-            body.Append("Porudžbinu možete pogledati na sledećoj stranici: <a href='" + ConfigurationManager.AppSettings["webshopUrl"] + "/" + ConfigurationManager.AppSettings["webshopAdminUrl"] + "/order.aspx?orderID=" + orderID + "'>Porudžbine</a>");
+        {
+            try
+            { 
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
+                mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
+                mail.Subject = "Nova porudžbina";
+                StringBuilder body = new StringBuilder();
+                body.Append("<strong>Nova porudžbina na sajtu " + ConfigurationManager.AppSettings["webShopUrl"] + "</strong>");
+                body.Append("<br/>");
+                body.Append("Porudžbinu možete pogledati na sledećoj stranici: <a href='" + ConfigurationManager.AppSettings["webshopUrl"] + "/" + ConfigurationManager.AppSettings["webshopAdminUrl"] + "/order.aspx?orderID=" + orderID + "'>Porudžbine</a>");
 
-            body.Append("<br/><br/><table width='100%' border='0' cellspacing='0' style='font-family:verdana;font-size:0.9em'>");
-            body.Append("<tr bgcolor='#cccccc'>");
-            body.Append("<th align='center' style='width:50px'>Rbr</th><th>Naziv</th><th style='width:100px'>Količina</th><th style='width:100px'>Cena</th><th style='width:100px'>Ukupno</th>");
-            body.Append("</tr>");
-            double ukupno = 0;
-
-            for (int i = 0; i < order.Items.Count; i++)
-            {
-                ukupno += order.Items[i].UserPrice * order.Items[i].Quantity;
-                body.Append("<tr height='20px' valign='middle'>");
-                body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + ", " + order.Items[i].Product.Description + ", " + order.Items[i].Product.Code + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
+                body.Append("<br/><br/><table width='100%' border='0' cellspacing='0' style='font-family:verdana;font-size:0.9em'>");
+                body.Append("<tr bgcolor='#cccccc'>");
+                body.Append("<th align='center' style='width:50px'>Rbr</th><th>Naziv</th><th style='width:100px'>Količina</th><th style='width:100px'>Cena</th><th style='width:100px'>Ukupno</th>");
                 body.Append("</tr>");
+                double ukupno = 0;
+
+                for (int i = 0; i < order.Items.Count; i++)
+                {
+                    ukupno += order.Items[i].UserPrice * order.Items[i].Quantity;
+                    body.Append("<tr height='20px' valign='middle'>");
+                    body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + ", " + order.Items[i].Product.Description + ", " + order.Items[i].Product.Code + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
+                    body.Append("</tr>");
+                }
+                body.Append("</table>");
+                body.Append("<div style='text-align:right;'>");
+                body.Append("<br/>");
+                body.Append("Iznos: " + string.Format("{0:N2}", ukupno));
+                body.Append("<br />");
+                //double userDiscountValue = (discountTypeID == 1) ? ukupno * userDiscount / 100 : userDiscount;
+                body.Append("Popust: " + string.Format("{0:N2}", order.UserDiscountValue));
+                body.Append("<br/>");
+                body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
+                body.Append("<br />");
+                body.Append("Dostava: " + string.Format("{0:N2}", ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])));
+                body.Append("<br />");
+                body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))));
+                body.Append("</div>");
+                if(order.UserDiscountValue > 0)
+                    body.Append("<p>Odobren je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</p");
+                body.Append("<br/>");
+                if (order.Lastname != string.Empty || order.Firstname != string.Empty)
+                    body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");
+                else if (order.Name != string.Empty)
+                {
+                    body.Append("<p><strong>Naziv: </strong>" + order.Name + "</p>");
+                    body.Append("<p><strong>PIB: </strong>" + order.Pib + "</p>");
+                }
+                body.Append("<p><strong>Adresa: </strong>" + order.Address + " " + order.Code + " " + order.City + " " + order.Zip + "</p>");
+                body.Append("<p><strong>Telefon: </strong>" + order.Phone + "</p>");
+                body.Append("<p><strong>Način plaćanja: </strong>" + order.Payment.Name + "</p>");
+                body.Append("<p><strong>Način preuzimanja: </strong>" + order.Delivery.Name + "</p>");
+                body.Append("<p><strong>Napomena: </strong>" + order.Comment + "</p>");
+
+                mail.Body = body.ToString();
+                mail.IsBodyHtml = true;
+                mail.BodyEncoding = Encoding.UTF8;
+
+                SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
+                smtp.Send(mail);
             }
-            body.Append("</table>");
-            body.Append("<div style='text-align:right;'>");
-            body.Append("<br/>");
-            body.Append("Iznos: " + string.Format("{0:N2}", ukupno));
-            body.Append("<br />");
-            //double userDiscountValue = (discountTypeID == 1) ? ukupno * userDiscount / 100 : userDiscount;
-            body.Append("Popust: " + string.Format("{0:N2}", order.UserDiscountValue));
-            body.Append("<br/>");
-            body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
-            body.Append("<br />");
-            body.Append("Dostava: " + string.Format("{0:N2}", ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])));
-            body.Append("<br />");
-            body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))));
-            body.Append("</div>");
-            if(order.UserDiscountValue > 0)
-                body.Append("<p>Odobren je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</p");
-            body.Append("<br/>");
-            if (order.Lastname != string.Empty || order.Firstname != string.Empty)
-                body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");
-            else if (order.Name != string.Empty)
+            catch(Exception ex)
             {
-                body.Append("<p><strong>Naziv: </strong>" + order.Name + "</p>");
-                body.Append("<p><strong>PIB: </strong>" + order.Pib + "</p>");
+                throw new BLException("Nije moguće poslati mail", ex);
             }
-            body.Append("<p><strong>Adresa: </strong>" + order.Address + " " + order.Code + " " + order.City + " " + order.Zip + "</p>");
-            body.Append("<p><strong>Telefon: </strong>" + order.Phone + "</p>");
-            body.Append("<p><strong>Način plaćanja: </strong>" + order.Payment.Name + "</p>");
-            body.Append("<p><strong>Način preuzimanja: </strong>" + order.Delivery.Name + "</p>");
-            body.Append("<p><strong>Napomena: </strong>" + order.Comment + "</p>");
-
-            mail.Body = body.ToString();
-            mail.IsBodyHtml = true;
-            mail.BodyEncoding = Encoding.UTF8;
-
-            SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
-            smtp.Send(mail);
         }
 
         public static void SendMessage(string email, string subject, string body)
         {
-            MailMessage mail = new MailMessage();
-            mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString());
-            mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
-            mail.ReplyTo = new MailAddress(email);
-            mail.Subject = email + " " + subject;
-            mail.Body = body;
+            try
+            { 
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString());
+                mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
+                mail.ReplyTo = new MailAddress(email);
+                mail.Subject = email + " " + subject;
+                mail.Body = body;
 
-            SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
-            smtp.Send(mail);
+                SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
+                smtp.Send(mail);
+            }
+            catch(Exception ex)
+            {
+                throw new BLException("Nije moguće poslati mail", ex);
+            }
         }
 
         public static SmtpClient getErrorSmtp()
@@ -434,44 +463,58 @@ namespace eshopUtilities
 
         public static void SendOrderStatusUpdate(string email, string name, string orderNumber, DateTime date, string status)
         {
-            MailMessage mail = new MailMessage();
-            mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"], ConfigurationManager.AppSettings["companyName"]);
-            mail.To.Add(new MailAddress(email));
-            mail.Subject = ConfigurationManager.AppSettings["companyName"] + " - Status porudžbine";
-            StringBuilder body = new StringBuilder();
-            body.Append("<p>Poštovani, " + name + "</p>");
-            body.Append("<br/>");
-            body.Append("<p>Status vaše porudžbine sa brojem: <strong>" + orderNumber + "</strong> od: <strong>" + date.ToShortDateString() + "</strong> je izmenjen na: </p>");
-            body.Append("<br/>");
-            body.Append("<div style='width=100%;background-color:#f0f000;padding-top:0.5em;padding-bottom:0.5em;padding-left:0.5em;padding-right:0.5em;color:#333333;text-align:center;font-size:18px;margin:1em;height:2em'><strong>" + status.ToUpper() + "</strong></div>");
-            body.Append("<br/>");
-            body.Append("<p>Vaša online prodavnica <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'>" + ConfigurationManager.AppSettings["companyName"] + "</a></p>");
+            try
+            { 
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"], ConfigurationManager.AppSettings["companyName"]);
+                mail.To.Add(new MailAddress(email));
+                mail.Subject = ConfigurationManager.AppSettings["companyName"] + " - Status porudžbine";
+                StringBuilder body = new StringBuilder();
+                body.Append("<p>Poštovani, " + name + "</p>");
+                body.Append("<br/>");
+                body.Append("<p>Status vaše porudžbine sa brojem: <strong>" + orderNumber + "</strong> od: <strong>" + date.ToShortDateString() + "</strong> je izmenjen na: </p>");
+                body.Append("<br/>");
+                body.Append("<div style='width=100%;background-color:#f0f000;padding-top:0.5em;padding-bottom:0.5em;padding-left:0.5em;padding-right:0.5em;color:#333333;text-align:center;font-size:18px;margin:1em;height:2em'><strong>" + status.ToUpper() + "</strong></div>");
+                body.Append("<br/>");
+                body.Append("<p>Vaša online prodavnica <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'>" + ConfigurationManager.AppSettings["companyName"] + "</a></p>");
 
-            mail.IsBodyHtml = true;
-            mail.Body = body.ToString();
+                mail.IsBodyHtml = true;
+                mail.Body = body.ToString();
 
-            SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
-            smtp.Send(mail);
+                SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
+                smtp.Send(mail);
+            }
+            catch(Exception ex)
+            {
+                throw new BLException("Nije moguće poslati mail", ex);
+            }
         }
 
         public static void SendOrderDiscountGrantedNotification(Order order)
         {
-            MailMessage mail = new MailMessage();
-            mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"], ConfigurationManager.AppSettings["companyName"]);
-            mail.To.Add(new MailAddress(order.Email));
-            mail.Subject = "Odobren popust";
-            StringBuilder body = new StringBuilder();
-            body.Append("<p>Poštovani " + order.Firstname + " " + order.Lastname + "</p>");
-            body.Append("<br/>");
-            body.Append("<p>Odobren Vam je popust u iznosu od: <strong>" + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</strong> za porudžbinu broj: " + order.Code + " od " + order.Date + "</p>");
-            body.Append("<br/>");
-            body.Append("<p>Vaša online prodavnica <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'>" + ConfigurationManager.AppSettings["companyName"] + "</a></p>");
+            try
+            { 
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"], ConfigurationManager.AppSettings["companyName"]);
+                mail.To.Add(new MailAddress(order.Email));
+                mail.Subject = "Odobren popust";
+                StringBuilder body = new StringBuilder();
+                body.Append("<p>Poštovani " + order.Firstname + " " + order.Lastname + "</p>");
+                body.Append("<br/>");
+                body.Append("<p>Odobren Vam je popust u iznosu od: <strong>" + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</strong> za porudžbinu broj: " + order.Code + " od " + order.Date + "</p>");
+                body.Append("<br/>");
+                body.Append("<p>Vaša online prodavnica <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'>" + ConfigurationManager.AppSettings["companyName"] + "</a></p>");
 
-            mail.IsBodyHtml = true;
-            mail.Body = body.ToString();
+                mail.IsBodyHtml = true;
+                mail.Body = body.ToString();
 
-            SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
-            smtp.Send(mail);
+                SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
+                smtp.Send(mail);
+            }
+            catch(Exception ex)
+            {
+                throw new BLException("Nije moguće poslati mail", ex);
+            }
         }
     }
 }

@@ -649,7 +649,7 @@ namespace eshopDL
                         objConn.Open();
 
                         if (product.Specification == string.Empty || product.Specification == null)
-                            objComm.CommandText = "UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPRice = @supplierPrice, unitOfMeasure = @unitOfMeasure WHERE productID=@productID";
+                            objComm.CommandText = "UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPRice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID WHERE productID=@productID";
 
                         objComm.Parameters.Add("@code", SqlDbType.NVarChar, 50).Value = product.Code;
                         objComm.Parameters.Add("@supplierCode", SqlDbType.NVarChar, 50).Value = product.SupplierCode;
