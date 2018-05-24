@@ -440,7 +440,7 @@ namespace eshopBL
                     newRow["brand"] = xmlNode.SelectSingleNode("manufacturer").InnerText.Trim();
                     newRow["name"] = xmlNode.SelectSingleNode("name").InnerText.Trim();
                     newRow["price"] = xmlNode.SelectSingleNode("price").InnerText.Replace('.',',').Trim();
-                    newRow["priceRebate"] = xmlNode.SelectSingleNode("price_rebate").InnerText.Trim();
+                    newRow["priceRebate"] = xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.',',').Trim();
                     newRow["vat"] = xmlNode.SelectSingleNode("vat").InnerText.Trim();
                     newRow["category"] = xmlNode.SelectSingleNode("category").InnerText.Trim();
                     newRow["ean"] = xmlNode.SelectSingleNode("ean").InnerText.Trim();
@@ -482,8 +482,8 @@ namespace eshopBL
                         {
                             if (!productDL.IsLocked(productID))
                             {
-                                double price = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price").InnerText.Replace('.', ',').Trim()), category.PricePercent);
-                                double webPrice = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price").InnerText.Replace('.', ',').Trim()), category.WebPricePercent);
+                                double price = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.', ',').Trim()), category.PricePercent);
+                                double webPrice = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.', ',').Trim()), category.WebPricePercent);
                                 status += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
                             }
                         }
@@ -690,10 +690,10 @@ namespace eshopBL
             product.Brand.BrandID = brand.BrandID;
 
             product.Name = eweProduct.Rows[0]["name"].ToString();
-            product.Price = calculatePrice(double.Parse(eweProduct.Rows[0]["price"].ToString()), category.PricePercent);
-            product.WebPrice = calculatePrice(double.Parse(eweProduct.Rows[0]["price"].ToString()), category.WebPricePercent);
+            product.Price = calculatePrice(double.Parse(eweProduct.Rows[0]["priceRebate"].ToString()), category.PricePercent);
+            product.WebPrice = calculatePrice(double.Parse(eweProduct.Rows[0]["priceRebate"].ToString()), category.WebPricePercent);
             product.Ean = eweProduct.Rows[0]["ean"].ToString();
-            product.SupplierPrice = double.Parse(eweProduct.Rows[0]["price"].ToString());
+            product.SupplierPrice = double.Parse(eweProduct.Rows[0]["priceRebate"].ToString());
             product.UnitOfMeasure = new UnitOfMeasure(2, "Komad", "kom");
 
             XmlDocument xmlDoc = new XmlDocument();

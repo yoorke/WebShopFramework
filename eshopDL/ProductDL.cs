@@ -9,6 +9,8 @@ using System.Data.SqlClient;
 using System.Web.Configuration;
 using System.Web;
 using System.Text.RegularExpressions;
+using System.IO;
+using System.Configuration;
 
 namespace eshopDL
 {
@@ -972,7 +974,7 @@ namespace eshopDL
 
         public int DeleteProduct(int productID)
         {
-            int status;
+            int status = 0;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
                 using (SqlCommand objComm = new SqlCommand("DELETE FROM product WHERE productID=@productID", objConn))
@@ -984,6 +986,9 @@ namespace eshopDL
                         objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
 
                         status = objComm.ExecuteNonQuery();
+
+                        if(bool.Parse(ConfigurationManager.AppSettings["deleteImagesFilesOnProductDelete"]))
+                            deleteProductImagesFiles(productID);
                     }
                     catch (SqlException ex)
                     {
@@ -993,6 +998,61 @@ namespace eshopDL
                 }
             }
             return status;
+        }
+
+        private void deleteProductImagesFiles(int productID)
+        {
+            List<ProductImage> images = GetProductImages(productID);
+
+            foreach(ProductImage image in images)
+            {
+                try
+                { 
+                    string path = createImageUrl(image.ImageUrl);
+                    string name = path.Substring(0, path.IndexOf("."));
+                    string extension = path.Substring(path.IndexOf("."));
+
+                    try
+                    { 
+                        File.Delete(HttpContext.Current.Server.MapPath("~/" + path));
+                    }
+                    catch(Exception ex)
+                    {
+                        ErrorLog.LogError(ex);
+                    }
+
+                    try
+                    { 
+                        File.Delete(HttpContext.Current.Server.MapPath("~/" + name + "-" + ConfigurationManager.AppSettings["mainName"] + extension));
+                    }
+                    catch(Exception ex)
+                    {
+                        ErrorLog.LogError(ex);
+                    }
+
+                    try
+                    { 
+                        File.Delete(HttpContext.Current.Server.MapPath("~/" + name + "-" + ConfigurationManager.AppSettings["listName"] + extension));
+                    }
+                    catch(Exception ex)
+                    {
+                        ErrorLog.LogError(ex);
+                    }
+
+                    try
+                    { 
+                        File.Delete(HttpContext.Current.Server.MapPath("~/" + name + "-" + ConfigurationManager.AppSettings["thumbName"] + extension));
+                    }
+                    catch(Exception ex)
+                    {
+                        ErrorLog.LogError(ex);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    ErrorLog.LogError(ex);
+                }
+            }
         }
 
         private int DeleteProductAttributes(int productID)
@@ -1429,7 +1489,7 @@ namespace eshopDL
         {
             StringBuilder directory = new System.Text.StringBuilder();
             directory.Append("/images/p/");
-            string imageName = url.Substring(0, url.IndexOf(".jpg"));
+            string imageName = url.Substring(0, url.IndexOf("."));
             for (int i = 0; i < imageName.Length; i++)
                 directory.Append(imageName[i].ToString() + "/");
             directory.Append(url);
