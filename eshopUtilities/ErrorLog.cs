@@ -23,7 +23,7 @@ namespace eshopUtilities
             message = getMessage(ex);
 
             try { 
-                using (StreamWriter sw = new StreamWriter(HttpContext.Current.Server.MapPath("/log/error.log"), true))
+                using (StreamWriter sw = new StreamWriter(HttpContext.Current.Server.MapPath("/log/" + DateTime.Now.ToString("ddMMyyyy") + "-error.log"), true))
                     sw.WriteLine(DateTime.Now.ToUniversalTime().ToString() + " - " + code.ToString() + " - " + message + " " + Environment.NewLine + rawUrl +  Environment.NewLine + userHostAddress + Environment.NewLine + url);
                 sendMail(message, rawUrl, userHostAddress, url);
             }
@@ -43,24 +43,43 @@ namespace eshopUtilities
 
         public static void LogMessage(string message)
         {
-            using (StreamWriter sw = new StreamWriter(HttpContext.Current.Server.MapPath("/log/error.log"), true))
+            try
+            { 
+            using (StreamWriter sw = new StreamWriter(HttpContext.Current.Server.MapPath("/log/" + DateTime.Now.ToString("ddMMyyyy") + ".log"), true))
                 sw.WriteLine(DateTime.Now.ToUniversalTime().ToString() + " - " + message);
+            }
+            catch(Exception ex)
+            {
+                if(ex is IOException)
+                { 
+                    Thread.Sleep(100);
+                    LogMessage(message);
+                }
+            }
         }
 
         private static void sendMail(string message, string rawUrl, string userHostAddress, string url)
         {
-            MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress(ConfigurationManager.AppSettings["errorEmail"]);
-            mailMessage.To.Add(new MailAddress(ConfigurationManager.AppSettings["errorEmail"]));
-            mailMessage.Subject = "Error";
-            mailMessage.BodyEncoding = Encoding.UTF8;
-            mailMessage.Body = message;
-            mailMessage.Body += Environment.NewLine + rawUrl;
-            mailMessage.Body += Environment.NewLine + userHostAddress;
-            mailMessage.Body += Environment.NewLine + url;
+            try
+            { 
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress(ConfigurationManager.AppSettings["errorEmailFrom"]);
+                mailMessage.To.Add(new MailAddress(ConfigurationManager.AppSettings["errorEmailTo"]));
+                mailMessage.Subject = ConfigurationManager.AppSettings["CompanyName"] + " - Error";
+                mailMessage.BodyEncoding = Encoding.UTF8;
+                mailMessage.IsBodyHtml = true;
+                mailMessage.Body = message;
+                mailMessage.Body += "<br/>" + Environment.NewLine + "<strong>Raw url: </strong>" + rawUrl;
+                mailMessage.Body += "<br/>" + Environment.NewLine + "<strong>User host address: </strong>" + userHostAddress;
+                mailMessage.Body += "<br/>" + Environment.NewLine + "<strong>Url: </strong>" + url;
 
-            SmtpClient smtp = Common.getErrorSmtp();
-            //smtp.Send(mailMessage);
+                SmtpClient smtp = Common.getErrorSmtp();
+                smtp.Send(mailMessage);
+            }
+            catch(Exception ex)
+            {
+                LogMessage(ex.Message);
+            }
         }
 
         private static string getMessage(Exception ex)
@@ -68,7 +87,7 @@ namespace eshopUtilities
 
             if (ex.InnerException == null)
                 return ex.Message;
-            else return ex.Message + Environment.NewLine + ex.StackTrace + Environment.NewLine + getMessage(ex.InnerException);
+            else return ex.Message + Environment.NewLine + "<strong>Stack trace: </strong>" + ex.StackTrace + Environment.NewLine + "<strong>Message: </strong>" + getMessage(ex.InnerException);
         }
     }
 }

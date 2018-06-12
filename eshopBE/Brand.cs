@@ -9,15 +9,17 @@ namespace eshopBE
     {
         private int _brandID;
         private string _name;
+        private string _logoUrl;
 
         public Brand()
         {
         }
 
-        public Brand(int brandID, string name)
+        public Brand(int brandID, string name, string logoUrl)
         {
             _brandID = brandID;
             _name = name;
+            _logoUrl = logoUrl;
         }
 
         public int BrandID
@@ -30,6 +32,12 @@ namespace eshopBE
         {
             get { return _name; }
             set { _name = value; }
+        }
+
+        public string LogoUrl
+        {
+            get { return _logoUrl; }
+            set { _logoUrl = value; }
         }
     }
 }

@@ -15,7 +15,7 @@ namespace eshopBL
             List<Brand> brands = brandDL.GetBrands();
 
             if (allSelection && brands != null)
-                brands.Insert(0, new Brand(-1, "Sve"));
+                brands.Insert(0, new Brand(-1, "Sve", string.Empty));
 
             return brands;
         }
@@ -33,6 +33,11 @@ namespace eshopBL
         {
             BrandDL brandDL = new BrandDL();
             return brandDL.GetBrandByName(name);
+        }
+
+        public Brand GetBrand(int id)
+        {
+            return new BrandDL().GetBrand(id);
         }
 
         public int SaveBrand(Brand brand)

@@ -348,7 +348,7 @@ namespace eshopBL
                 newProduct.Price = price;
                 newProduct.WebPrice = price;
 
-                newProduct.Brand = new Brand(0, "Nepoznat");
+                newProduct.Brand = new Brand(0, "Nepoznat", string.Empty);
                 newProduct.Categories = new List<Category>();
                 if (externalCategoryID <= 0)
                     newProduct.Categories.Add(new Category(9999, "Nepoznat", null, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, -1, false, false, 0, 0, 0));

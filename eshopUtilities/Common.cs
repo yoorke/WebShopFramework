@@ -451,12 +451,12 @@ namespace eshopUtilities
         public static SmtpClient getErrorSmtp()
         {
             SmtpClient smtp = new SmtpClient();
-            NetworkCredential networkCredential = new NetworkCredential(ConfigurationManager.AppSettings["errorEmail"].ToString(), ConfigurationManager.AppSettings["errorEmailPassword"].ToString());
+            NetworkCredential networkCredential = new NetworkCredential(ConfigurationManager.AppSettings["errorEmailFrom"].ToString(), ConfigurationManager.AppSettings["errorEmailFromPassword"].ToString());
             smtp.UseDefaultCredentials = false;
             smtp.Credentials = networkCredential;
-            smtp.Host = ConfigurationManager.AppSettings["errorSmtp"].ToString();
-            smtp.Port = int.Parse(ConfigurationManager.AppSettings["errorSmtpPort"]);
-            smtp.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["errorSmtpSsl"]);
+            smtp.Host = ConfigurationManager.AppSettings["errorEmailFromSmtp"].ToString();
+            smtp.Port = int.Parse(ConfigurationManager.AppSettings["errorEmailFromSmtpPort"]);
+            smtp.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["errorEmailFromSmtpSsl"]);
 
             return smtp;
         }

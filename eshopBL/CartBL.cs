@@ -129,5 +129,10 @@ namespace eshopBL
             for (int i = 0; i < products.Rows.Count; i++)
                 DeleteProductFromCart(int.Parse(products.Rows[i]["productID"].ToString()), cartID);          
         }
+
+        public bool UpdateProductQuantity(int productID, int value, string cartID)
+        {
+            return new CartDL().UpdateProductQuantity(productID, value, cartID);
+        }
     }
 }

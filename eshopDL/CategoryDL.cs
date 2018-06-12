@@ -405,7 +405,7 @@ namespace eshopDL
                         if (reader.HasRows)
                             //brands.Load(reader);
                             while (reader.Read())
-                                brands.Add(new Brand(reader.GetInt32(0), reader.GetString(1)));
+                                brands.Add(new Brand(reader.GetInt32(0), reader.GetString(1), string.Empty));
                     }
                 }
             }

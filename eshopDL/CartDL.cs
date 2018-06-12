@@ -182,5 +182,23 @@ namespace eshopDL
                 }
             }
         }
+
+        public bool UpdateProductQuantity(int productID, int value, string cartID)
+        {
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("cart_updateProductQuantity", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@cartID", SqlDbType.NVarChar, 50).Value = cartID;
+                    objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+                    objComm.Parameters.Add("@value", SqlDbType.Int).Value = value;
+
+                    objComm.ExecuteNonQuery();
+                }
+            }
+            return true;
+        }
     }
 }

@@ -156,7 +156,7 @@ namespace eshopDL
                                 product.ProductID = reader.GetInt32(0);
                                 product.Code = reader.GetString(1);
                                 product.SupplierCode = reader.GetString(2);
-                                product.Brand = new Brand(reader.GetInt32(3), reader.GetString(8));
+                                product.Brand = new Brand(reader.GetInt32(3), reader.GetString(8), string.Empty);
                                 product.Name = reader.GetString(4);
                                 product.Description = reader.GetString(5);
                                 product.Price = reader.GetDouble(6);
@@ -324,7 +324,7 @@ namespace eshopDL
                             product.Description = reader.GetString(3);
                             product.Price = reader.GetDouble(4);
                             product.WebPrice = reader.GetDouble(5);
-                            product.Brand = new Brand(-1, reader.GetString(6));
+                            product.Brand = new Brand(-1, reader.GetString(6), string.Empty);
                             product.Images = new List<ProductImage>();
                             //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
                             //product.Images.Add("/images/" + reader.GetString(7));
@@ -396,7 +396,7 @@ namespace eshopDL
                             product.Description = reader.GetString(3);
                             product.Price = reader.GetDouble(4);
                             product.WebPrice = reader.GetDouble(5);
-                            product.Brand = new Brand(-1, reader.GetString(6));
+                            product.Brand = new Brand(-1, reader.GetString(6), string.Empty);
                             product.Images = new List<ProductImage>();
                             //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
                                 product.Images.Add(new ProductImage(reader.GetString(7), 1));
@@ -458,7 +458,7 @@ namespace eshopDL
                             product.Description = reader.GetString(3);
                             product.Price = reader.GetDouble(4);
                             product.WebPrice = reader.GetDouble(5);
-                            product.Brand = new Brand(-1, reader.GetString(6));
+                            product.Brand = new Brand(-1, reader.GetString(6), string.Empty);
                             product.Images = new List<ProductImage>();
                             //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~/images/" + reader.GetString(7))))
                                 product.Images.Add(new ProductImage(reader.GetString(7), 1));
@@ -569,7 +569,7 @@ namespace eshopDL
                             product.Categories = new List<Category>();
                             product.Categories.Add(new Category(-1, reader.GetString(3), -1, string.Empty, string.Empty, 0, 0, 0, string.Empty, false, 0, false, false, 0, 0, 0));
                             product.Name = reader.GetString(1);
-                            product.Brand = new Brand(-1, reader.GetString(2));
+                            product.Brand = new Brand(-1, reader.GetString(2), string.Empty);
 
                             products.Add(product);
                         }
@@ -985,14 +985,18 @@ namespace eshopDL
 
                         objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
 
+
+                        if (bool.Parse(ConfigurationManager.AppSettings["deleteImagesFilesOnProductDelete"]))
+                            deleteProductImagesFiles(productID);
                         status = objComm.ExecuteNonQuery();
 
-                        if(bool.Parse(ConfigurationManager.AppSettings["deleteImagesFilesOnProductDelete"]))
-                            deleteProductImagesFiles(productID);
+                        
                     }
                     catch (SqlException ex)
                     {
                         ErrorLog.LogError(ex);
+                        if (ex.Message.Contains("REFERENCE") && ex.Message.Contains("orderItem"))
+                            throw new BLException("Nije moguće obrisati proizvod pošto se nalazi u porudžbenicama.");
                         throw new DLException("Error while deleting product", ex);
                     }
                 }
@@ -1151,7 +1155,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT productID, code, supplierCode, brand.brandID, product.name, description, price, webPrice, brand.name, isApproved, isActive, insertDate, updateDate, vatID, supplierID, specification, isLocked, isInStock, ean, product.supplierPrice, unitOfMeasureID FROM product INNER JOIN brand ON product.brandID=brand.brandID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT productID, code, supplierCode, brand.brandID, product.name, description, price, webPrice, brand.name, isApproved, isActive, insertDate, updateDate, vatID, supplierID, specification, isLocked, isInStock, ean, product.supplierPrice, unitOfMeasureID, brand.logoUrl FROM product INNER JOIN brand ON product.brandID=brand.brandID", objConn))
                 {
                     try
                     {
@@ -1183,7 +1187,7 @@ namespace eshopDL
                                 product.ProductID = reader.GetInt32(0);
                                 product.Code = reader.GetString(1);
                                 product.SupplierCode = reader.GetString(2);
-                                product.Brand = new Brand(reader.GetInt32(3), reader.GetString(8));
+                                product.Brand = new Brand(reader.GetInt32(3), reader.GetString(8), !Convert.IsDBNull(reader[21]) ? reader.GetString(21) : string.Empty);
                                 product.Name = reader.GetString(4);
                                 product.Description = reader.GetString(5);
                                 product.Price = reader.GetDouble(6);
@@ -1604,7 +1608,7 @@ namespace eshopDL
                             product.Description = reader.GetString(3);
                             product.Price = reader.GetDouble(4);
                             product.WebPrice = reader.GetDouble(5);
-                            product.Brand = new Brand(reader.GetInt32(6), reader.GetString(7));
+                            product.Brand = new Brand(reader.GetInt32(6), reader.GetString(7), string.Empty);
                             product.Images = new List<ProductImage>();
                             //string directory = createImageUrl(reader.GetString(8));
                             //if (System.IO.File.Exists(HttpContext.Current.Server.MapPath("~" + directory)))
