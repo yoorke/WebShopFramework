@@ -6,6 +6,7 @@ using eshopDL;
 using eshopBE;
 using System.Data;
 using eshopUtilities;
+using System.Configuration;
 
 namespace eshopBL
 {
@@ -148,15 +149,25 @@ namespace eshopBL
             CategoryDL categoryDL = new CategoryDL();
             DataTable categoriesDT = categoryDL.GetCategories("sortOrder", showNotActive);
 
-            return GetCategoriesList(categoriesDT, 1);
+            return GetCategoriesList(categoriesDT, 1, string.Empty);
         }
 
-        private List<Category> GetCategoriesList(DataTable categoriesDT, int parentID)
+        private List<Category> GetCategoriesList(DataTable categoriesDT, int parentID, string rootUrl)
         {
             List<Category> list = null;
 
             DataView dv = new DataView(categoriesDT);
             dv.RowFilter = "parentID=" + parentID.ToString();
+
+            string parentUrl = string.Empty;
+            if (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]))
+            { 
+                DataView dvParent = new DataView(categoriesDT);
+                dvParent.RowFilter = "categoryID=" + parentID.ToString();
+                parentUrl = rootUrl + (dvParent.Count > 0 ? (!rootUrl.EndsWith("/") && !dvParent[0]["url"].ToString().StartsWith("/") ? "/" : string.Empty) + (dvParent.Count > 0 ? dvParent[0]["url"].ToString() : string.Empty) : string.Empty);
+                parentUrl += parentUrl.EndsWith("/") ? string.Empty : "/";
+            }
+
             Category category;
 
             if (dv.Count > 0)
@@ -166,7 +177,7 @@ namespace eshopBL
                 category = new Category();
                 category.CategoryID = (int)row["categoryID"];
                 category.Name = row["name"].ToString();
-                category.Url = row["url"].ToString();
+                category.Url = (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"])) ? (parentUrl + row["url"].ToString()) : row["url"].ToString();
                 category.ImageUrl = row["imageUrl"].ToString();
                 category.SortOrder = (int)row["sortOrder"];
                 category.CategoryBannerID = (int)row["categoryBannerID"];
@@ -175,7 +186,7 @@ namespace eshopBL
                     category.CategoryExtraMenus = new CategoryExtraMenuBL().GetCategoryExtraMenusForCategory(category.CategoryID);
                 else category.CategoryExtraMenus = new List<CategoryExtraMenuCategory>();
 
-                category.SubCategory = GetCategoriesList(categoriesDT, (int)row["categoryID"]);
+                category.SubCategory = GetCategoriesList(categoriesDT, (int)row["categoryID"], parentUrl);
 
                 category.ImageUrlSource = (int)row["imageUrlSource"];
                 category.ImageUrlPositionX = (int)row["imageUrlPositionX"];
@@ -308,12 +319,18 @@ namespace eshopBL
 
         public Category GetCategoryByUrl(string url)
         {
-            return new CategoryDL().GetCategoryByUrl(url);
+            if(!url.Contains('/') && !bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]))
+                return new CategoryDL().GetCategoryByUrl(url);
+
+            string[] urlArray = url.Split('/');
+            //if (urlArray.Length < 2)
+                //return null;
+            return new CategoryDL().GetCategoryByUrl(urlArray.Length > 1 ? urlArray[urlArray.Length - 2] : string.Empty, urlArray[urlArray.Length - 1]);
         }
 
-        public List<Category> GetAllSubCategories(int categoryID)
+        public List<Category> GetAllSubCategories(int categoryID, bool includeAllSubcategories)
         {
-            return new CategoryDL().GetAllSubCategories(categoryID);
+            return new CategoryDL().GetAllSubCategories(categoryID, includeAllSubcategories);
         }
 
         public int AddBrandToCategoryExtraMenu(int categoryExtraMenuID, int brandID, int categoryID)

@@ -32,6 +32,7 @@ namespace eshopBE
         private Promotion _promotion;
         private double _supplierPrice;
         private UnitOfMeasure _unitOfMeasure;
+        private string _fullCategoryUrl;
 
         public int ProductID
         {
@@ -165,6 +166,12 @@ namespace eshopBE
             set { _promotion = value; }
         }
 
+        public string FullCategoryUrl
+        {
+            get { return _fullCategoryUrl; }
+            set { _fullCategoryUrl = value; }
+        }
+
         public string Url
         {
             get
@@ -173,7 +180,7 @@ namespace eshopBE
                 {
                     string[] properties = ConfigurationManager.AppSettings["productUrlDefinition"].Split(',');
                     StringBuilder url = new StringBuilder();
-                    url.Append(_categories[0].Name + "/");
+                    url.Append(bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]) ? this._fullCategoryUrl  + "/" : _categories[0].Name + "/");
                     foreach (string property in properties)
                     {
                         if (property.Contains("."))
@@ -189,7 +196,7 @@ namespace eshopBE
                 }
                 else
                 {
-                    string url = bool.Parse(ConfigurationManager.AppSettings["fullProductUrl"]) ? _categories[0].Name + "/" + _brand.Name + " " : string.Empty;
+                    string url = bool.Parse(ConfigurationManager.AppSettings["fullProductUrl"]) ? (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]) ? this._fullCategoryUrl + "/" : _categories[0].Name + "/") + _brand.Name + " " : string.Empty;
                     url += _name.Replace('/', '-') + "-" + _productID.ToString();
                     //return "/proizvodi/" + CreateFriendlyUrl(_categories[0].Name + "/" + _brand.Name + " " + _name.Replace('/','-') + "-" + _productID);
                     return "/proizvodi/" + CreateFriendlyUrl(url);

@@ -22,8 +22,15 @@ namespace eshopBL
 
         public List<Brand> GetBrands(string categoryUrl, bool includeChildrenCategories = false)
         {
+            Category category = null;
             CategoryDL categoryDL = new CategoryDL();
-            Category category = categoryDL.GetCategoryByUrl(categoryUrl);
+            if (!categoryUrl.Contains('/'))            
+                category = categoryDL.GetCategoryByUrl(categoryUrl);
+            else
+            {
+                string[] categoryUrlArray = categoryUrl.Split('/');
+                category = categoryDL.GetCategoryByUrl(categoryUrlArray[categoryUrlArray.Length - 2], categoryUrlArray[categoryUrlArray.Length - 1]);
+            }
 
             BrandDL brandDL = new BrandDL();
             return brandDL.GetBrands(category.CategoryID, includeChildrenCategories);

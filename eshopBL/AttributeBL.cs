@@ -100,7 +100,11 @@ namespace eshopBL
         public List<eshopBE.Attribute> GetAttributeListForFilter(string categoryUrl)
         {
             AttributeDL attributeDL = new AttributeDL();
-            return attributeDL.GetAttributeListForFilter(categoryUrl);
+            if(!categoryUrl.Contains('/'))
+                return attributeDL.GetAttributeListForFilter(categoryUrl);
+
+            string[] categoryUrlArray = categoryUrl.Split('/');
+            return attributeDL.GetAttributeListForFilter(categoryUrlArray[categoryUrlArray.Length - 2], categoryUrlArray[categoryUrlArray.Length - 1]);
         }
 
         public int SaveAttributePositionForCategory(int attributeID, int categoryID, int position)

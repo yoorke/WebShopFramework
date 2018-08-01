@@ -44,7 +44,7 @@ namespace eshopBL
             DataTable categories = new CategoryBL().GetCategories("categoryID", false);
             foreach(DataRow categoryRow in categories.Rows)
             {
-                root.AppendChild(createElement(webShopUrl + categoryRow["url"].ToString(), xmlDoc));
+                root.AppendChild(createElement(webShopUrl + (!categoryRow["fullUrl"].ToString().StartsWith("/") ? "/" : string.Empty) + categoryRow["fullUrl"].ToString(), xmlDoc));
                 foreach (Product product in new ProductBL().GetProductsForSitemap(int.Parse(categoryRow["categoryID"].ToString())))
                     root.AppendChild(createElement(webShopUrl + product.Url, xmlDoc));
             }

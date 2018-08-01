@@ -5,6 +5,8 @@ using System.Text;
 using System.Web.Routing;
 using eshopBE;
 using System.Configuration;
+using System.Web;
+using System.Text.RegularExpressions;
 
 namespace eshopBL
 {
@@ -16,7 +18,9 @@ namespace eshopBL
             using (routes.GetWriteLock())
             {
                 routes.Clear();
-                routes.MapPageRoute("category", "proizvodi/{category}", "~/products.aspx");
+
+                routes.MapPageRoute("productPage", "proizvodi/{category}/{*product}", "~/product.aspx", false, null, new RouteValueDictionary { { "product", new IsProductContraint() } });
+                routes.MapPageRoute("category", "proizvodi/{*category}", "~/products.aspx");
                 routes.MapPageRoute("product", "proizvodi/{category}/{product}", "~/product.aspx");
                 routes.MapPageRoute("lista-zelja", "lista-zelja", "~/wishList.aspx");
                 routes.MapPageRoute("korpa", "korpa", "~/cart.aspx");
@@ -42,6 +46,19 @@ namespace eshopBL
                 foreach (Promotion promotion in new PromotionBL().GetPromotions(false, null, null))
                     routes.MapPageRoute(promotion.Name, "akcija/" + promotion.Url, "~/promotion.aspx", false, new RouteValueDictionary { { "url", promotion.Url } });
             }
+        }
+    }
+
+    public class IsProductContraint : IRouteConstraint
+    {
+        public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection)
+        {
+            if (values["product"] == null)
+                return false;
+
+            Regex regex = new Regex(@"-(\d+)$");
+
+            return (regex.Match(values["product"].ToString())).Success;
         }
     }
 }

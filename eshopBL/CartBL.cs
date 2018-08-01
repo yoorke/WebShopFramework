@@ -93,7 +93,7 @@ namespace eshopBL
                             //category
                             if (coupon.Objects[j].ObjectTypeID == 1)
                             {
-                                List<Category> categories = new CategoryBL().GetAllSubCategories(coupon.Objects[j].ObjectID);
+                                List<Category> categories = new CategoryBL().GetAllSubCategories(coupon.Objects[j].ObjectID, true);
                                 foreach(Category category in categories)
                                     if(category.CategoryID == product.Categories[0].CategoryID)
                                     { 

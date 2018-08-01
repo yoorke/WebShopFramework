@@ -170,6 +170,31 @@ namespace eshopDL
             return attributeValues;
         }
 
+        public List<AttributeValue> GetAttributeValuesForFilter(int attributeID, string parentCategoryUrl, string categoryUrl)
+        {
+            List<AttributeValue> attributeValues = null;
+
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("attributeValue_getForFilter", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@attributeID", SqlDbType.Int).Value = attributeID;
+                    objComm.Parameters.Add("@parentCategoryUrl", SqlDbType.NVarChar, 50).Value = parentCategoryUrl;
+                    objComm.Parameters.Add("@categoryUrl", SqlDbType.NVarChar, 50).Value = categoryUrl;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                            attributeValues = new List<AttributeValue>();
+                        while (reader.Read())
+                            attributeValues.Add(new AttributeValue(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), 0, string.Empty, 0));
+                    }
+                }
+            }
+            return attributeValues;
+        }
+
         /*private eshopBE.Attribute GetAttribute(int attributeID, string name)
         {
             eshopBE.Attribute attribute = null;
@@ -477,6 +502,40 @@ namespace eshopDL
                             attribute.Name = reader.GetString(1);
                             attribute.Filter = true;
                             attribute.Values = GetAttributeValuesForFilter(attribute.AttributeID, categoryUrl);
+
+                            attributes.Add(attribute);
+                        }
+                    }
+                }
+            }
+            return attributes;
+        }
+
+        public List<eshopBE.Attribute> GetAttributeListForFilter(string parentCategoryUrl, string categoryUrl)
+        {
+            List<eshopBE.Attribute> attributes = null;
+            eshopBE.Attribute attribute = null;
+
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("attribute_getListForFilter", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@parentCategoryUrl", SqlDbType.NVarChar, 50).Value = parentCategoryUrl;
+                    objComm.Parameters.Add("@categoryUrl", SqlDbType.NVarChar, 50).Value = categoryUrl;
+
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                            attributes = new List<eshopBE.Attribute>();
+                        while(reader.Read())
+                        {
+                            attribute = new eshopBE.Attribute();
+                            attribute.AttributeID = reader.GetInt32(0);
+                            attribute.Name = reader.GetString(1);
+                            attribute.Filter = true;
+                            attribute.Values = GetAttributeValuesForFilter(attribute.AttributeID, parentCategoryUrl, categoryUrl);
 
                             attributes.Add(attribute);
                         }

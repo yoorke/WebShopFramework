@@ -154,12 +154,12 @@ namespace eshopBL
                         break;
                     }
             }*/
-            CategoryDL categoryDL = new CategoryDL();
-            Category category = categoryDL.GetCategoryByUrl(categoryUrl);
+            CategoryBL categoryBL = new CategoryBL();
+            Category category = categoryBL.GetCategoryByUrl(categoryUrl);
 
 
             ProductDL productDL = new ProductDL();
-            return productDL.GetProducts(category.CategoryID, brandsID, attributeValues, getSort(sortName), getPrice(priceFrom), getPrice(priceTo), includeChildrenCategoriesProducts);
+            return productDL.GetProducts(category.CategoryID, brandsID, attributeValues, getSort(sortName), getPrice(priceFrom), getPrice(priceTo), includeChildrenCategoriesProducts || category.ShowProductsFromSubCategories);
         }
 
         private string getSort(string sortName)
@@ -225,7 +225,7 @@ namespace eshopBL
 
         public double[] GetMinMaxPrice(string categoryName, bool includeChildrenCategories = false)
         {
-            Category category = new CategoryBL().GetCategory(categoryName);
+            Category category = new CategoryBL().GetCategoryByUrl(categoryName);
             return new ProductDL().GetMinMaxPriceForCategory(category.CategoryID, includeChildrenCategories);
         }
 
@@ -404,6 +404,11 @@ namespace eshopBL
         public List<Product> GetProductsForSitemap(int categoryID)
         {
             return new ProductDL().GetProductForSiteMap(categoryID);
+        }
+
+        public bool ChangeCategory(int productID, int newCategoryID)
+        {
+            return new ProductDL().ChangeCategory(productID, newCategoryID);
         }
     }
 }
