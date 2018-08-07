@@ -17,7 +17,7 @@ namespace eshopDL
             bool exist = false;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT * FROM [user] WHERE username=@username AND password=@password", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT * FROM [user] WHERE username=@username AND password=@password AND active = 1 AND blocked=0", objConn))
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@username", SqlDbType.NVarChar, 50).Value = username;
@@ -42,7 +42,7 @@ namespace eshopDL
             {
                 using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
                 {
-                    using (SqlCommand objComm = new SqlCommand("INSERT INTO [user] (firstName, lastName, username, email, password, address, city, phone, salt, insertDate, zip, discount, discountTypeID) VALUES (@firstName, @lastName, @username, @email, @password, @address, @city, @phone, @salt, @insertDate, @zip, @discount, @discountTypeID); SELECT SCOPE_IDENTITY()", objConn))
+                    using (SqlCommand objComm = new SqlCommand("INSERT INTO [user] (firstName, lastName, username, email, password, address, city, phone, salt, insertDate, zip, discount, discountTypeID, active, blocked) VALUES (@firstName, @lastName, @username, @email, @password, @address, @city, @phone, @salt, @insertDate, @zip, @discount, @discountTypeID, @active, @blocked); SELECT SCOPE_IDENTITY()", objConn))
                     {
                         objConn.Open();
                         objComm.Parameters.Add("@firstName", SqlDbType.NVarChar, 50).Value = firstName;
@@ -55,9 +55,11 @@ namespace eshopDL
                         objComm.Parameters.Add("@phone", SqlDbType.NVarChar, 50).Value = phone;
                         objComm.Parameters.Add("@salt", SqlDbType.NVarChar, 50).Value = salt;
                         objComm.Parameters.Add("@insertDate", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
-                        objComm.Parameters.Add("@zip", SqlDbType.NVarChar, 5).Value = zip;
+                        objComm.Parameters.Add("@zip", SqlDbType.NVarChar, 5).Value = zip != null ? zip : string.Empty;
                         objComm.Parameters.Add("@discount", SqlDbType.Float).Value = 0;
                         objComm.Parameters.Add("@discountTypeID", SqlDbType.Int).Value = 1;
+                        objComm.Parameters.Add("@active", SqlDbType.Bit).Value = true;
+                        objComm.Parameters.Add("@blocked", SqlDbType.Bit).Value = false;
 
                         userID = int.Parse(objComm.ExecuteScalar().ToString());
                         if (userID > 0)
@@ -84,7 +86,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT userID, firstName, lastName, address, city, phone, email, username, insertDate, zip, discount, discountTypeID FROM [user]", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT userID, firstName, lastName, address, city, phone, email, username, insertDate, zip, discount, discountTypeID, active, blocked FROM [user]", objConn))
                 {
                     if (username != string.Empty)
                     {
@@ -117,7 +119,7 @@ namespace eshopDL
             DataTable user = new DataTable();
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT userID, firstName, lastName, address, city, phone, insertDate, zip, discount, discountTypeID FROM [user] WHERE email=@email", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT userID, firstName, lastName, address, city, phone, insertDate, zip, discount, discountTypeID, active, blocked FROM [user] WHERE email=@email", objConn))
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@email", SqlDbType.NVarChar, 50).Value = email;
@@ -314,7 +316,7 @@ namespace eshopDL
             DataTable users = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT userID, firstName, lastName, username, email, address, city, phone, discount, discountTypeID FROM [user] WHERE userID > 42 ORDER BY userID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT userID, firstName, lastName, username, email, address, city, phone, discount, discountTypeID, active, blocked FROM [user] WHERE userID > 42 ORDER BY userID", objConn))
                 {
                     objConn.Open();
                     using (SqlDataReader reader = objComm.ExecuteReader())
@@ -372,7 +374,7 @@ namespace eshopDL
             User user = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT [user].userID, firstName, lastName, username, [password], email, [address], city, phone, userType.userTypeID, userType.name, insertDate, zip, discount, discountTypeID FROM [user] INNER JOIN userUserType ON [user].userID=userUserType.userID INNER JOIN userType ON userUserType.userTypeID=userType.userTypeID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT [user].userID, firstName, lastName, username, [password], email, [address], city, phone, userType.userTypeID, userType.name, insertDate, zip, discount, discountTypeID, active, blocked FROM [user] INNER JOIN userUserType ON [user].userID=userUserType.userID INNER JOIN userType ON userUserType.userTypeID=userType.userTypeID", objConn))
                 {
                     objConn.Open();
                     if (userID > 0)
@@ -407,6 +409,8 @@ namespace eshopDL
                                 user.Zip = !Convert.IsDBNull(reader[12]) ? reader.GetString(12) : string.Empty;
                                 user.Discount = reader.GetDouble(13);
                                 user.DiscountTypeID = reader.GetInt32(14);
+                                user.Active = reader.GetBoolean(15);
+                                user.Blocked = reader.GetBoolean(16);
                             }
                         }
                     }
@@ -572,6 +576,8 @@ namespace eshopDL
                     objComm.Parameters.Add("@userID", SqlDbType.Int).Value=user.UserID;
                     objComm.Parameters.Add("@discount", SqlDbType.Float).Value = user.Discount;
                     objComm.Parameters.Add("@discountTypeID", SqlDbType.Int).Value = user.DiscountTypeID;
+                    objComm.Parameters.Add("@active", SqlDbType.Bit).Value = user.Active;
+                    objComm.Parameters.Add("@blocked", SqlDbType.Bit).Value = user.Blocked;
 
                     status = objComm.ExecuteNonQuery();
                 }

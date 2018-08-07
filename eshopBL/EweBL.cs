@@ -777,8 +777,8 @@ namespace eshopBL
                 {
                     if(!productDL.IsLocked(productID))
                     {
-                        double price = calculatePrice(double.Parse(products.Rows[i]["price"].ToString()), category.PricePercent);
-                        double webPrice = calculatePrice(double.Parse(products.Rows[i]["price"].ToString()), category.WebPricePercent);
+                        double price = calculatePrice(double.Parse(products.Rows[i]["priceRebate"].ToString()), category.PricePercent);
+                        double webPrice = calculatePrice(double.Parse(products.Rows[i]["priceRebate"].ToString()), category.WebPricePercent);
                         updatedCount += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
                     }
                 }

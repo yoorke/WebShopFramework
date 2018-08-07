@@ -22,6 +22,8 @@ namespace eshopBE
         private string _zip;
         private double _discount;
         private int _discountTypeID;
+        private bool _active;
+        private bool _blocked;
 
 
         public User()
@@ -135,6 +137,18 @@ namespace eshopBE
         {
             get { return _discountTypeID; }
             set { _discountTypeID = value; }
+        }
+
+        public bool Active
+        {
+            get { return _active; }
+            set { _active = value; }
+        }
+
+        public bool Blocked
+        {
+            get { return _blocked; }
+            set { _blocked = value; }
         }
     }
 }
