@@ -422,5 +422,10 @@ namespace eshopBL
         {
             return new CategoryDL().GetFirstLevelSubcategories(categoryID);
         }
+
+        public DataTable Search(string searchText)
+        {
+            return new CategoryDL().Search(searchText);
+        }
     }
 }

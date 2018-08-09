@@ -249,9 +249,9 @@ namespace eshopBL
             return new ProductDL().GetTop10Order();
         }
 
-        public List<Product> SearchProducts(string search, string sort)
+        public List<Product> SearchProducts(string search, string sort, int categoryID)
         {
-            return new ProductDL().SearchProducts(search, getSort(sort));
+            return new ProductDL().SearchProducts(search, getSort(sort), categoryID);
         }
 
         public void SetPromotionPrice(int productID, double price, double value, int promotionID)

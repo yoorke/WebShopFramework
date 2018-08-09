@@ -316,7 +316,7 @@ namespace eshopDL
             DataTable users = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT userID, firstName, lastName, username, email, address, city, phone, discount, discountTypeID, active, blocked FROM [user] WHERE userID > 42 ORDER BY userID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT [user].userID, firstName, lastName, username, email, address, city, phone, discount, discountTypeID, active, blocked, userType.name as userType FROM [user] INNER JOIN userUserType ON [user].userID = userUserType.userID INNER JOIN userType ON userUserType.userTypeID = userType.userTypeID WHERE [user].userID > 0 ORDER BY [user].userID", objConn))
                 {
                     objConn.Open();
                     using (SqlDataReader reader = objComm.ExecuteReader())

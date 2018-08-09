@@ -1449,7 +1449,7 @@ namespace eshopDL
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
-                    specification += "<table class='table table-striped'><tbody>";
+                    specification += "<table class='table table-striped table-condensed'><tbody>";
                     string attributeGroup = string.Empty;
                     int i = 0;
                     using (SqlDataReader reader = objComm.ExecuteReader())
@@ -1606,7 +1606,7 @@ namespace eshopDL
             return products;
         }
 
-        public List<Product> SearchProducts(string search, string sort)
+        public List<Product> SearchProducts(string search, string sort, int? categoryID)
         {
             List<Product> products = new List<Product>();
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
@@ -1616,18 +1616,19 @@ namespace eshopDL
                     DataTable searchTable = new DataTable();
                     searchTable.Columns.Add("search");
                     DataRow newRow;
-                    foreach (string searchItem in search.Split(' '))
-                    { 
+                    //foreach (string searchItem in search.Split(' '))
+                    //{ 
                         newRow = searchTable.NewRow();
-                        newRow["search"] = searchItem;
+                        newRow["search"] = search;
                         searchTable.Rows.Add(newRow);
-                    }
+                    //}
 
                     objConn.Open();
                     objComm.CommandType = CommandType.StoredProcedure;
                     //objComm.Parameters.Add("@search", SqlDbType.NVarChar, 50).Value = search;
                     objComm.Parameters.AddWithValue("@search", searchTable);
                     objComm.Parameters.Add("@sort", SqlDbType.NVarChar, 50).Value = sort;
+                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID > 0 ? categoryID : null;
                     objComm.Parameters[0].SqlDbType = SqlDbType.Structured;
                     using(SqlDataReader reader = objComm.ExecuteReader())
                     {
