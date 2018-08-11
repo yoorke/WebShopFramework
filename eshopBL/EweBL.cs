@@ -684,6 +684,7 @@ namespace eshopBL
                 brand = new Brand();
                 brand.Name = eweProduct.Rows[0]["brand"].ToString();
                 brand.BrandID = new BrandBL().SaveBrand(brand);
+                brand.LogoUrl = string.Empty;
             }
             if (product.Brand == null)
                 product.Brand = new Brand();
