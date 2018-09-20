@@ -67,7 +67,7 @@ namespace eshopDL
                                 newRow[8] = !Convert.IsDBNull(reader[8]) ? reader.GetInt32(8) : 0;
                                 newRow[9] = !Convert.IsDBNull(reader[9]) ? reader.GetInt32(9) : 0;
                                 newRow[10] = !Convert.IsDBNull(reader[10]) ? reader.GetString(10) : string.Empty;
-                                newRow[11] = !Convert.IsDBNull(reader[11]) ? reader.GetString(11) : string.Empty;
+                                newRow[11] = !Convert.IsDBNull(reader[11]) ? reader.GetString(11).Contains("proizvodi") ? reader.GetString(11) : "proizvodi/" + reader.GetString(11) : string.Empty;
 
                                 categoriesDT.Rows.Add(newRow);
                             }
