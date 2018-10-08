@@ -15,6 +15,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 using eshopBE;
+using AegisImplicitMail;
 
 namespace eshopUtilities
 {
@@ -53,10 +54,12 @@ namespace eshopUtilities
         public static int SendOrderConfirmationMail(string email, string name, Order order)
         {
             try
-            { 
+            {
                 MailMessage message = new MailMessage();
+                //MimeMailMessage message = new MimeMailMessage();
                 //message.From = new MailAddress("office@pinservis.com");
-                message.From = new MailAddress(ConfigurationManager.AppSettings["orderEmail"], ConfigurationManager.AppSettings["companyName"]);
+                ////message.From = new MailAddress(ConfigurationManager.AppSettings["orderEmail"], ConfigurationManager.AppSettings["companyName"]);
+                message.From = new MailAddress(ConfigurationManager.AppSettings["orderEmail"]);
                 message.To.Add(new MailAddress(email));
                 //message.CC.Add(new MailAddress("info@pinservis.co.rs.gladiolus.arvixe.com"));
                 message.Subject = "Potvrda narudžbine - " + ConfigurationManager.AppSettings["companyName"];
@@ -120,6 +123,7 @@ namespace eshopUtilities
 
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
+                //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
                 smtp.Send(message);
 
                 return 0;
@@ -135,8 +139,10 @@ namespace eshopUtilities
             try
             {
                 MailMessage message = new MailMessage();
+                //MimeMailMessage message = new MimeMailMessage();
                 //message.From = new MailAddress("office@pinservis.com");
-                message.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
+                //message.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
+                message.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"]);
                 //message.From = new MailAddress("office@pinshop.co.rs");
                 message.To.Add(new MailAddress(email));
                 message.Subject = "Korisnički nalog kreiran - " + ConfigurationManager.AppSettings["companyName"];
@@ -151,6 +157,7 @@ namespace eshopUtilities
                 message.IsBodyHtml = true;
 
                 SmtpClient smtp = getSmtp(message.From.Address.ToString(), "infoEmail");
+                //MimeMailer smtp = getAegisSmtp(message.From.Address.ToString(), "infoEmail");
                 smtp.Send(message);
             }
             catch (Exception ex)
@@ -165,7 +172,9 @@ namespace eshopUtilities
             try
             {
                 MailMessage message = new MailMessage();
-                message.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
+                //MimeMailMessage message = new MimeMailMessage();
+                //message.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
+                message.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"]);
                 message.To.Add(new MailAddress(username));
                 message.Subject = "Resetovanje korisničke šifre";
                 message.BodyEncoding = Encoding.UTF8;
@@ -176,6 +185,8 @@ namespace eshopUtilities
 
 
                 SmtpClient smtp = getSmtp(message.From.Address.ToString(), "infoEmail");
+                //MimeMailer smtp = getAegisSmtp(message.From.Address.ToString(), "infoEmail");
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 smtp.Send(message);
                 return true;
             }
@@ -186,15 +197,39 @@ namespace eshopUtilities
             }
         }
 
-        public static SmtpClient getSmtp(string email, string type)
+        public static MimeMailer getAegisSmtp(string email, string type)
         {
-            SmtpClient smtp = new SmtpClient();
+            ////SmtpClient smtp = new SmtpClient();
+            MimeMailer smtp = new MimeMailer(ConfigurationManager.AppSettings["smtp"], int.Parse(ConfigurationManager.AppSettings["smtpPort"]));
             NetworkCredential networkCredential = new NetworkCredential(email, ConfigurationManager.AppSettings[type + "Password"].ToString());
             //NetworkCredential networkCredential = new NetworkCredential("office@pinshop.co.rs", "webprodaja023");
-            smtp.UseDefaultCredentials = false;
-            smtp.Credentials = networkCredential;
-            smtp.Host = ConfigurationManager.AppSettings["smtp"].ToString();
+            ////smtp.UseDefaultCredentials = false;
+            ////smtp.Credentials = networkCredential;
+            ////smtp.Host = ConfigurationManager.AppSettings["smtp"].ToString();
             //smtp.Host = "mail.pinshop.co.rs";
+            ////smtp.Port = int.Parse(ConfigurationManager.AppSettings["smtpPort"]);
+            ////smtp.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["smtpSsl"]);
+            //smtp.SslType = bool.Parse(ConfigurationManager.AppSettings["smtpSsl"]) ? SslMode.Tls : SslMode.None;
+            smtp.SslType = SslMode.None;
+            //smtp.AuthenticationMode = bool.Parse(ConfigurationManager.AppSettings["smtpSsl"]) ? AuthenticationType.Base64 : AuthenticationType.PlainText;
+            smtp.AuthenticationMode = AuthenticationType.Base64;
+            smtp.User = email;
+            smtp.Password = ConfigurationManager.AppSettings[type + "Password"];
+            //smtp.EnableImplicitSsl = true;
+            //SslMode sslMode = smtp.DetectSslMode();
+            //SslMode sslMode = DetectSslType();
+            
+
+            return smtp;
+        }
+
+        private static SmtpClient getSmtp(string email, string type)
+        {
+            SmtpClient smtp = new SmtpClient();
+            NetworkCredential networkCredentials = new NetworkCredential(email, ConfigurationManager.AppSettings[type + "Password"]);
+            smtp.UseDefaultCredentials = false;
+            smtp.Credentials = networkCredentials;
+            smtp.Host = ConfigurationManager.AppSettings["smtp"];
             smtp.Port = int.Parse(ConfigurationManager.AppSettings["smtpPort"]);
             smtp.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["smtpSsl"]);
 
@@ -223,8 +258,9 @@ namespace eshopUtilities
         public static void SendOrder()
         {
             try
-            { 
+            {
                 MailMessage mail = new MailMessage();
+                //MimeMailMessage mail = new MimeMailMessage();
                 mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"]);
                 mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
                 mail.Subject = "Nova porudžbina";
@@ -233,6 +269,7 @@ namespace eshopUtilities
                 mail.IsBodyHtml=true;
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
+                //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
                 smtp.Send(mail);
             }
             catch(Exception ex)
@@ -362,9 +399,11 @@ namespace eshopUtilities
         public static void SendNewOrderNotification(string orderID, Order order)
         {
             try
-            { 
+            {
                 MailMessage mail = new MailMessage();
-                mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
+                //MimeMailMessage mail = new MimeMailMessage();
+                //mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
+                mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"]);
                 mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
                 mail.Subject = "Nova porudžbina";
                 StringBuilder body = new StringBuilder();
@@ -420,6 +459,7 @@ namespace eshopUtilities
                 mail.BodyEncoding = Encoding.UTF8;
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
+                //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
                 smtp.Send(mail);
             }
             catch(Exception ex)
@@ -431,21 +471,32 @@ namespace eshopUtilities
         public static void SendMessage(string email, string subject, string body)
         {
             try
-            { 
+            {
                 MailMessage mail = new MailMessage();
+                //MimeMailMessage mail = new MimeMailMessage();
                 mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString());
                 mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
-                mail.ReplyTo = new MailAddress(email);
-                mail.Subject = email + " " + subject;
+                mail.ReplyToList.Add(new MailAddress(email));
+                mail.Subject = subject;
                 mail.Body = body;
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
+                //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
+                //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                //smtp.SendCompleted += Smtp_SendCompleted;
+                //smtp.SendMailAsync(mail);
                 smtp.Send(mail);
             }
             catch(Exception ex)
             {
                 throw new BLException("Nije moguće poslati mail", ex);
             }
+        }
+
+        private static void Smtp_SendCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            //throw new NotImplementedException();
+            var response = e;
         }
 
         public static SmtpClient getErrorSmtp()
@@ -464,8 +515,9 @@ namespace eshopUtilities
         public static void SendOrderStatusUpdate(string email, string name, string orderNumber, DateTime date, string status)
         {
             try
-            { 
+            {
                 MailMessage mail = new MailMessage();
+                //MimeMailMessage mail = new MimeMailMessage();
                 mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"], ConfigurationManager.AppSettings["companyName"]);
                 mail.To.Add(new MailAddress(email));
                 mail.Subject = ConfigurationManager.AppSettings["companyName"] + " - Status porudžbine";
@@ -482,6 +534,7 @@ namespace eshopUtilities
                 mail.Body = body.ToString();
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
+                //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
                 smtp.Send(mail);
             }
             catch(Exception ex)
@@ -493,8 +546,9 @@ namespace eshopUtilities
         public static void SendOrderDiscountGrantedNotification(Order order)
         {
             try
-            { 
+            {
                 MailMessage mail = new MailMessage();
+                //MimeMailMessage mail = new MimeMailMessage();
                 mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"], ConfigurationManager.AppSettings["companyName"]);
                 mail.To.Add(new MailAddress(order.Email));
                 mail.Subject = "Odobren popust";
@@ -509,12 +563,34 @@ namespace eshopUtilities
                 mail.Body = body.ToString();
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
+                //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
                 smtp.Send(mail);
             }
             catch(Exception ex)
             {
                 throw new BLException("Nije moguće poslati mail", ex);
             }
+        }
+
+        private static SslMode DetectSslType()
+        {
+            var mailer = new MimeMailer(ConfigurationManager.AppSettings["smtp"], int.Parse(ConfigurationManager.AppSettings["smtpPort"]))
+            {
+                User = ConfigurationManager.AppSettings["infoEmail"],
+                Password = ConfigurationManager.AppSettings["infoEmailPassword"],
+                AuthenticationMode = AuthenticationType.Base64,
+                //EnableImplicitSsl = true,
+                SslType = SslMode.Auto
+            };
+
+            //mailer.
+            mailer.SendCompleted += Mailer_SendCompleted;
+            return mailer.DetectSslMode();
+        }
+
+        private static void Mailer_SendCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }
