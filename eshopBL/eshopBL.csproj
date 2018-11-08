@@ -80,6 +80,7 @@
     <Compile Include="CustomPageBL.cs" />
     <Compile Include="CustomRoleProvider.cs" />
     <Compile Include="EweBL.cs" />
+    <Compile Include="ImagesBL.cs" />
     <Compile Include="KimtecBL.cs" />
     <Compile Include="kupindoBL.cs" />
     <Compile Include="NotificationHandler.cs" />

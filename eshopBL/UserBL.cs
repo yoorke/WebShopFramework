@@ -38,7 +38,7 @@ namespace eshopBL
             return UserDL.GetUser(username, userID);
         }
 
-        public static int SaveUser(string firstName, string lastName, string username, string password, string email, string address, string city, string phone, string userType, string zip)
+        public static User SaveUser(string firstName, string lastName, string username, string password, string email, string address, string city, string phone, string userType, string zip)
         {
             string salt = getSalt();
             string plainPassword;
@@ -46,9 +46,9 @@ namespace eshopBL
             plainPassword = password;
             password = hashPassword(password, salt);
             int status = UserDL.SaveUser(firstName, lastName, username, password, email, address, city, phone, userType, salt, zip);
-            if (status > 0)
-                Common.SendUserCreatedConfirmationMail(username, plainPassword);
-            return status;
+            //if (status > 0)
+                //Common.SendUserCreatedConfirmationMail(username, plainPassword);
+            return new User(status, firstName, lastName, username, plainPassword, address, city, phone, null, email, salt, DateTime.Now, zip, 0, 0);
         }
 
         private static string createPassword()

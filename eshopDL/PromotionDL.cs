@@ -90,7 +90,7 @@ namespace eshopDL
                         if (reader.HasRows)
                             promotions = new List<Promotion>();
                         while (reader.Read())
-                            promotions.Add(new Promotion(reader.GetInt32(0), reader.GetString(1), reader.GetDouble(2), string.Empty, 0, false, DateTime.MinValue, DateTime.Now.AddDays(1), !Convert.IsDBNull(reader[3]) ? reader.GetString(3) : string.Empty, false));
+                            promotions.Add(new Promotion(reader.GetInt32(0), reader.GetString(1), reader.GetDouble(2), string.Empty, 0, false, DateTime.MinValue, DateTime.Now.AddDays(1), !Convert.IsDBNull(reader[3]) ? reader.GetString(3) : string.Empty, false, "/akcija/" + reader.GetString(3)));
                     }
                 }
             }
@@ -109,7 +109,7 @@ namespace eshopDL
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while (reader.Read())
-                            promotion = new Promotion(reader.GetInt32(0), reader.GetString(1), reader.GetDouble(2), reader.GetString(3), 0, reader.GetBoolean(4), Common.ConvertToLocalTime(reader.GetDateTime(5)), Common.ConvertToLocalTime(reader.GetDateTime(6)), !Convert.IsDBNull(reader[7]) ? reader.GetString(7) : string.Empty, reader.GetBoolean(8));
+                            promotion = new Promotion(reader.GetInt32(0), reader.GetString(1), reader.GetDouble(2), reader.GetString(3), 0, reader.GetBoolean(4), Common.ConvertToLocalTime(reader.GetDateTime(5)), Common.ConvertToLocalTime(reader.GetDateTime(6)), !Convert.IsDBNull(reader[7]) ? reader.GetString(7) : string.Empty, reader.GetBoolean(8), "/akcija?akcija=" + reader.GetString(7));
                     }
                 }
             }
@@ -161,7 +161,7 @@ namespace eshopDL
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while (reader.Read())
-                            promotion = new Promotion(reader.GetInt32(0), reader.GetString(1), reader.GetDouble(2), reader.GetString(3), 0, reader.GetBoolean(4), Common.ConvertToLocalTime(reader.GetDateTime(5)), Common.ConvertToLocalTime(reader.GetDateTime(6)), reader.GetString(7), reader.GetBoolean(8));
+                            promotion = new Promotion(reader.GetInt32(0), reader.GetString(1), reader.GetDouble(2), reader.GetString(3), 0, reader.GetBoolean(4), Common.ConvertToLocalTime(reader.GetDateTime(5)), Common.ConvertToLocalTime(reader.GetDateTime(6)), reader.GetString(7), reader.GetBoolean(8), "/akcija/?akcija=" + reader.GetString(7));
                     }
                 }
             }

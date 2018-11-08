@@ -166,7 +166,7 @@ namespace eshopDL
                                 product.IsLocked = reader.GetBoolean(11);
                                 product.IsInStock = reader.GetBoolean(12);
                                 product.Images = GetProductImages(product.ProductID);
-                                product.Promotion = new Promotion(-1, string.Empty, 0, string.Empty, reader.GetDouble(13), false, DateTime.Now, DateTime.Now, string.Empty, false);
+                                product.Promotion = new Promotion(-1, string.Empty, 0, string.Empty, reader.GetDouble(13), false, DateTime.Now, DateTime.Now, string.Empty, false, string.Empty);
                                 product.Categories = new List<Category>();
                                 product.Categories.Add(new CategoryDL().GetCategory(categoryID));
                                 product.InsertDate = Common.ConvertToLocalTime(reader.GetDateTime(14));
@@ -527,7 +527,7 @@ namespace eshopDL
             return barcodes;
         }
 
-        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, bool? isActive, bool? isApproved, string search, string sort, string reverse)
+        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, bool? isActive, bool? isApproved, string search, string sort, string reverse, bool? hasImage)
         {
             DataTable products = new DataTable();
             //products.Columns.Add("productID", typeof(int));
@@ -559,6 +559,7 @@ namespace eshopDL
                     objComm.Parameters.Add("@search", SqlDbType.NVarChar, 200).Value = search;
                     objComm.Parameters.Add("@sort", SqlDbType.NVarChar, 200).Value = sort;
                     objComm.Parameters.Add("@reverse", SqlDbType.NVarChar, 200).Value = reverse;
+                    objComm.Parameters.Add("@hasImage", SqlDbType.Bit).Value = hasImage;
 
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
@@ -1861,6 +1862,45 @@ namespace eshopDL
                 ErrorLog.LogError(ex);
                 throw new DLException("Error: ProductChangeCategory", ex);
             }
+        }
+
+        public bool ImageExistsInDatabase(string filename)
+        {
+            bool status = false;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("image_existsInDatabase", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@filename", SqlDbType.VarChar, 100).Value = filename;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                            status = true;
+                    }
+                }
+            }
+            return status;
+        }
+
+        public DataTable ImagesTableExistsInDatabase(DataTable images)
+        {
+            DataTable dtImages = new DataTable();
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("images_table_existsInDatabase", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@images", SqlDbType.Structured).Value = images;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        dtImages.Load(reader);
+                    }
+                }
+            }
+            return dtImages;
         }
 
         #endregion GetProduct

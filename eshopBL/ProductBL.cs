@@ -391,9 +391,9 @@ namespace eshopBL
             return new ProductDL().GetActualPrice(productID);
         }
 
-        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, string isActiveName, string isApprovedName, string search, string sort, string reverse)
+        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, string isActiveName, string isApprovedName, string search, string sort, string reverse, string hasImage)
         {
-            return new ProductDL().GetProductsDataTable(categoryID, supplierID, promotionID, brandID, getActive(isActiveName), getApproved(isApprovedName), search, sort, reverse);
+            return new ProductDL().GetProductsDataTable(categoryID, supplierID, promotionID, brandID, getActive(isActiveName), getApproved(isApprovedName), search, sort, reverse, hasImage.Equals("Sve") ? null : (bool?)(hasImage.Equals("Ima") ? true : false));
         }
 
         public DataTable GetProductsDataTable()
@@ -409,6 +409,16 @@ namespace eshopBL
         public bool ChangeCategory(int productID, int newCategoryID)
         {
             return new ProductDL().ChangeCategory(productID, newCategoryID);
+        }
+
+        public bool ImageExistsInDatabase(string filename)
+        {
+            return new ProductDL().ImageExistsInDatabase(filename);
+        }
+
+        public DataTable ImagesTableExistsInDatabase(DataTable images)
+        {
+            return new ProductDL().ImagesTableExistsInDatabase(images);
         }
     }
 }

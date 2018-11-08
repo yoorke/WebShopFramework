@@ -354,7 +354,12 @@ namespace eshopDL
             DataTable categories = new DataTable();
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, url, numberOfProducts, firstPageOrderBy FROM category WHERE showOnFirstPage=1 ORDER BY firstPageSortOrder", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, url, numberOfProducts, firstPageOrderBy, " +
+                    "(SELECT '/proizvodi/' + ISNULL(ppc.url, '') + (CASE WHEN ppc.url IS NOT NULL THEN '/' ELSE '' END) + ISNULL(pc.url, '') + (CASE WHEN pc.url IS NOT NULL THEN '/' ELSE '' END) + category.url " +
+                    "FROM category c LEFT JOIN category pc ON c.parentCategoryID = pc.categoryID " +
+                    "LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID " +
+                    "WHERE c.categoryID = category.categoryID) as fullUrl " +
+                    "FROM category WHERE showOnFirstPage=1 ORDER BY firstPageSortOrder", objConn))
                 {
                     objConn.Open();
                     using (SqlDataReader reader = objComm.ExecuteReader())
@@ -475,7 +480,7 @@ namespace eshopDL
                         if (reader.HasRows)
                             categories = new List<Category>();
                         while (reader.Read())
-                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1) + "(" + reader.GetInt32(8) + ")", !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, "/proizvodi/" + (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]) ? reader.GetString(7) : reader.GetString(4)), !Convert.IsDBNull(reader[6]) ? reader.GetString(6) : string.Empty, 0, 0, 0, string.Empty, true, -1, false, false, 0, 0, 0, null));
+                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1) + "(" + reader.GetInt32(8) + ")", !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, "/proizvodi/" + (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]) ? (!Convert.IsDBNull(reader[7]) ? reader.GetString(7) : string.Empty) : reader.GetString(4)), !Convert.IsDBNull(reader[6]) ? reader.GetString(6) : string.Empty, 0, 0, 0, string.Empty, true, -1, false, false, 0, 0, 0, null));
                     }
                 }
             }

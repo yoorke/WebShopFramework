@@ -93,13 +93,18 @@ namespace eshopBL
                             //category
                             if (coupon.Objects[j].ObjectTypeID == 1)
                             {
-                                List<Category> categories = new CategoryBL().GetAllSubCategories(coupon.Objects[j].ObjectID, true);
-                                foreach(Category category in categories)
-                                    if(category.CategoryID == product.Categories[0].CategoryID)
-                                    { 
-                                        couponObjectStatus[j] = true;
-                                        break;
-                                    }
+                                if (product.Categories[0].CategoryID == coupon.Objects[j].ObjectID)
+                                    couponObjectStatus[j] = true;
+                                else
+                                { 
+                                    List<Category> categories = new CategoryBL().GetAllSubCategories(coupon.Objects[j].ObjectID, true);
+                                    foreach(Category category in categories ?? new List<Category>())
+                                        if(category.CategoryID == product.Categories[0].CategoryID)
+                                        { 
+                                            couponObjectStatus[j] = true;
+                                            break;
+                                        }
+                                }
                             }
                             //brand
                             if (coupon.Objects[j].ObjectTypeID == 2 && product.Brand.BrandID == coupon.Objects[j].ObjectID)

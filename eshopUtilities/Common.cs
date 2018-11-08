@@ -70,7 +70,7 @@ namespace eshopUtilities
                 body.Append("<img src='" + ConfigurationManager.AppSettings["logoUrl"].ToString() + "' style='width:50px;margin-bottom:20px' />");
                 body.Append("<h1 style='font-size:1em;width:100%;text-align:center'>Potvrda porudžbine</h1>");
                 body.Append("<br/><strong>Poštovani " + name + "</strong><br><br>Vaša porudžbina je uspešno prosleđena.");
-                body.Append("<br/><br/>U nastavku možete videti detalje Vaše narudžbine");
+                body.Append("<br/><br/>U nastavku možete videti detalje Vaše porudžbine.");
                 body.Append("<br/><br/>");
                 body.Append("<table width='100%' border='0' cellspacing='0' style='font-family:verdana;font-size:0.9em'>");
                 body.Append("<tr bgcolor='#cccccc'>");
@@ -121,6 +121,15 @@ namespace eshopUtilities
                 body.Append("</div>");
                 message.Body = body.ToString();
 
+                AlternateView plainView = AlternateView.CreateAlternateViewFromString("Vaša porudžbina je uspešno prosleđena.", null, "text/plain");
+                AlternateView htmlView = AlternateView.CreateAlternateViewFromString(message.Body, null, "text/html");
+
+                message.AlternateViews.Add(plainView);
+                message.AlternateViews.Add(htmlView);
+
+                message.Body = string.Empty;
+                message.Headers.Add("Message-Id", "<" + Guid.NewGuid() + "@pinshop.rs>");
+
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
                 //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
@@ -155,6 +164,13 @@ namespace eshopUtilities
                 body.Append("<span style='font-weight:bold;color:#d3232e'>" + ConfigurationManager.AppSettings["companyName"] + "</span>");
                 message.Body = body.ToString();
                 message.IsBodyHtml = true;
+                AlternateView plainView = AlternateView.CreateAlternateViewFromString("Poštovani, Vaš korisnički nalog je uspešno kreiran.\r\nZa pristup portalu možete korisniti sledeće korisničke podatke:\r\n" +
+                    "Korisničko ime: " + email + "\r\n" + "Korisnička šifra: " + password, null, "text/plain");
+                AlternateView htmlView = AlternateView.CreateAlternateViewFromString(message.Body, null, "text/html");
+                message.AlternateViews.Add(plainView);
+                message.AlternateViews.Add(htmlView);
+                message.Body = string.Empty;
+                message.Headers.Add("Message-Id", "<" + Guid.NewGuid().ToString() + "@pinshop.rs>");
 
                 SmtpClient smtp = getSmtp(message.From.Address.ToString(), "infoEmail");
                 //MimeMailer smtp = getAegisSmtp(message.From.Address.ToString(), "infoEmail");

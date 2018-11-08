@@ -10,6 +10,7 @@ namespace eshopBE
     {
         private string _imageUrl;
         private int _sortOrder;
+        private string _filename;
 
         public string ImageUrl
         {
@@ -23,15 +24,22 @@ namespace eshopBE
             set { _sortOrder = value; }
         }
 
+        public string Filename
+        {
+            get { return _filename; }
+            set { _filename = value; }
+        }
+
         public ProductImage()
         {
 
         }
 
-        public ProductImage(string imageUrl, int sortOrder)
+        public ProductImage(string imageUrl, int sortOrder, string filename = "")
         {
             _imageUrl = imageUrl;
             _sortOrder = sortOrder;
+            _filename = filename;
         }
     }
 }
