@@ -123,6 +123,11 @@ namespace eshopBL
             return new UserDL().UpdateUser(user);
         }
 
+        public int UpdateUserAccountData(User user)
+        {
+            return new UserDL().UpdateUserAccountData(user);
+        }
+
         public string ChangePassword(string username, string oldPassword, string newPassword)
         {
             string salt = GetSalt(username);

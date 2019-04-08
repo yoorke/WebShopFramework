@@ -39,7 +39,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT brand.brandID, brand.name, COUNT(*), logoUrl FROM brand INNER JOIN product ON brand.brandID=product.brandID INNER JOIN productCategory ON product.productID=productCategory.productID WHERE ", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT brand.brandID, brand.name, COUNT(*), logoUrl FROM brand INNER JOIN product ON brand.brandID=product.brandID INNER JOIN productCategory ON product.productID=productCategory.productID INNER JOIN productImageUrl ON product.productID = productImageUrl.productID WHERE ", objConn))
                 {
                     objConn.Open();
                     List<int> categories = new CategoryDL().GetChildrenCategories(categoryID);
@@ -58,7 +58,7 @@ namespace eshopDL
                         for (int i = 0; i < categories.Count; i++)
                             objComm.Parameters.Add("@categoryID" + (i + 1), SqlDbType.Int).Value = categories[i];
 
-                    objComm.CommandText += " AND product.isActive=1 AND product.isApproved=1 GROUP BY brand.brandID, brand.name, brand.logoUrl ORDER BY brand.name";
+                    objComm.CommandText += " AND product.isActive=1 AND product.isApproved=1 AND productImageUrl.imageUrl <> '0.jpg' AND productImageUrl.sortOrder = 1 GROUP BY brand.brandID, brand.name, brand.logoUrl ORDER BY brand.name";
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         if (reader.HasRows)

@@ -51,7 +51,7 @@ namespace eshopUtilities
             return table;
         }
 
-        public static int SendOrderConfirmationMail(string email, string name, Order order)
+        public static int SendOrderConfirmationMail(string email, string name, Order order, Settings settings)
         {
             try
             {
@@ -96,9 +96,36 @@ namespace eshopUtilities
                 body.Append("<br />");
                 body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
                 body.Append("<br />");
-                body.Append("Dostava: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])) : ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? "0,00" : " Po cenovniku kurirske službe"));
+                //body.Append("Dostava: " + 
+                    //(bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) 
+                        //? string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"])
+                            //? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))
+                                //: ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
+                                        //? "0,00" : " Po cenovniku kurirske službe"));
+
+                body.Append("Dostava: " +
+                    (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"])
+                        ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
+                            ? 0 : settings.DeliveryCost)
+                        : ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
+                            ? "0,00" : " Po cenovniku kurirske službe"));
                 body.Append("<br />");
-                body.Append("Ukupno sa dostavom: " + (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) ? string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))) : (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? "" : " + cena dostave")));
+
+                //body.Append("Ukupno sa dostavom: " + 
+                    //(bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) 
+                        //? string.Format("{0:N2}", ukupno - order.UserDiscountValue + 
+                            //(ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
+                                //? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))) 
+                        //: (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
+                            //? "" : " + cena dostave")));
+
+                body.Append("Ukupno sa dostavom: " +
+                    (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"])
+                        ? string.Format("{0:N2}", ukupno - order.UserDiscountValue +
+                            (ukupno > settings.FreeDeliveryTotalValue
+                                ? 0 : settings.DeliveryCost))
+                        : (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
+                            ? "" : " + cena dostave")));
                 body.Append("</div>");
                 body.Append("<br/>");
                 if(order.UserDiscountValue > 0)
@@ -412,7 +439,7 @@ namespace eshopUtilities
                 yield return day;
         }
 
-        public static void SendNewOrderNotification(string orderID, Order order)
+        public static void SendNewOrderNotification(string orderID, Order order, Settings settings)
         {
             try
             {
@@ -450,9 +477,25 @@ namespace eshopUtilities
                 body.Append("<br/>");
                 body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
                 body.Append("<br />");
-                body.Append("Dostava: " + string.Format("{0:N2}", ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])));
+
+                //body.Append("Dostava: " + 
+                    //string.Format("{0:N2}", ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
+                        //? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])));
+
+                body.Append("Dostava: " +
+                    string.Format("{0:N2}", ukupno > settings.FreeDeliveryTotalValue
+                        ? 0 : settings.DeliveryCost));
                 body.Append("<br />");
-                body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue + (ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) ? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))));
+
+                //body.Append("Ukupno sa dostavom: "
+                    //+ string.Format("{0:N2}", ukupno - order.UserDiscountValue + 
+                        //(ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
+                            //? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))));
+
+                body.Append("Ukupno sa dostavom: "
+                    + string.Format("{0:N2}", ukupno - order.UserDiscountValue +
+                    (ukupno > settings.FreeDeliveryTotalValue
+                        ? 0 : settings.DeliveryCost)));
                 body.Append("</div>");
                 if(order.UserDiscountValue > 0)
                     body.Append("<p>Odobren je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</p");

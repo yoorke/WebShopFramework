@@ -13,10 +13,15 @@ namespace eshopBL
     {
         public int AddProductToCart(int productID, string cartID, double quantity, double productPrice, double userPrice)
         {
-            CartDL cartDL = new CartDL();
-            int status = cartDL.AddProductToCart(productID, cartID, quantity, productPrice, userPrice);
-            ApplyCoupon(cartID);
-            return status;
+            if (new ProductBL().IsInStock(productID))
+            {
+                CartDL cartDL = new CartDL();
+                int status = cartDL.AddProductToCart(productID, cartID, quantity, productPrice, userPrice);
+                ApplyCoupon(cartID);
+                return status;
+            }
+            else
+                return -1;
         }
 
         public int DeleteProductFromCart(int productID, string cartID)

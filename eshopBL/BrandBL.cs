@@ -29,11 +29,16 @@ namespace eshopBL
             else
             {
                 string[] categoryUrlArray = categoryUrl.Split('/');
-                category = categoryDL.GetCategoryByUrl(categoryUrlArray[categoryUrlArray.Length - 2], categoryUrlArray[categoryUrlArray.Length - 1]);
+                category = categoryDL.GetCategoryByUrl(categoryUrlArray.Length > 2 ? categoryUrlArray[categoryUrlArray.Length - 3] : string.Empty, categoryUrlArray[categoryUrlArray.Length - 2], categoryUrlArray[categoryUrlArray.Length - 1]);
             }
 
             BrandDL brandDL = new BrandDL();
             return brandDL.GetBrands(category.CategoryID, includeChildrenCategories);
+        }
+
+        public List<Brand> GetBrands(int categoryID, bool includeChildrenCategories = false)
+        {
+            return new BrandDL().GetBrands(categoryID, includeChildrenCategories);
         }
 
         public Brand GetBrandByName(string name)

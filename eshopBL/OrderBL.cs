@@ -16,6 +16,10 @@ namespace eshopBL
             OrderDL orderDL = new OrderDL();
             int status = orderDL.SaveOrder(order);
             //Common.SendOrder();
+            //System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem(bw =>
+            //{
+                //new NotificationHandler().SendOrderConfirmationMail(string.Empty, string.Empty, order, new SettingsBL().GetSettings());
+            //});
             return status;
         }
 

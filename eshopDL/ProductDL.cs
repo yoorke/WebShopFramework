@@ -314,7 +314,7 @@ namespace eshopDL
                         
                     }
 
-                    objComm.CommandText += " ORDER BY " + sort;
+                    objComm.CommandText += " ORDER BY product.isInStock DESC, " + sort;
 
                     objConn.Open();
                     using (SqlDataReader reader = objComm.ExecuteReader())
@@ -1617,12 +1617,15 @@ namespace eshopDL
                     DataTable searchTable = new DataTable();
                     searchTable.Columns.Add("search");
                     DataRow newRow;
-                    //foreach (string searchItem in search.Split(' '))
-                    //{ 
+                    newRow = searchTable.NewRow();
+                    newRow["search"] = search;
+                    searchTable.Rows.Add(newRow);
+                    foreach (string searchItem in search.Split(' '))
+                    { 
                         newRow = searchTable.NewRow();
-                        newRow["search"] = search;
+                        newRow["search"] = searchItem;
                         searchTable.Rows.Add(newRow);
-                    //}
+                    }
 
                     objConn.Open();
                     objComm.CommandType = CommandType.StoredProcedure;
@@ -1901,6 +1904,27 @@ namespace eshopDL
                 }
             }
             return dtImages;
+        }
+
+        public bool IsInStock(int productID)
+        {
+            bool isInStock = false;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_isInStock", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                            while(reader.Read())
+                            isInStock = reader.GetBoolean(0);
+                    }
+                }
+            }
+            return isInStock;
         }
 
         #endregion GetProduct

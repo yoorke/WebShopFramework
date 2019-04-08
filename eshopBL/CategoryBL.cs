@@ -325,7 +325,7 @@ namespace eshopBL
             string[] urlArray = url.Split('/');
             //if (urlArray.Length < 2)
                 //return null;
-            return new CategoryDL().GetCategoryByUrl(urlArray.Length > 1 ? urlArray[urlArray.Length - 2] : string.Empty, urlArray[urlArray.Length - 1]);
+            return new CategoryDL().GetCategoryByUrl(urlArray.Length > 2 ? urlArray[urlArray.Length - 3] : string.Empty, urlArray.Length > 1 ? urlArray[urlArray.Length - 2] : string.Empty, urlArray[urlArray.Length - 1]);
         }
 
         public List<Category> GetAllSubCategories(int categoryID, bool includeAllSubcategories)

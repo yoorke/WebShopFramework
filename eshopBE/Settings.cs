@@ -10,5 +10,7 @@ namespace eshopBE
         public string CompanyName { get; set; }
         public string Phone { get; set; }
         public string WorkingHours { get; set; }
+        public double DeliveryCost { get; set; }
+        public double FreeDeliveryTotalValue { get; set; }
     }
 }

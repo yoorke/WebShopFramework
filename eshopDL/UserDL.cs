@@ -585,6 +585,30 @@ namespace eshopDL
             return user.UserID;
         }
 
+        public int UpdateUserAccountData(User user)
+        {
+            int status = 0;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("user_updateAccountData", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@lastName", SqlDbType.NVarChar, 50).Value = user.LastName;
+                    objComm.Parameters.Add("@firstName", SqlDbType.NVarChar, 50).Value = user.FirstName;
+                    objComm.Parameters.Add("@email", SqlDbType.NVarChar, 50).Value = user.Email;
+                    objComm.Parameters.Add("@phone", SqlDbType.NVarChar, 50).Value = user.Phone;
+                    objComm.Parameters.Add("@address", SqlDbType.NVarChar, 100).Value = user.Address;
+                    objComm.Parameters.Add("@zip", SqlDbType.NVarChar, 5).Value = user.Zip;
+                    objComm.Parameters.Add("@city", SqlDbType.NVarChar, 50).Value = user.City;
+                    objComm.Parameters.Add("@userID", SqlDbType.Int).Value = user.UserID;
+
+                    status = objComm.ExecuteNonQuery();
+                }
+            }
+            return user.UserID;
+        }
+
         //public int ChangePassword(int userID, string password, string salt)
         //{
             //int status = 0;

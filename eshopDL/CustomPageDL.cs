@@ -48,7 +48,7 @@ namespace eshopDL
                         customPage.CustomPageID = int.Parse(objComm.Parameters["@customPageID"].Value.ToString());
 
                         if (customPage.CustomPageID > 0 && customPage.Products != null)
-                            saveCustomPageProducts(customPage.Products, customPage.CustomPageID);
+                            SaveCustomPageProducts(customPage.Products, customPage.CustomPageID);
                     }
                 }
             }
@@ -86,7 +86,7 @@ namespace eshopDL
                     status = objComm.ExecuteNonQuery();
 
                     if(customPage.Products != null)
-                        saveCustomPageProducts(customPage.Products, customPage.CustomPageID);
+                        SaveCustomPageProducts(customPage.Products, customPage.CustomPageID);
                 }
             }
             return customPage.CustomPageID; ;
@@ -289,7 +289,7 @@ namespace eshopDL
             return customPages;
         }
 
-        private void saveCustomPageProducts(List<CustomPageProduct> products, int customPageID)
+        public void SaveCustomPageProducts(List<CustomPageProduct> products, int customPageID)
         {
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {

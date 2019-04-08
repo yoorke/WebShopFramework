@@ -56,5 +56,10 @@ namespace eshopBL
         {
             return new CustomPageDL().GetCustomPages();
         }
+
+        public void SaveCustomPageProducts(List<CustomPageProduct> products, int customPageID)
+        {
+            new CustomPageDL().SaveCustomPageProducts(products, customPageID);
+        }
     }
 }

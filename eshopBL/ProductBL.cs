@@ -36,6 +36,28 @@ namespace eshopBL
         public int SaveProduct(Product product)
         {
             ProductDL productDL = new ProductDL();
+            if (product.Images == null || product.Images.Count == 0)
+            {
+                if (product.Images == null)
+                    product.Images = new List<ProductImage>();
+                product.Images.Add(new ProductImage("0.jpg", 1));
+            }
+
+            for (int i = 0; i < product.Images.Count - 1; i++)
+                for(int j = i + 1; j < product.Images.Count; j++)
+                {
+                    if(product.Images[j].SortOrder < product.Images[i].SortOrder)
+                    {
+                        ProductImage temp = product.Images[i];
+                        product.Images[i] = product.Images[j];
+                        product.Images[j] = temp;
+                    }
+                }
+            for(int i = 0; i< product.Images.Count; i++)
+            {
+                product.Images[i].SortOrder = i + 1;
+            }
+
             if (product.ProductID > 0)
             {
                 product.UpdateDate = DateTime.Now.ToUniversalTime();
@@ -419,6 +441,11 @@ namespace eshopBL
         public DataTable ImagesTableExistsInDatabase(DataTable images)
         {
             return new ProductDL().ImagesTableExistsInDatabase(images);
+        }
+
+        public bool IsInStock(int productID)
+        {
+            return new ProductDL().IsInStock(productID);
         }
     }
 }

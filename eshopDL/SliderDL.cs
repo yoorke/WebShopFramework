@@ -192,7 +192,7 @@ namespace eshopDL
                     objComm.Parameters.Add("@sliderID", SqlDbType.Int).Value = item.SliderID;
                     objComm.Parameters.Add("@imageUrl", SqlDbType.NVarChar, 50).Value = item.ImageUrl;
                     objComm.Parameters.Add("@sortIndex", SqlDbType.Int).Value = item.SortIndex;
-                    objComm.Parameters.Add("@url", SqlDbType.NVarChar, 100).Value = item.Url;
+                    objComm.Parameters.Add("@url", SqlDbType.NVarChar, 200).Value = item.Url;
 
                     status = objComm.ExecuteNonQuery();
                 }

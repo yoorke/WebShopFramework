@@ -7,6 +7,7 @@ using System.IO;
 using System.Web;
 using eshopBE;
 using System.Data;
+using eshopUtilities;
 
 namespace eshopBL
 {
@@ -76,17 +77,20 @@ namespace eshopBL
             //return unusedFiles;
         }
 
-        public void DeleteUnusedFiles(DataTable unusedFiles)
+        public void DeleteUnusedFiles()
         {
+            DataTable unusedFiles = GetUnusedImageFiles();
             foreach(DataRow file in unusedFiles.Rows)
             {
                 try
-                { 
-                    File.Delete(HttpContext.Current.Server.MapPath("~/images/p/" + file["file"]));
+                {
+                    //File.Delete(HttpContext.Current.Server.MapPath("~/images/p/" + file["file"]));
+                    File.Delete(file["file"].ToString());
+                    ErrorLog.LogMessage("Deleted: " + file["file"].ToString());
                 }
                 catch(Exception ex)
                 {
-
+                    ErrorLog.LogError(ex);
                 }
             }
         }

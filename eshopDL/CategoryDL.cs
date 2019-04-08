@@ -311,7 +311,7 @@ namespace eshopDL
             return category;
         }
 
-        public Category GetCategoryByUrl(string parentCategoryUrl, string categoryUrl)
+        public Category GetCategoryByUrl(string parentParentCategoryUrl, string parentCategoryUrl, string categoryUrl)
         {
             Category category = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
@@ -322,6 +322,7 @@ namespace eshopDL
                     objComm.CommandType = CommandType.StoredProcedure;
                     objComm.Parameters.Add("@parentUrl", SqlDbType.NVarChar, 50).Value = parentCategoryUrl;
                     objComm.Parameters.Add("@categoryUrl", SqlDbType.NVarChar, 50).Value = categoryUrl;
+                    objComm.Parameters.Add("@parentParentCategoryUrl", SqlDbType.NVarChar, 50).Value = parentParentCategoryUrl;
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while (reader.Read())
@@ -629,9 +630,23 @@ namespace eshopDL
             {
                 using (SqlCommand objComm = new SqlCommand("category_search", objConn))
                 {
+                    DataTable searchTable = new DataTable();
+                    searchTable.Columns.Add("search");
+                    DataRow newRow;
+                    newRow = searchTable.NewRow();
+                    newRow["search"] = searchText;
+                    searchTable.Rows.Add(newRow);
+                    if(searchText.Split(' ').Count() > 1)
+                        foreach(string searchItem in searchText.Split(' '))
+                        {
+                            newRow = searchTable.NewRow();
+                            newRow["search"] = searchItem;
+                            searchTable.Rows.Add(newRow);
+                        }
                     objConn.Open();
                     objComm.CommandType = CommandType.StoredProcedure;
-                    objComm.Parameters.Add("@searchText", SqlDbType.NVarChar, 100).Value = searchText;
+                    objComm.Parameters.AddWithValue("@search", searchTable);
+                    objComm.Parameters[0].SqlDbType = SqlDbType.Structured;
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         
