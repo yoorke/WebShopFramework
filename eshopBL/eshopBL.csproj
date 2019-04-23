@@ -106,6 +106,7 @@
     <Compile Include="SitemapBL.cs" />
     <Compile Include="SliderBL.cs" />
     <Compile Include="SupplierBL.cs" />
+    <Compile Include="ThreegBL.cs" />
     <Compile Include="UnitOfMeasureBL.cs" />
     <Compile Include="UserBL.cs" />
     <Compile Include="VatBL.cs" />
