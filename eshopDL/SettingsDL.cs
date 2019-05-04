@@ -30,6 +30,7 @@ namespace eshopDL
                             settings.WorkingHours = !Convert.IsDBNull(reader[3]) ? reader.GetString(3) : string.Empty;
                             settings.DeliveryCost = !Convert.IsDBNull(reader[4]) ? reader.GetDouble(4) : 0;
                             settings.FreeDeliveryTotalValue = !Convert.IsDBNull(reader[5]) ? reader.GetDouble(5) : 0;
+                            settings.ExchangeRate = !Convert.IsDBNull(reader[6]) ? reader.GetDouble(6) : 0;
                         }
                     }
                 }
@@ -52,6 +53,7 @@ namespace eshopDL
                     objComm.Parameters.Add("@workingHours", SqlDbType.NVarChar, 200).Value = settings.WorkingHours;
                     objComm.Parameters.Add("@deliveryCost", SqlDbType.Float).Value = settings.DeliveryCost;
                     objComm.Parameters.Add("@freeDeliveryTotalValue", SqlDbType.Float).Value = settings.FreeDeliveryTotalValue;
+                    objComm.Parameters.Add("@exchangeRate", SqlDbType.Float).Value = settings.ExchangeRate;
 
                     status = objComm.ExecuteNonQuery();
                 }

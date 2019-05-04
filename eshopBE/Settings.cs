@@ -12,5 +12,6 @@ namespace eshopBE
         public string WorkingHours { get; set; }
         public double DeliveryCost { get; set; }
         public double FreeDeliveryTotalValue { get; set; }
+        public double ExchangeRate { get; set; }
     }
 }

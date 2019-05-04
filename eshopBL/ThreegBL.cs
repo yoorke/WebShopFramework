@@ -63,11 +63,11 @@ namespace eshopBL
                 isNew = true;
             isLocked = new ProductBL().IsLocked(product.ProductID);
 
-            Brand brand = new BrandBL().GetBrandByName(threegProduct.Rows[0]["kategorija3"].ToString());
+            Brand brand = new BrandBL().GetBrandByName(threegProduct.Rows[0]["brand"].ToString());
             if(brand == null)
             {
                 brand = new Brand();
-                brand.Name = threegProduct.Rows[0]["kategorija3"].ToString();
+                brand.Name = threegProduct.Rows[0]["brand"].ToString();
                 brand.LogoUrl = string.Empty;
                 brand.BrandID = new BrandBL().SaveBrand(brand);
             }
@@ -116,7 +116,9 @@ namespace eshopBL
 
         private double calculatePrice(double supplierPrice, double percent)
         {
-            return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 100 * 100 - 10).ToString());
+            Settings settings = new SettingsBL().GetSettings();
+            supplierPrice = supplierPrice * settings.ExchangeRate;
+            return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 10 * 10 - 10).ToString());
         }
 
         private string saveImageFromUrl(string url, int count)
@@ -139,6 +141,77 @@ namespace eshopBL
             {
                 throw;
             }
+        }
+
+        public int SaveProducts(DataTable products)
+        {
+            return new ThreegDL().SaveProducts(products);
+        }
+
+        public void DeleteAllProducts(string timestamp)
+        {
+            new ThreegDL().DeleteAllProducts(timestamp);
+        }
+
+        public void SaveBrands()
+        {
+            new ThreegDL().SaveBrands();
+        }
+
+        public void SaveThreegCategoryForCategory(int categoryID, int threegCategoryID, bool isCategory1, bool isCategory2)
+        {
+            new ThreegDL().SaveThreegCategoryForCategory(categoryID, threegCategoryID, isCategory1, isCategory2);
+        }
+
+        public void DeleteThreegCategoryForCategory(int categoryID)
+        {
+            new ThreegDL().DeleteThreegCategoryForCategory(categoryID);
+        }
+
+        public int GetCategory1ForCategory(int categoryID)
+        {
+            return new ThreegDL().GetCategory1ForCategory(categoryID);
+        }
+
+        public int GetCategory2ForCategory(int categoryID)
+        {
+            return new ThreegDL().GetCategory2ForCategory(categoryID);
+        }
+
+        public DataTable GetThreegCategoriesForCategory(int categoryID)
+        {
+            return new ThreegDL().GetThreegCategoriesForCategory(categoryID);
+        }
+
+        public int[] UpdateProducts(int categoryID, int threegCategoryID)
+        {
+            ProductDL productDL = new ProductDL();
+
+            productDL.SetInStock(1014, false, categoryID, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+            DataTable threegProducts = GetProductsByCategory3ID(threegCategoryID);
+            int updatedCount = 0;
+            Category category = new CategoryBL().GetCategory(categoryID);
+
+            foreach(DataRow product in threegProducts.Rows)
+            {
+                int productID = 0; //new ProductBL().GetProductIDBySupplierCode(product["sifra"].ToString());
+                if((productID = new ProductBL().GetProductIDBySupplierCode(product["sifra"].ToString())) > 0)
+                {
+                    if(!productDL.IsLocked(productID))
+                    {
+                        double price = calculatePrice(double.Parse(product["vpCena"].ToString()), category.PricePercent);
+                        double webPrice = calculatePrice(double.Parse(product["vpCena"].ToString()), category.WebPricePercent);
+                        updatedCount += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                    }
+                }
+            }
+
+            return new int[] { threegProducts.Rows.Count - updatedCount, updatedCount };
+        }
+
+        public DataTable GetProductsByCategory3ID(int category3ID)
+        {
+            return new ThreegDL().GetProductByCategory3ID(category3ID);
         }
     }
 }

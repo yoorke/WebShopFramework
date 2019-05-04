@@ -163,7 +163,6 @@ namespace eshopBL
                                     case "id":
                                         {
                                             product.SupplierCode = xmlChildNode.InnerText.Trim();
-                                            product.ProductID = productBL.GetProductIDBySupplierCode(product.SupplierCode);
                                             isLocked = productBL.IsLocked(product.ProductID);
                                             if (product.ProductID <= 0)
                                                 isNew = true;
