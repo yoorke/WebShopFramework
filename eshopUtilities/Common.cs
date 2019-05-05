@@ -464,7 +464,8 @@ namespace eshopUtilities
                 {
                     ukupno += order.Items[i].UserPrice * order.Items[i].Quantity;
                     body.Append("<tr height='20px' valign='middle'>");
-                    body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + ", " + order.Items[i].Product.Description + ", " + order.Items[i].Product.Code + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
+                    body.Append("<td align='center'>" + (i + 1).ToString() + "</td>" + "" +
+                        "<td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Brand.Name + " " + order.Items[i].Product.Name.ToString() + ", " + order.Items[i].Product.Description + ", " + order.Items[i].Product.Code + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
                     body.Append("</tr>");
                 }
                 body.Append("</table>");

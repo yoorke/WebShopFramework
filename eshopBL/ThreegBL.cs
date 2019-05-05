@@ -76,10 +76,12 @@ namespace eshopBL
             product.Brand = brand;
 
             product.Name = threegProduct.Rows[0]["naziv"].ToString();
-            product.Price = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), category.PricePercent);
-            product.WebPrice = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), category.WebPricePercent);
+            product.Price = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), category.PricePercent, double.Parse(threegProduct.Rows[0]["rabat"].ToString()));
+            product.WebPrice = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), category.WebPricePercent, double.Parse(threegProduct.Rows[0]["rabat"].ToString()));
             product.Ean = threegProduct.Rows[0]["barkod"].ToString();
-            product.SupplierPrice = double.Parse(threegProduct.Rows[0]["vpCena"].ToString());
+            double supplierPrice = double.Parse(threegProduct.Rows[0]["vpCena"].ToString()) * new SettingsBL().GetSettings().ExchangeRate;
+            supplierPrice = supplierPrice * (1 - double.Parse(threegProduct.Rows[0]["rabat"].ToString()) / 100);
+            product.SupplierPrice = supplierPrice; //double.Parse(threegProduct.Rows[0]["vpCena"].ToString());
             product.UnitOfMeasure = new UnitOfMeasure(2, "Komad", "kom");
 
             bool hasImages = false;
@@ -114,11 +116,28 @@ namespace eshopBL
 
         }
 
-        private double calculatePrice(double supplierPrice, double percent)
+        private double calculatePrice(double supplierPrice, double percent, double rebate)
         {
             Settings settings = new SettingsBL().GetSettings();
             supplierPrice = supplierPrice * settings.ExchangeRate;
-            return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 10 * 10 - 10).ToString());
+            supplierPrice = supplierPrice - supplierPrice * (rebate / 100);
+            //return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 10 * 10 - 10).ToString());
+            double price = ((int)(supplierPrice * (percent / 100 + 1) * 1.2));
+            return double.Parse(((int)price / getRoundIndex(price) * getRoundIndex(price) - getRoundSubstractValue(price)).ToString());
+        }
+
+        private int getRoundIndex(double price)
+        {
+            if (price < 1000)
+                return 10;
+            return 100;
+        }
+
+        private int getRoundSubstractValue(double price)
+        {
+            if (price < 1000)
+                return 0;
+            return 10;
         }
 
         private string saveImageFromUrl(string url, int count)
@@ -199,8 +218,8 @@ namespace eshopBL
                 {
                     if(!productDL.IsLocked(productID))
                     {
-                        double price = calculatePrice(double.Parse(product["vpCena"].ToString()), category.PricePercent);
-                        double webPrice = calculatePrice(double.Parse(product["vpCena"].ToString()), category.WebPricePercent);
+                        double price = calculatePrice(double.Parse(product["vpCena"].ToString()), category.PricePercent, double.Parse(product["rabat"].ToString()));
+                        double webPrice = calculatePrice(double.Parse(product["vpCena"].ToString()), category.WebPricePercent, double.Parse(product["rabat"].ToString()));
                         updatedCount += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
                     }
                 }

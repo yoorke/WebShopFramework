@@ -112,6 +112,7 @@ namespace eshopDL
                     status = 1;
 
                     SaveBrands();
+                    SaveCategories();
                 }
             }
             return status;
@@ -248,6 +249,19 @@ namespace eshopDL
             }
 
             return products;
+        }
+
+        public void SaveCategories()
+        {
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using(SqlCommand objComm = new SqlCommand("threegCategory_save", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

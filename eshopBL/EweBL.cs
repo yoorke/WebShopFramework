@@ -584,7 +584,23 @@ namespace eshopBL
 
         private double calculatePrice(double supplierPrice, double percent)
         {
-            return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 100 * 100 - 10).ToString());
+            //return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 100 * 100 - 10).ToString());
+            double price = ((int)(supplierPrice * (percent / 100 + 1) * 1.2));
+            return double.Parse(((int)price / getRoundIndex(price) * getRoundIndex(price) - getRoundSubstractValue(price)).ToString());
+        }
+
+        private int getRoundIndex(double price)
+        {
+            if (price < 1000)
+                return 10;
+            return 100;
+        }
+
+        private int getRoundSubstractValue(double price)
+        {
+            if (price < 1000)
+                return 0;
+            return 10;
         }
 
         public void UpdateEweCategories()

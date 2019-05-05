@@ -13,5 +13,6 @@ namespace eshopBE
         public double DeliveryCost { get; set; }
         public double FreeDeliveryTotalValue { get; set; }
         public double ExchangeRate { get; set; }
+        public string UnknownBrandName { get; set; }
     }
 }

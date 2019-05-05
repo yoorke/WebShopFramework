@@ -31,6 +31,7 @@ namespace eshopDL
                             settings.DeliveryCost = !Convert.IsDBNull(reader[4]) ? reader.GetDouble(4) : 0;
                             settings.FreeDeliveryTotalValue = !Convert.IsDBNull(reader[5]) ? reader.GetDouble(5) : 0;
                             settings.ExchangeRate = !Convert.IsDBNull(reader[6]) ? reader.GetDouble(6) : 0;
+                            settings.UnknownBrandName = !Convert.IsDBNull(reader[7]) ? reader.GetString(7) : string.Empty;
                         }
                     }
                 }
@@ -54,6 +55,7 @@ namespace eshopDL
                     objComm.Parameters.Add("@deliveryCost", SqlDbType.Float).Value = settings.DeliveryCost;
                     objComm.Parameters.Add("@freeDeliveryTotalValue", SqlDbType.Float).Value = settings.FreeDeliveryTotalValue;
                     objComm.Parameters.Add("@exchangeRate", SqlDbType.Float).Value = settings.ExchangeRate;
+                    objComm.Parameters.Add("@unknownBrandName", SqlDbType.NVarChar, 50).Value = settings.UnknownBrandName;
 
                     status = objComm.ExecuteNonQuery();
                 }
