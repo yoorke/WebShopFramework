@@ -63,6 +63,7 @@
     <Compile Include="Brand.cs" />
     <Compile Include="Category.cs" />
     <Compile Include="CategoryBanner.cs" />
+    <Compile Include="CategoryBrand.cs" />
     <Compile Include="CategoryExtraMenu.cs" />
     <Compile Include="CategoryExtraMenuCategory.cs" />
     <Compile Include="City.cs" />

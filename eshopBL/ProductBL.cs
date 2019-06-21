@@ -447,5 +447,20 @@ namespace eshopBL
         {
             return new ProductDL().IsInStock(productID);
         }
+
+        public void SetPriceLocked(int productID, bool priceLocked)
+        {
+            new ProductDL().SetPriceLocked(productID, priceLocked);
+        }
+
+        public bool IsPriceLocked(int productID)
+        {
+            return new ProductDL().IsPriceLocked(productID);
+        }
+
+        public ProductUpdatePrice GetProductBySupplierCode(string supplierCode)
+        {
+            return new ProductDL().GetProductBySupplierCode(supplierCode);
+        }
     }
 }

@@ -54,14 +54,19 @@ namespace eshopBL
             product.Specification = string.Empty;
             product.IsInStock = true;
             bool isNew = false;
-            bool isLocked = false;
+            //bool isLocked = false;
             product.Code = product.SupplierCode;
             product.Description = string.Empty;
 
-            product.ProductID = new ProductBL().GetProductIDBySupplierCode(product.SupplierCode);
+            //product.ProductID = new ProductBL().GetProductIDBySupplierCode(product.SupplierCode);
+            ProductUpdatePrice productUpdatePrice = new ProductBL().GetProductBySupplierCode(product.SupplierCode);
+            product.ProductID = productUpdatePrice != null ? productUpdatePrice.ID : -1;
+            product.IsLocked = productUpdatePrice != null ? productUpdatePrice.IsLocked : false;
+            product.IsPriceLocked = productUpdatePrice != null ? productUpdatePrice.IsPriceLocked : false;
             if(product.ProductID <= 0)
                 isNew = true;
-            isLocked = new ProductBL().IsLocked(product.ProductID);
+            //isLocked = new ProductBL().IsLocked(product.ProductID);
+            //bool isPriceLocked = new ProductBL().IsPriceLocked(product.ProductID);
 
             Brand brand = new BrandBL().GetBrandByName(threegProduct.Rows[0]["brand"].ToString());
             if(brand == null)
@@ -76,8 +81,15 @@ namespace eshopBL
             product.Brand = brand;
 
             product.Name = threegProduct.Rows[0]["naziv"].ToString();
-            product.Price = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), category.PricePercent, double.Parse(threegProduct.Rows[0]["rabat"].ToString()));
-            product.WebPrice = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), category.WebPricePercent, double.Parse(threegProduct.Rows[0]["rabat"].ToString()));
+
+            if(!product.IsPriceLocked)
+            {
+                List<double> categoryBrandPrice = new CategoryBrandBL().GetPricePercent(categoryID, product.Brand.BrandID);
+                //product.Price = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), category.PricePercent, double.Parse(threegProduct.Rows[0]["rabat"].ToString()), category.PriceFixedAmount);
+                //product.WebPrice = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), category.WebPricePercent, double.Parse(threegProduct.Rows[0]["rabat"].ToString()), category.PriceFixedAmount);
+                product.Price = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), categoryBrandPrice[0], double.Parse(threegProduct.Rows[0]["rabat"].ToString()), category.PriceFixedAmount);
+                product.WebPrice = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), categoryBrandPrice[1], double.Parse(threegProduct.Rows[0]["rabat"].ToString()), category.PriceFixedAmount);
+            }
             product.Ean = threegProduct.Rows[0]["barkod"].ToString();
             double supplierPrice = double.Parse(threegProduct.Rows[0]["vpCena"].ToString()) * new SettingsBL().GetSettings().ExchangeRate;
             supplierPrice = supplierPrice * (1 - double.Parse(threegProduct.Rows[0]["rabat"].ToString()) / 100);
@@ -109,20 +121,20 @@ namespace eshopBL
                     throw new Exception("No image");
             }
 
-            if (!isLocked && (bool.Parse(ConfigurationManager.AppSettings["saveProductWithoutImage"]) || hasImages))
+            if (!product.IsLocked && (bool.Parse(ConfigurationManager.AppSettings["saveProductWithoutImage"]) || hasImages))
                 if (new ProductBL().SaveProduct(product) > 0)
                     return true;
             return false;
 
         }
 
-        private double calculatePrice(double supplierPrice, double percent, double rebate)
+        private double calculatePrice(double supplierPrice, double percent, double rebate, double priceFixedAmount)
         {
             Settings settings = new SettingsBL().GetSettings();
             supplierPrice = supplierPrice * settings.ExchangeRate;
             supplierPrice = supplierPrice - supplierPrice * (rebate / 100);
             //return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 10 * 10 - 10).ToString());
-            double price = ((int)(supplierPrice * (percent / 100 + 1) * 1.2));
+            double price = ((int)((supplierPrice * (percent / 100 + 1) + priceFixedAmount) * 1.2));
             return double.Parse(((int)price / getRoundIndex(price) * getRoundIndex(price) - getRoundSubstractValue(price)).ToString());
         }
 
@@ -207,25 +219,50 @@ namespace eshopBL
             ProductDL productDL = new ProductDL();
 
             productDL.SetInStock(1014, false, categoryID, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
-            DataTable threegProducts = GetProductsByCategory3ID(threegCategoryID);
+            DataTable threegCategories = GetThreegCategoriesForCategory(categoryID);
             int updatedCount = 0;
-            Category category = new CategoryBL().GetCategory(categoryID);
+            int totalProducts = 0;
 
-            foreach(DataRow product in threegProducts.Rows)
-            {
-                int productID = 0; //new ProductBL().GetProductIDBySupplierCode(product["sifra"].ToString());
-                if((productID = new ProductBL().GetProductIDBySupplierCode(product["sifra"].ToString())) > 0)
+            foreach (DataRow threegCategory in threegCategories.Rows)
+            { 
+                DataTable threegProducts = GetProductsByCategory3ID((int)threegCategory["ID"]);
+                totalProducts += threegProducts.Rows.Count;
+                Category category = new CategoryBL().GetCategory(categoryID);
+
+                int productIndex = 0;
+                foreach (DataRow product in threegProducts.Rows)
                 {
-                    if(!productDL.IsLocked(productID))
+                    //int productID = 0; //new ProductBL().GetProductIDBySupplierCode(product["sifra"].ToString());
+                    ProductUpdatePrice productUpdatePrice = new ProductBL().GetProductBySupplierCode(product["sifra"].ToString());
+                    //if((productID = new ProductBL().GetProductIDBySupplierCode(product["sifra"].ToString())) > 0)
+                    if(productUpdatePrice != null && productUpdatePrice.ID > 0)
                     {
-                        double price = calculatePrice(double.Parse(product["vpCena"].ToString()), category.PricePercent, double.Parse(product["rabat"].ToString()));
-                        double webPrice = calculatePrice(double.Parse(product["vpCena"].ToString()), category.WebPricePercent, double.Parse(product["rabat"].ToString()));
-                        updatedCount += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                        //if(!productDL.IsLocked(productID))
+                        if(!productUpdatePrice.IsLocked)
+                        {
+                            //if(!productDL.IsPriceLocked(productID))
+                            if(!productUpdatePrice.IsPriceLocked)
+                            {
+                                //List<double> categoryBrandPrice = new CategoryBrandBL().GetPricePercent(categoryID, new ProductBL().GetProduct(productUpdatePrice.ID, string.Empty, false, string.Empty).Brand.BrandID);
+                                List<double> categoryBrandPrice = new CategoryBrandBL().GetPricePercent(categoryID, productUpdatePrice.BrandID);
+                                //double price = calculatePrice(double.Parse(product["vpCena"].ToString()), category.PricePercent, double.Parse(product["rabat"].ToString()), category.PriceFixedAmount);
+                                //double webPrice = calculatePrice(double.Parse(product["vpCena"].ToString()), category.WebPricePercent, double.Parse(product["rabat"].ToString()), category.PriceFixedAmount);
+                                double price = calculatePrice(double.Parse(product["vpCena"].ToString()), categoryBrandPrice[0], double.Parse(product["rabat"].ToString()), category.PriceFixedAmount);
+                                double webPrice = calculatePrice(double.Parse(product["vpCena"].ToString()), categoryBrandPrice[1], double.Parse(product["rabat"].ToString()), category.PriceFixedAmount);
+                                updatedCount += productDL.UpdatePriceAndStock(productUpdatePrice.ID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                            }
+                            else
+                            {
+                                productDL.SetIsInStock(productUpdatePrice.ID, true);
+                                updatedCount++;
+                            }
+                        }
                     }
+                    productIndex++;
                 }
             }
 
-            return new int[] { threegProducts.Rows.Count - updatedCount, updatedCount };
+            return new int[] { totalProducts - updatedCount, updatedCount };
         }
 
         public DataTable GetProductsByCategory3ID(int category3ID)

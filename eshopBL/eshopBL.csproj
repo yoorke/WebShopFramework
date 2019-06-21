@@ -74,6 +74,7 @@
     <Compile Include="CartBL.cs" />
     <Compile Include="CategoryBannerBL.cs" />
     <Compile Include="CategoryBL.cs" />
+    <Compile Include="CategoryBrandBL.cs" />
     <Compile Include="CategoryExtraMenuBL.cs" />
     <Compile Include="CityBL.cs" />
     <Compile Include="CouponBL.cs" />

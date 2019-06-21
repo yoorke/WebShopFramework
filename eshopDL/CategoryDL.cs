@@ -54,7 +54,7 @@ namespace eshopDL
                             {
                                 newRow = categoriesDT.NewRow();
                                 newRow[0] = reader.GetInt32(0);
-                                newRow[1] = reader.GetString(1);
+                                newRow[1] = bool.Parse(WebConfigurationManager.AppSettings["capitalizeFirstLetter"]) ? Common.CapitalizeFirstLetter(reader.GetString(1)) : reader.GetString(1);
                                 if (Convert.IsDBNull(reader[2]) == false)
                                     newRow[2] = reader.GetInt32(2);
                                 else
@@ -88,7 +88,61 @@ namespace eshopDL
             int status = 0;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             { 
-                using (SqlCommand objComm = new SqlCommand("INSERT INTO category (name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID, showInFooter, imageUrlSource, imageUrlPositionX, imageUrlPositionY, icon, showProductsFromSubcategories) VALUES (@name, @parentCategoryID, @url, @imageUrl, @sortOrder, @pricePercent, @webPricePercent, @showOnFirstPage, @numberOfProducts, @firstPageSortOrder, @firstPageOrderBy, @description, @active, @sliderID, @categoryBannerID, @updateProductsFromExternalApplication, @exportProducts, @externalID, @externalParentID, @showInFooter, @imageUrlSource, @imageUrlPositionX, @imageUrlPositionY, @icon, @showProductsFromSubcategories);SELECT CAST(SCOPE_IDENTITY() as int)"))
+                using (SqlCommand objComm = new SqlCommand("INSERT INTO category (" +
+                        "name, " +
+                        "parentCategoryID, " +
+                        "url, imageUrl, " +
+                        "sortOrder, " +
+                        "pricePercent, " +
+                        "webPricePercent, " +
+                        "showOnFirstPage, " +
+                        "numberOfProducts, " +
+                        "firstPageSortOrder, " +
+                        "firstPageOrderBy, " +
+                        "description, " +
+                        "active, " +
+                        "sliderID, " +
+                        "categoryBannerID, " +
+                        "updateProductsFromExternalApplication, " +
+                        "exportProducts, " +
+                        "externalID, " +
+                        "externalParentID, " +
+                        "showInFooter, " +
+                        "imageUrlSource, " +
+                        "imageUrlPositionX, " +
+                        "imageUrlPositionY, " +
+                        "icon, " +
+                        "showProductsFromSubcategories, " +
+                        "priceFixedAmount" +
+                    ") " +
+                    "VALUES (" +
+                        "@name, " +
+                        "@parentCategoryID, " +
+                        "@url, " +
+                        "@imageUrl, " +
+                        "@sortOrder, " +
+                        "@pricePercent, " +
+                        "@webPricePercent, " +
+                        "@showOnFirstPage, " +
+                        "@numberOfProducts, " +
+                        "@firstPageSortOrder, " +
+                        "@firstPageOrderBy, " +
+                        "@description, " +
+                        "@active, " +
+                        "@sliderID, " +
+                        "@categoryBannerID, " +
+                        "@updateProductsFromExternalApplication, " +
+                        "@exportProducts, " +
+                        "@externalID, " +
+                        "@externalParentID, " +
+                        "@showInFooter, " +
+                        "@imageUrlSource, " +
+                        "@imageUrlPositionX, " +
+                        "@imageUrlPositionY, " +
+                        "@icon, " +
+                        "@showProductsFromSubcategories, " +
+                        "@priceFixedAmount" +
+                    ");SELECT CAST(SCOPE_IDENTITY() as int)"))
                 {
                     try
                     {
@@ -123,6 +177,7 @@ namespace eshopDL
                         objComm.Parameters.Add("@imageUrlPositionY", SqlDbType.Int).Value = category.ImageUrlPositionY;
                         objComm.Parameters.Add("@icon", SqlDbType.VarChar, 50).Value = category.Icon;
                         objComm.Parameters.Add("@showProductsFromSubcategories", SqlDbType.Bit).Value = category.ShowProductsFromSubCategories;
+                        objComm.Parameters.Add("@priceFixedAmount", SqlDbType.Float).Value = category.PriceFixedAmount;
 
                         //status = objComm.ExecuteNonQuery();
                         using (SqlDataReader reader = objComm.ExecuteReader())
@@ -145,7 +200,7 @@ namespace eshopDL
         {
             int status;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
-                using (SqlCommand objComm = new SqlCommand("UPDATE category SET name=@name, parentCategoryID=@parentCategoryID, url=@url, imageUrl=@imageUrl, sortOrder=@sortOrder, pricePercent=@pricePercent, webPricePercent=@webPricePercent, showOnFirstPage=@showOnFirstPage, numberOfProducts=@numberOfProducts, firstPageSortOrder=@firstPageSortOrder, firstPageOrderBy=@firstPageOrderBy, description=@description, active = @active, sliderID = @sliderID, categoryBannerID = @categoryBannerID, updateProductsFromExternalApplication = @updateProductsFromExternalApplication, exportProducts = @exportProducts, externalID = @externalID, externalParentID = @externalParentID, showInFooter = @showInFooter, imageUrlSource = @imageUrlSource, imageUrlPositionX = @imageUrlPositionX, imageUrlPositionY = @imageUrlPositionY, icon = @icon, showProductsFromSubcategories = @showProductsFromSubcategories WHERE categoryID=@categoryID"))
+                using (SqlCommand objComm = new SqlCommand("UPDATE category SET name=@name, parentCategoryID=@parentCategoryID, url=@url, imageUrl=@imageUrl, sortOrder=@sortOrder, pricePercent=@pricePercent, webPricePercent=@webPricePercent, showOnFirstPage=@showOnFirstPage, numberOfProducts=@numberOfProducts, firstPageSortOrder=@firstPageSortOrder, firstPageOrderBy=@firstPageOrderBy, description=@description, active = @active, sliderID = @sliderID, categoryBannerID = @categoryBannerID, updateProductsFromExternalApplication = @updateProductsFromExternalApplication, exportProducts = @exportProducts, externalID = @externalID, externalParentID = @externalParentID, showInFooter = @showInFooter, imageUrlSource = @imageUrlSource, imageUrlPositionX = @imageUrlPositionX, imageUrlPositionY = @imageUrlPositionY, icon = @icon, showProductsFromSubcategories = @showProductsFromSubcategories, priceFixedAmount = @priceFixedAmount WHERE categoryID=@categoryID"))
                 {
                     try
                     {
@@ -181,6 +236,7 @@ namespace eshopDL
                         objComm.Parameters.Add("@imageUrlPositionY", SqlDbType.Int).Value = category.ImageUrlPositionY;
                         objComm.Parameters.Add("@icon", SqlDbType.VarChar, 50).Value = category.Icon;
                         objComm.Parameters.Add("@showProductsFromSubcategories", SqlDbType.Bit).Value = category.ShowProductsFromSubCategories;
+                        objComm.Parameters.Add("@priceFixedAmount", SqlDbType.Float).Value = category.PriceFixedAmount;
 
                         status = objComm.ExecuteNonQuery();
                     }
@@ -198,7 +254,7 @@ namespace eshopDL
             Category category = null;
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
-                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID, showInFooter, imageUrlSource, imageUrlPositionX, imageUrlPositionY, icon, showProductsFromSubCategories FROM category"))
+                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID, showInFooter, imageUrlSource, imageUrlPositionX, imageUrlPositionY, icon, showProductsFromSubCategories, priceFixedAmount FROM category"))
                 {
                     try
                     {
@@ -263,6 +319,7 @@ namespace eshopDL
                                 category.ImageUrlPositionY = !Convert.IsDBNull(reader[23]) ? reader.GetInt32(23) : 0;
                                 category.Icon = !Convert.IsDBNull(reader[24]) ? reader.GetString(24) : string.Empty;
                                 category.ShowProductsFromSubCategories = !Convert.IsDBNull(reader[25]) ? reader.GetBoolean(25) : false;
+                                category.PriceFixedAmount = !Convert.IsDBNull(reader[26]) ? reader.GetDouble(26) : 0;
                             }
                         }
                     }

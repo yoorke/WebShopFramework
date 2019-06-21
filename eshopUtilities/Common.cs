@@ -447,7 +447,9 @@ namespace eshopUtilities
                 //MimeMailMessage mail = new MimeMailMessage();
                 //mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
                 mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"]);
-                mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
+                //mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
+                foreach (string emailAddress in ConfigurationManager.AppSettings["infoEmail"].Split(';'))
+                    mail.To.Add(new MailAddress(emailAddress));
                 mail.Subject = "Nova porudžbina";
                 StringBuilder body = new StringBuilder();
                 body.Append("<strong>Nova porudžbina na sajtu " + ConfigurationManager.AppSettings["webShopUrl"] + "</strong>");
@@ -651,6 +653,13 @@ namespace eshopUtilities
         private static void Mailer_SendCompleted(object sender, AsyncCompletedEventArgs e)
         {
             throw new NotImplementedException();
+        }
+
+        public static string CapitalizeFirstLetter(string value)
+        {
+            if (value == null || value.Length == 0)
+                return value;
+            return value[0].ToString().ToUpper() + value.Substring(1).ToLower();
         }
     }
 }

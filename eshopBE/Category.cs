@@ -35,6 +35,7 @@ namespace eshopBE
         private int _imageUrlPositionY;
         private string _icon;
         private bool _showProductsFromSubCategories;
+        private double _priceFixedAmount;
 
         public Category()
         {
@@ -228,6 +229,12 @@ namespace eshopBE
         {
             get { return _showProductsFromSubCategories; }
             set { _showProductsFromSubCategories = value; }
+        }
+
+        public double PriceFixedAmount
+        {
+            get { return _priceFixedAmount; }
+            set { _priceFixedAmount = value; }
         }
     }
 }

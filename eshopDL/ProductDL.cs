@@ -609,7 +609,7 @@ namespace eshopDL
         {
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("INSERT INTO product (code, supplierCode, brandID, name, description, price, webPrice, isApproved, isActive, supplierID, vatID, insertDate, updateDate, specification, isLocked, isInStock, ean, supplierPrice, unitOfMeasureID) VALUES (@code, @supplierCode, @brandID, @name, @description, @price, @webPrice, @isApproved, @isActive, @supplierID, @vatID, @insertDate, @updateDate, @specification, @isLocked, @isInStock, @ean, @supplierPrice, @unitOfMeasureID); SELECT SCOPE_IDENTITY()", objConn))
+                using (SqlCommand objComm = new SqlCommand("INSERT INTO product (code, supplierCode, brandID, name, description, price, webPrice, isApproved, isActive, supplierID, vatID, insertDate, updateDate, specification, isLocked, isInStock, ean, supplierPrice, unitOfMeasureID, isPriceLocked) VALUES (@code, @supplierCode, @brandID, @name, @description, @price, @webPrice, @isApproved, @isActive, @supplierID, @vatID, @insertDate, @updateDate, @specification, @isLocked, @isInStock, @ean, @supplierPrice, @unitOfMeasureID, @isPriceLocked); SELECT SCOPE_IDENTITY()", objConn))
                 {
                     try
                     {
@@ -635,6 +635,7 @@ namespace eshopDL
                         objComm.Parameters.Add("@ean", SqlDbType.NVarChar, 50).Value = product.Ean;
                         objComm.Parameters.Add("@supplierPrice", SqlDbType.Float).Value = product.SupplierPrice;
                         objComm.Parameters.Add("@unitOfMeasureID", SqlDbType.Int).Value = product.UnitOfMeasure.UnitOfMeasureID;
+                        objComm.Parameters.Add("@isPriceLocked", SqlDbType.Bit).Value = product.IsPriceLocked;
 
                         product.ProductID = int.Parse(objComm.ExecuteScalar().ToString());
 
@@ -666,14 +667,14 @@ namespace eshopDL
             int status;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, specification=@specification, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPrice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID WHERE productID=@productID", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, specification=@specification, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPrice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID, isPriceLocked = @isPriceLocked WHERE productID=@productID", objConn))
                 {
                     try
                     {
                         objConn.Open();
 
                         if (product.Specification == string.Empty || product.Specification == null)
-                            objComm.CommandText = "UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPRice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID WHERE productID=@productID";
+                            objComm.CommandText = "UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPRice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID, isPriceLocked = @isPriceLocked WHERE productID=@productID";
 
                         objComm.Parameters.Add("@code", SqlDbType.NVarChar, 50).Value = product.Code;
                         objComm.Parameters.Add("@supplierCode", SqlDbType.NVarChar, 50).Value = product.SupplierCode;
@@ -695,6 +696,7 @@ namespace eshopDL
                         objComm.Parameters.Add("@supplierPrice", SqlDbType.Float).Value = product.SupplierPrice;
                         objComm.Parameters.Add("@productID", SqlDbType.Int).Value = product.ProductID;
                         objComm.Parameters.Add("@unitOfMeasureID", SqlDbType.Int).Value = product.UnitOfMeasure.UnitOfMeasureID;
+                        objComm.Parameters.Add("@isPriceLocked", SqlDbType.Bit).Value = product.IsPriceLocked;
 
                         status = objComm.ExecuteNonQuery();
 
@@ -932,8 +934,14 @@ namespace eshopDL
             int status = 0;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE product SET isInStock=@isInStock WHERE productID=@productID", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE product SET isInStock=@isInStock", objConn))
                 {
+                    if(!bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]))
+                    {
+                        objComm.CommandText += ", isActive = @isActive";
+                        objComm.Parameters.Add("@isActive", SqlDbType.Bit).Value = isInStock;
+                    }
+                    objComm.CommandText += " WHERE productID=@productID";
                     objConn.Open();
                     objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = isInStock;
                     objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
@@ -1181,7 +1189,7 @@ namespace eshopDL
                     ", (SELECT ppc.url + (CASE WHEN ppc.url IS NOT NULL THEN '/' ELSE '' END) + pc.url + (CASE WHEN pc.url IS NOT NULL THEN '/' ELSE '' END) + category.url" +
                     " FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID" + 
                     " LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID" +
-                    " WHERE category.categoryID = productCategory.categoryID)" +
+                    " WHERE category.categoryID = productCategory.categoryID), isPriceLocked" +
                     " FROM product INNER JOIN brand ON product.brandID=brand.brandID" +
                     " INNER JOIN productCategory ON product.productID = productCategory.productID", objConn))
                 {
@@ -1247,6 +1255,7 @@ namespace eshopDL
                                 if(!Convert.IsDBNull(reader[20]))
                                     product.UnitOfMeasure = new UnitOfMeasureDL().GetUnitOfMeasure(reader.GetInt32(20));
                                 product.FullCategoryUrl = !Convert.IsDBNull(reader[22]) ? reader.GetString(22) : string.Empty;
+                                product.IsPriceLocked = !Convert.IsDBNull(reader[23]) ? reader.GetBoolean(23) : false;
 
                                 //if (product.Specification == string.Empty)
                                     //product.Specification = createProductSpecification(product.ProductID);
@@ -1925,6 +1934,65 @@ namespace eshopDL
                 }
             }
             return isInStock;
+        }
+
+        public void SetPriceLocked(int productID, bool priceLocked)
+        {
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_setPriceLocked", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+                    objComm.Parameters.Add("@isPriceLocked", SqlDbType.Bit).Value = priceLocked;
+                    objComm.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public bool IsPriceLocked(int productID)
+        {
+            bool isPriceLocked = false;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_isPriceLocked", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                        while (reader.Read())
+                            isPriceLocked = reader.GetBoolean(0);
+                }
+            }
+            return isPriceLocked;
+        }
+
+        public ProductUpdatePrice GetProductBySupplierCode(string supplierCode)
+        {
+            ProductUpdatePrice productUpdatePrice = null;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("productUpdatePrice_getBySupplierCode", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@supplierCode", SqlDbType.VarChar, 50).Value = supplierCode;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            productUpdatePrice = new ProductUpdatePrice();
+                            productUpdatePrice.ID = reader.GetInt32(0);
+                            productUpdatePrice.BrandID = reader.GetInt32(1);
+                            productUpdatePrice.IsLocked = reader.GetBoolean(2);
+                            productUpdatePrice.IsPriceLocked = !Convert.IsDBNull(reader[3]) ? reader.GetBoolean(3) : false;
+                        }
+                    }
+                }
+            }
+            return productUpdatePrice;
         }
 
         #endregion GetProduct

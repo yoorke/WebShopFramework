@@ -219,8 +219,11 @@ namespace eshopBL
                                         {
                                             if (!isLocked)
                                             {
-                                                product.Price = calculatePrice(double.Parse(xmlChildNode.InnerText.Replace('.', ',').Trim()), category.PricePercent);
-                                                product.WebPrice = calculatePrice(double.Parse(xmlChildNode.InnerText.Replace('.', ',').Trim()), category.WebPricePercent);
+                                                List<double> categoryBrandPrice = new CategoryBrandBL().GetPricePercent(categoryID, product.Brand.BrandID);
+                                                //product.Price = calculatePrice(double.Parse(xmlChildNode.InnerText.Replace('.', ',').Trim()), category.PricePercent, category.PriceFixedAmount);
+                                                //product.WebPrice = calculatePrice(double.Parse(xmlChildNode.InnerText.Replace('.', ',').Trim()), category.WebPricePercent, category.PriceFixedAmount);
+                                                product.Price = calculatePrice(double.Parse(xmlChildNode.InnerText.Replace('.', ',').Trim()), categoryBrandPrice[0], category.PriceFixedAmount);
+                                                product.WebPrice = calculatePrice(double.Parse(xmlChildNode.InnerText.Replace('.', ',').Trim()), categoryBrandPrice[1], category.PriceFixedAmount);
                                             }
                                             break;
                                         }
@@ -476,14 +479,30 @@ namespace eshopBL
                     foreach (XmlNode xmlNode in nodeList)
                     {
                         string supplierCode = xmlNode.SelectSingleNode("id").InnerText.Trim();
-                        int productID;
-                        if ((productID = productDL.GetProductIDBySupplierCode(supplierCode)) > 0)
+                        //int productID;
+                        ProductUpdatePrice product;
+                        if ((product = productDL.GetProductBySupplierCode(supplierCode)) != null)
                         {
-                            if (!productDL.IsLocked(productID))
+                            //if (!productDL.IsLocked(productID))
+                            if(!product.IsLocked)
                             {
-                                double price = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.', ',').Trim()), category.PricePercent);
-                                double webPrice = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.', ',').Trim()), category.WebPricePercent);
-                                status += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                                //if(!productDL.IsPriceLocked(productID))
+                                if(!product.IsPriceLocked)
+                                {
+                                    //List<double> categoryBrandPrices = new CategoryBrandBL().GetPricePercent(categoryID, new ProductBL().GetProduct(productID, string.Empty, false, string.Empty).Brand.BrandID);
+                                    List<double> categoryBrandPrices = new CategoryBrandBL().GetPricePercent(categoryID, product.BrandID);
+
+                                    //double price = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.', ',').Trim()), category.PricePercent, category.PriceFixedAmount);
+                                    //double webPrice = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.', ',').Trim()), category.WebPricePercent, category.PriceFixedAmount);
+                                    double price = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.', ',').Trim()), categoryBrandPrices[0], category.PriceFixedAmount);
+                                    double webPrice = calculatePrice(double.Parse(xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.', ',').Trim()), categoryBrandPrices[1], category.PriceFixedAmount);
+                                    status += productDL.UpdatePriceAndStock(product.ID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                                }
+                                else
+                                {
+                                    productDL.SetIsInStock(product.ID, true);
+                                    status++;
+                                }
                             }
                         }
                     }
@@ -582,10 +601,10 @@ namespace eshopBL
             return html.ToString();
         }
 
-        private double calculatePrice(double supplierPrice, double percent)
+        private double calculatePrice(double supplierPrice, double percent, double priceFixedAmount)
         {
             //return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 100 * 100 - 10).ToString());
-            double price = ((int)(supplierPrice * (percent / 100 + 1) * 1.2));
+            double price = ((int)((supplierPrice * (percent / 100 + 1) + priceFixedAmount) * 1.2));
             return double.Parse(((int)price / getRoundIndex(price) * getRoundIndex(price) - getRoundSubstractValue(price)).ToString());
         }
 
@@ -684,14 +703,19 @@ namespace eshopBL
             product.Specification = specificationToHtml(eweProduct.Rows[0]["specification"].ToString());
             product.IsInStock = true;
             bool isNew = false;
-            bool isLocked = false;
+            //bool isLocked = false;
             product.Code = product.SupplierCode;
             product.Description = string.Empty;
 
-            product.ProductID = new ProductBL().GetProductIDBySupplierCode(product.SupplierCode);
+            //product.ProductID = new ProductBL().GetProductIDBySupplierCode(product.SupplierCode);
+            ProductUpdatePrice productUpdatePrice = new ProductBL().GetProductBySupplierCode(product.SupplierCode);
+            product.ProductID = productUpdatePrice != null ? productUpdatePrice.ID : -1;
+            product.IsLocked = productUpdatePrice != null ? productUpdatePrice.IsLocked : false;
+            product.IsPriceLocked = productUpdatePrice != null ? productUpdatePrice.IsPriceLocked : false;
             if (product.ProductID <= 0)
                 isNew = true;
-            isLocked = new ProductBL().IsLocked(product.ProductID);
+            //isLocked = new ProductBL().IsLocked(product.ProductID);
+            //bool isPriceLocked = new ProductBL().IsPriceLocked(product.ProductID);
 
             Brand brand = new BrandBL().GetBrandByName(eweProduct.Rows[0]["brand"].ToString());
             if(brand == null)
@@ -707,8 +731,15 @@ namespace eshopBL
             product.Brand.BrandID = brand.BrandID;
 
             product.Name = eweProduct.Rows[0]["name"].ToString();
-            product.Price = calculatePrice(double.Parse(eweProduct.Rows[0]["priceRebate"].ToString()), category.PricePercent);
-            product.WebPrice = calculatePrice(double.Parse(eweProduct.Rows[0]["priceRebate"].ToString()), category.WebPricePercent);
+
+            if(!product.IsPriceLocked)
+            {
+                List<double> categoryBrandPrice = new CategoryBrandBL().GetPricePercent(categoryID, product.Brand.BrandID);
+                //product.Price = calculatePrice(double.Parse(eweProduct.Rows[0]["priceRebate"].ToString()), category.PricePercent, category.PriceFixedAmount);
+                //product.WebPrice = calculatePrice(double.Parse(eweProduct.Rows[0]["priceRebate"].ToString()), category.WebPricePercent, category.PriceFixedAmount);
+                product.Price = calculatePrice(double.Parse(eweProduct.Rows[0]["priceRebate"].ToString()), categoryBrandPrice[0], category.PriceFixedAmount);
+                product.WebPrice = calculatePrice(double.Parse(eweProduct.Rows[0]["priceRebate"].ToString()), categoryBrandPrice[1], category.PriceFixedAmount);
+            }
             product.Ean = eweProduct.Rows[0]["ean"].ToString();
             product.SupplierPrice = double.Parse(eweProduct.Rows[0]["priceRebate"].ToString());
             product.UnitOfMeasure = new UnitOfMeasure(2, "Komad", "kom");
@@ -772,7 +803,7 @@ namespace eshopBL
                 }
             }
 
-            if (!isLocked && (bool.Parse(ConfigurationManager.AppSettings["saveProductWithoutImage"]) || hasImages))
+            if (!product.IsLocked && (bool.Parse(ConfigurationManager.AppSettings["saveProductWithoutImage"]) || hasImages))
                 if (new ProductBL().SaveProduct(product) > 0)
                     return true;
             return false;
@@ -789,14 +820,29 @@ namespace eshopBL
 
             for(int i = 0; i < products.Rows.Count; i++)
             {
-                int productID = 0;
-                if((productID = productDL.GetProductIDBySupplierCode(products.Rows[i]["code"].ToString())) > 0)
+                //int productID = 0;
+                ProductUpdatePrice product;
+                if((product = productDL.GetProductBySupplierCode(products.Rows[i]["code"].ToString())) != null)
                 {
-                    if(!productDL.IsLocked(productID))
+                    //if(!productDL.IsLocked(productID))
+                    if(!product.IsLocked)
                     {
-                        double price = calculatePrice(double.Parse(products.Rows[i]["priceRebate"].ToString()), category.PricePercent);
-                        double webPrice = calculatePrice(double.Parse(products.Rows[i]["priceRebate"].ToString()), category.WebPricePercent);
-                        updatedCount += productDL.UpdatePriceAndStock(productID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                        //if(!productDL.IsPriceLocked(productID))
+                        if(!product.IsPriceLocked)
+                        { 
+                            //List<double> categoryBrandPrice = new CategoryBrandBL().GetPricePercent(categoryID, new ProductBL().GetProduct(productID, string.Empty, false, string.Empty).Brand.BrandID);
+                            List<double> categoryBrandPrice = new CategoryBrandBL().GetPricePercent(categoryID, product.BrandID);
+                            //double price = calculatePrice(double.Parse(products.Rows[i]["priceRebate"].ToString()), category.PricePercent, category.PriceFixedAmount);
+                            //double webPrice = calculatePrice(double.Parse(products.Rows[i]["priceRebate"].ToString()), category.WebPricePercent, category.PriceFixedAmount);
+                            double price = calculatePrice(double.Parse(products.Rows[i]["priceRebate"].ToString()), categoryBrandPrice[0], category.PriceFixedAmount);
+                            double webPrice = calculatePrice(double.Parse(products.Rows[i]["priceRebate"].ToString()), categoryBrandPrice[1], category.PriceFixedAmount);
+                            updatedCount += productDL.UpdatePriceAndStock(product.ID, price, webPrice, true, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+                        }
+                        else
+                        {
+                            productDL.SetIsInStock(product.ID, true);
+                            updatedCount++;
+                        }
                     }
                 }
 

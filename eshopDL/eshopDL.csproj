@@ -69,6 +69,7 @@
     <Compile Include="BrandDL.cs" />
     <Compile Include="CartDL.cs" />
     <Compile Include="CategoryBannerDL.cs" />
+    <Compile Include="categoryBrandDL.cs" />
     <Compile Include="CategoryDL.cs" />
     <Compile Include="CategoryExtraMenuDL.cs" />
     <Compile Include="CityDL.cs" />

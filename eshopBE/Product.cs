@@ -33,6 +33,7 @@ namespace eshopBE
         private double _supplierPrice;
         private UnitOfMeasure _unitOfMeasure;
         private string _fullCategoryUrl;
+        private bool _isPriceLocked;
 
         public int ProductID
         {
@@ -240,5 +241,19 @@ namespace eshopBE
             get { return _supplierPrice; }
             set { _supplierPrice = value; }
         }
+
+        public bool IsPriceLocked
+        {
+            get { return _isPriceLocked; }
+            set { _isPriceLocked = value; }
+        }
+    }
+
+    public class ProductUpdatePrice
+    {
+        public int ID { get; set; }
+        public bool IsLocked { get; set; }
+        public bool IsPriceLocked { get; set; }
+        public int BrandID { get; set; }
     }
 }
