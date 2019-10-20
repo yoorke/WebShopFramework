@@ -1616,7 +1616,7 @@ namespace eshopDL
             return products;
         }
 
-        public List<Product> SearchProducts(string search, string sort, int? categoryID)
+        public List<Product> SearchProducts(string search, string sort, int? categoryID, int productCountLimit)
         {
             List<Product> products = new List<Product>();
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
@@ -1642,6 +1642,7 @@ namespace eshopDL
                     objComm.Parameters.AddWithValue("@search", searchTable);
                     objComm.Parameters.Add("@sort", SqlDbType.NVarChar, 50).Value = sort;
                     objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID > 0 ? categoryID : null;
+                    objComm.Parameters.Add("@productCountLimit", SqlDbType.Int).Value = productCountLimit;
                     objComm.Parameters[0].SqlDbType = SqlDbType.Structured;
                     using(SqlDataReader reader = objComm.ExecuteReader())
                     {

@@ -577,7 +577,27 @@ namespace eshopDL
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while (reader.Read())
-                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), !Convert.IsDBNull(reader[4]) ? reader.GetString(4) : string.Empty, reader.GetInt32(5), reader.GetDouble(6), reader.GetDouble(7), !Convert.IsDBNull(reader[8]) ? reader.GetString(8) : string.Empty, reader.GetBoolean(9), !Convert.IsDBNull(reader[10]) ? reader.GetInt32(10) : -1, reader.GetBoolean(11), reader.GetBoolean(12), 0, 0, 0,null));
+                            //categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), !Convert.IsDBNull(reader[4]) ? reader.GetString(4) : string.Empty, reader.GetInt32(5), reader.GetDouble(6), reader.GetDouble(7), !Convert.IsDBNull(reader[8]) ? reader.GetString(8) : string.Empty, reader.GetBoolean(9), !Convert.IsDBNull(reader[10]) ? reader.GetInt32(10) : -1, reader.GetBoolean(11), reader.GetBoolean(12), 0, 0, 0,null));
+                            categories.Add(new Category(
+                                    reader.GetInt32(0),
+                                    reader.GetString(1),
+                                    !Convert.IsDBNull(reader[2]) ? (int?)reader.GetInt32(2) : null,
+                                    string.Empty,
+                                    string.Empty,
+                                    -1,
+                                    0,
+                                    0,
+                                    string.Empty,
+                                    true,
+                                    -1,
+                                    reader.GetBoolean(3),
+                                    false,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    null,
+                                    false
+                                ));
                     }
                 }
             }

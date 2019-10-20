@@ -271,9 +271,9 @@ namespace eshopBL
             return new ProductDL().GetTop10Order();
         }
 
-        public List<Product> SearchProducts(string search, string sort, int categoryID)
+        public List<Product> SearchProducts(string search, string sort, int categoryID, int productCountLimit = -1)
         {
-            return new ProductDL().SearchProducts(search, getSort(sort), categoryID);
+            return new ProductDL().SearchProducts(search, getSort(sort), categoryID, productCountLimit);
         }
 
         public void SetPromotionPrice(int productID, double price, double value, int promotionID)
@@ -461,6 +461,28 @@ namespace eshopBL
         public ProductUpdatePrice GetProductBySupplierCode(string supplierCode)
         {
             return new ProductDL().GetProductBySupplierCode(supplierCode);
+        }
+
+        public List<ProductSearch> SearchProductsSimple(string search, string sort, int categoryID, int productCountLimit)
+        {
+            List<Product> products = new ProductDL().SearchProducts(search, sort, categoryID, productCountLimit);
+            List<ProductSearch> productsSearch = new List<ProductSearch>();
+
+            foreach(Product product in products)
+            {
+                ProductSearch productSearch = new ProductSearch();
+                productSearch.ID = product.ProductID;
+                productSearch.Name = product.Brand.Name + " " + product.Name;
+                string filename = product.Images[0].ImageUrl.Substring(0, product.Images[0].ImageUrl.LastIndexOf('.'));
+                string extension = product.Images[0].ImageUrl.Substring(product.Images[0].ImageUrl.LastIndexOf('.'));
+                productSearch.ImageUrl = CreateImageDirectory(int.Parse(product.Images[0].ImageUrl.Substring(0, product.Images[0].ImageUrl.LastIndexOf('.')))) + filename + "-" + ConfigurationManager.AppSettings["thumbName"] + extension;
+                productSearch.Url = product.Url;
+                productSearch.WebPrice = product.WebPrice;
+
+                productsSearch.Add(productSearch);
+            }
+
+            return productsSearch;
         }
     }
 }

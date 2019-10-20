@@ -81,6 +81,7 @@
     <Compile Include="Payment.cs" />
     <Compile Include="Product.cs" />
     <Compile Include="ProductImage.cs" />
+    <Compile Include="ProductSearch.cs" />
     <Compile Include="Promotion.cs" />
     <Compile Include="PromotionPrice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

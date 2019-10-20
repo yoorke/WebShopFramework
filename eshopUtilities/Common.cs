@@ -155,7 +155,7 @@ namespace eshopUtilities
                 message.AlternateViews.Add(htmlView);
 
                 message.Body = string.Empty;
-                message.Headers.Add("Message-Id", "<" + Guid.NewGuid() + "@pinshop.rs>");
+                message.Headers.Add("Message-Id", "<" + Guid.NewGuid().ToString() + "@" + ConfigurationManager.AppSettings["webShopDomain"] + ">");
 
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
@@ -197,7 +197,7 @@ namespace eshopUtilities
                 message.AlternateViews.Add(plainView);
                 message.AlternateViews.Add(htmlView);
                 message.Body = string.Empty;
-                message.Headers.Add("Message-Id", "<" + Guid.NewGuid().ToString() + "@pinshop.rs>");
+                message.Headers.Add("Message-Id", "<" + Guid.NewGuid().ToString() + "@" + ConfigurationManager.AppSettings["webShopDomain"] + ">");
 
                 SmtpClient smtp = getSmtp(message.From.Address.ToString(), "infoEmail");
                 //MimeMailer smtp = getAegisSmtp(message.From.Address.ToString(), "infoEmail");
@@ -447,10 +447,17 @@ namespace eshopUtilities
                 //MimeMailMessage mail = new MimeMailMessage();
                 //mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString(), ConfigurationManager.AppSettings["companyName"].ToString());
                 mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"]);
+                if (ConfigurationManager.AppSettings["webShopDestinationEmail"] == null || ConfigurationManager.AppSettings["webShopDestinationEmail"] == string.Empty)
+                    mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
+                else
+                {
+                    foreach (string destinationEmail in ConfigurationManager.AppSettings["webShopDestinationEmail"].Split(','))
+                        mail.To.Add(new MailAddress(destinationEmail));
+                }
                 //mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
-                foreach (string emailAddress in ConfigurationManager.AppSettings["infoEmail"].Split(';'))
-                    mail.To.Add(new MailAddress(emailAddress));
-                mail.Subject = "Nova porudžbina";
+                //foreach (string emailAddress in ConfigurationManager.AppSettings["infoEmail"].Split(';'))
+                    //mail.To.Add(new MailAddress(emailAddress));
+                //mail.Subject = "Nova porudžbina";
                 StringBuilder body = new StringBuilder();
                 body.Append("<strong>Nova porudžbina na sajtu " + ConfigurationManager.AppSettings["webShopUrl"] + "</strong>");
                 body.Append("<br/>");
@@ -505,7 +512,7 @@ namespace eshopUtilities
                 body.Append("<br/>");
                 if (order.Lastname != string.Empty || order.Firstname != string.Empty)
                     body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");
-                else if (order.Name != string.Empty)
+                if (order.Name != string.Empty)
                 {
                     body.Append("<p><strong>Naziv: </strong>" + order.Name + "</p>");
                     body.Append("<p><strong>PIB: </strong>" + order.Pib + "</p>");
@@ -519,6 +526,13 @@ namespace eshopUtilities
                 mail.Body = body.ToString();
                 mail.IsBodyHtml = true;
                 mail.BodyEncoding = Encoding.UTF8;
+
+                AlternateView plainView = AlternateView.CreateAlternateViewFromString("Nova porudžbina na sajtu", null, "text/plain");
+                AlternateView htmlView = AlternateView.CreateAlternateViewFromString(mail.Body, null, "text/html");
+                mail.AlternateViews.Add(plainView);
+                mail.AlternateViews.Add(htmlView);
+                mail.Body = string.Empty;
+                mail.Headers.Add("Message-Id", "<" + Guid.NewGuid().ToString() + "@" + ConfigurationManager.AppSettings["webShopDomain"] + ">");
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
                 //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
@@ -537,10 +551,24 @@ namespace eshopUtilities
                 MailMessage mail = new MailMessage();
                 //MimeMailMessage mail = new MimeMailMessage();
                 mail.From = new MailAddress(ConfigurationManager.AppSettings["infoEmail"].ToString());
-                mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
+                if(ConfigurationManager.AppSettings["webShopDestinationEmail"] == null || ConfigurationManager.AppSettings["webShopDestinationEmail"] == string.Empty)
+                    mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
+                else
+                    foreach(string destinationEmail in ConfigurationManager.AppSettings["webShopDestinationEmail"].Split(','))
+                    {
+                        mail.To.Add(destinationEmail);
+                    }
                 mail.ReplyToList.Add(new MailAddress(email));
                 mail.Subject = subject;
                 mail.Body = body;
+
+                AlternateView plainView = AlternateView.CreateAlternateViewFromString(body, null, "text/plain");
+                AlternateView htmlView = AlternateView.CreateAlternateViewFromString(mail.Body, null, "text/html");
+                mail.AlternateViews.Add(plainView);
+                mail.AlternateViews.Add(htmlView);
+                mail.Body = string.Empty;
+                mail.Headers.Add("Message-Id", "<" + Guid.NewGuid().ToString() + "@" + ConfigurationManager.AppSettings["webShopDomain"] + ">");
+
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
                 //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");

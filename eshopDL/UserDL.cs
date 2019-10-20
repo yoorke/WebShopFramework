@@ -72,7 +72,7 @@ namespace eshopDL
             {
                 ErrorLog.LogError(ex);
                 if (ex.Message.Contains("user"))
-                    throw new BLException("Email adresa koju ste uneli je već iskorišćena za kreiranje naloga.<br/>Ukoliko već posedujete nalog prijavite sa svojim korisničkim imenom i šifrom. ", ex);
+                    throw new BLException("Email adresa koju ste uneli je već iskorišćena za kreiranje naloga.<br/>Ukoliko već posedujete nalog prijavite sa svojim korisničkim imenom i šifrom.<br/>Korisnička šifra Vam je poslata u mail-u dobrodošlice nakon prve porudžbine koju ste izvršili.<br/>Ukoliko ne možete da se setite korisničke šifre kliknite na sledeći link: <a href='passwordResetRequest.aspx'>Zaboravljena šifra</a>", ex);
                 
             }
             return userID;
