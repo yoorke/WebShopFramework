@@ -633,8 +633,11 @@ namespace eshopBL
                 XmlNodeList nodeList = xmlDoc.DocumentElement.SelectNodes("product");
                 foreach (XmlNode xmlNode in nodeList)
                 {
-                    eweDL.SaveCategory(xmlNode.SelectSingleNode("category").InnerText.Trim(), null);
-                    eweDL.SaveCategory(xmlNode.SelectSingleNode("subcategory").InnerText.Trim(), xmlNode.SelectSingleNode("category").InnerText.Trim());
+                    if(xmlNode.SelectSingleNode("category") != null) { 
+                        eweDL.SaveCategory(xmlNode.SelectSingleNode("category").InnerText.Trim(), null);
+                        if (xmlNode.SelectSingleNode("subcategory") != null)
+                            eweDL.SaveCategory(xmlNode.SelectSingleNode("subcategory").InnerText.Trim(), xmlNode.SelectSingleNode("category").InnerText.Trim());
+                    }
                 }
             }
         }
