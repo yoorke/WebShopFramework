@@ -75,10 +75,12 @@
     <Compile Include="CityDL.cs" />
     <Compile Include="CouponDL.cs" />
     <Compile Include="CustomPageDL.cs" />
+    <Compile Include="DeliveryServiceDL.cs" />
     <Compile Include="EweDL.cs" />
     <Compile Include="KimtecDL.cs" />
     <Compile Include="KupindoDL.cs" />
     <Compile Include="OrderDL.cs" />
+    <Compile Include="OrderStatusDL.cs" />
     <Compile Include="ProductDL.cs" />
     <Compile Include="PromotionDL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

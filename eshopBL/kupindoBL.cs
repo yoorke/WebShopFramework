@@ -121,7 +121,7 @@ namespace eshopBL
                             xmlProduct.AppendChild(xmlLagerVarijante);
 
                             XmlElement xmlAktivan = xmlDoc.CreateElement("Aktivan");
-                            xmlAktivan.InnerText = bool.Parse(product["isActive"].ToString()) ? "1" : "0";
+                            xmlAktivan.InnerText = bool.Parse(product["isActive"].ToString()) && bool.Parse(product["isInStock"].ToString()) ? "1" : "0";
                             xmlProduct.AppendChild(xmlAktivan);
 
                             XmlElement xmlNacinPlacanja = xmlDoc.CreateElement("NaciniPlacanja");

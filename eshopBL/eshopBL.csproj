@@ -81,6 +81,7 @@
     <Compile Include="CustomMembershipProvider.cs" />
     <Compile Include="CustomPageBL.cs" />
     <Compile Include="CustomRoleProvider.cs" />
+    <Compile Include="DeliveryServiceBL.cs" />
     <Compile Include="EweBL.cs" />
     <Compile Include="ImagesBL.cs" />
     <Compile Include="KimtecBL.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="MailBL.cs" />
     <Compile Include="NotificationHandler.cs" />
     <Compile Include="OrderBL.cs" />
+    <Compile Include="OrderStatusBL.cs" />
     <Compile Include="ProductBL.cs" />
     <Compile Include="PromotionBL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

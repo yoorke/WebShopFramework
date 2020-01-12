@@ -120,9 +120,11 @@ namespace eshopDL
                                     order.Zip = reader.GetString(16);
                                 order.Items = getOrderItems(orderID);
                                 order.Coupon = new Coupon(reader.GetInt32(17), reader.GetString(18), reader.GetDouble(19), string.Empty, reader.GetDateTime(24), reader.GetDateTime(25), new CouponType(reader.GetInt32(26), string.Empty), null);
-                                order.OrderStatus = new OrderStatus(reader.GetInt32(20), reader.GetString(21));
+                                order.OrderStatus = new OrderStatus(reader.GetInt32(20), reader.GetString(21), false);
                                 order.Code = reader.GetString(23);
                                 order.UserDiscountValue = reader.GetDouble(27);
+                                order.DeliveryServiceID = !Convert.IsDBNull(reader[28]) ? reader.GetInt32(28) : -1;
+                                order.TrackCode = !Convert.IsDBNull(reader[29]) ? reader.GetString(29) : string.Empty;
 
                                 if (Convert.IsDBNull(reader[22]) == false)
                                     order.Comment = reader.GetString(22);
@@ -230,7 +232,7 @@ namespace eshopDL
             return statuses;
         }
          
-        public int UpdateOrderStatus(int orderID, int orderStatusID)
+        public int UpdateOrderStatus(int orderID, int orderStatusID, DeliveryService deliveryService, string trackCode)
         {
             int status = 0;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
@@ -241,6 +243,8 @@ namespace eshopDL
                     objComm.CommandType = CommandType.StoredProcedure;
                     objComm.Parameters.Add("@orderID", SqlDbType.Int).Value = orderID;
                     objComm.Parameters.Add("@orderStatusID", SqlDbType.Int).Value = orderStatusID;
+                    objComm.Parameters.Add("@deliveryServiceID", SqlDbType.Int).Value = deliveryService != null ? (int?)(deliveryService.ID) : null;
+                    objComm.Parameters.Add("@trackCode", SqlDbType.VarChar).Value = trackCode;
 
                     status = objComm.ExecuteNonQuery();
                 }

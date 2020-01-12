@@ -484,5 +484,10 @@ namespace eshopBL
 
             return productsSearch;
         }
+
+        public List<ProductSimple> GetProductsByNameAndCode(string name)
+        {
+            return new ProductDL().GetProductsByNameAndCode(name);
+        }
     }
 }

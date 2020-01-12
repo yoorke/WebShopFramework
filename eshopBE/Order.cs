@@ -30,6 +30,8 @@ namespace eshopBE
         private string _code;
         private string _cartID;
         private double _userDiscountValue;
+        private int _deliveryServiceID;
+        private string _trackCode;
 
         public int OrderID
         {
@@ -161,6 +163,18 @@ namespace eshopBE
         {
             get { return _userDiscountValue; }
             set { _userDiscountValue = value; }
+        }
+
+        public int DeliveryServiceID
+        {
+            get { return _deliveryServiceID; }
+            set { _deliveryServiceID = value; }
+        }
+
+        public string TrackCode
+        {
+            get { return _trackCode; }
+            set { _trackCode = value; }
         }
     }
 }

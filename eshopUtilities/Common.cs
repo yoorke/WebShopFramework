@@ -602,7 +602,7 @@ namespace eshopUtilities
             return smtp;
         }
 
-        public static void SendOrderStatusUpdate(string email, string name, string orderNumber, DateTime date, string status)
+        public static void SendOrderStatusUpdate(string email, string name, string orderNumber, DateTime date, string status, DeliveryService deliveryService, string trackCode)
         {
             try
             {
@@ -618,6 +618,16 @@ namespace eshopUtilities
                 body.Append("<br/>");
                 body.Append("<div style='width=100%;background-color:#f0f000;padding-top:0.5em;padding-bottom:0.5em;padding-left:0.5em;padding-right:0.5em;color:#333333;text-align:center;font-size:18px;margin:1em;height:2em'><strong>" + status.ToUpper() + "</strong></div>");
                 body.Append("<br/>");
+                if(deliveryService != null)
+                {
+                    body.Append("<br/><br/>")
+                        .Append("<p>Vaša roba je poslata kurirskom službom: " + deliveryService.Name);
+                }
+                if(trackCode != null && trackCode.Length > 0)
+                {
+                    body.Append("<br/><br/>")
+                        .Append("Poslati paket možete pratiti putem sledećeg linka: " + trackCode);
+                }
                 body.Append("<p>Vaša online prodavnica <a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'>" + ConfigurationManager.AppSettings["companyName"] + "</a></p>");
 
                 mail.IsBodyHtml = true;

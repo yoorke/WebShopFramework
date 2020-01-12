@@ -592,6 +592,8 @@ namespace eshopDL
                             product.Name = reader.GetString(1);
                             product.Brand = new Brand(-1, reader.GetString(2), string.Empty);
                             product.FullCategoryUrl = !Convert.IsDBNull(reader[4]) ? reader.GetString(4) : string.Empty;
+                            product.Description = !Convert.IsDBNull(reader[5]) ? reader.GetString(5) : string.Empty;
+                            product.Description = product.Description.Replace("<p>", string.Empty).Replace("</p>", string.Empty).Trim();
 
                             products.Add(product);
                         }
@@ -1994,6 +1996,28 @@ namespace eshopDL
                 }
             }
             return productUpdatePrice;
+        }
+
+        public List<ProductSimple> GetProductsByNameAndCode(string name)
+        {
+            List<ProductSimple> list = new List<ProductSimple>();
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_getProductsByNameAndCode", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@name", SqlDbType.NVarChar, 50).Value = name;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            list.Add(new ProductSimple(reader.GetInt32(0), reader.GetString(1), reader.GetString(2)));
+                        }
+                    }
+                }
+            }
+            return list;
         }
 
         #endregion GetProduct
