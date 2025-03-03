@@ -82,7 +82,7 @@ namespace eshopUtilities
                 {
                     ukupno += order.Items[i].UserPrice * order.Items[i].Quantity;
                     body.Append("<tr height='20px' valign='middle'>");
-                    body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + ", " + order.Items[i].Product.Description + ", " + order.Items[i].Product.Code + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
+                    body.Append("<td align='center'>" + (i + 1).ToString() + "</td><td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "'" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Name.ToString() + (bool.Parse(ConfigurationManager.AppSettings["showProductDescriptionInOrder"]) ? ", " + order.Items[i].Product.Description : string.Empty) + ", " + order.Items[i].Product.Code + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
                     body.Append("</tr>");
                 }
                 body.Append("</table>");
@@ -97,28 +97,38 @@ namespace eshopUtilities
                 body.Append("Ukupno: " + string.Format("{0:N2}", ukupno - order.UserDiscountValue));
                 body.Append("<br />");
                 //body.Append("Dostava: " + 
-                    //(bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) 
-                        //? string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"])
-                            //? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))
-                                //: ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
-                                        //? "0,00" : " Po cenovniku kurirske službe"));
+                //(bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) 
+                //? string.Format("{0:N2}", ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"])
+                //? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))
+                //: ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
+                //? "0,00" : " Po cenovniku kurirske službe"));
 
-                body.Append("Dostava: " +
-                    (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"])
-                        ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
-                            ? 0 : settings.DeliveryCost)
-                        : ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
-                            ? "0,00" : " Po cenovniku kurirske službe"));
+                if(int.Parse(ConfigurationManager.AppSettings["deliveryCalculationType"]) == 1)
+                {
+                    body.Append("Dostava: " +
+                        (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"])
+                            ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
+                                ? 0 : settings.DeliveryCost)
+                            : ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
+                                ? "0,00" : " Po cenovniku kurirske službe"));
+                }
+                else if(int.Parse(ConfigurationManager.AppSettings["deliveryCalculationType"]) == 2)
+                {
+                    body.Append("Dostava: " + string.Format("{0:N2}", order.Packages.Sum(package => package.DeliveryCost)));
+                }
+
                 body.Append("<br />");
 
                 //body.Append("Ukupno sa dostavom: " + 
-                    //(bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) 
-                        //? string.Format("{0:N2}", ukupno - order.UserDiscountValue + 
-                            //(ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
-                                //? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))) 
-                        //: (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
-                            //? "" : " + cena dostave")));
+                //(bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]) 
+                //? string.Format("{0:N2}", ukupno - order.UserDiscountValue + 
+                //(ukupno > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
+                //? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"]))) 
+                //: (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > double.Parse(ConfigurationManager.AppSettings["freeDeliveryTotalValue"]) 
+                //? "" : " + cena dostave")));
 
+                if(int.Parse(ConfigurationManager.AppSettings["deliveryCalculationType"]) == 1)
+                {
                 body.Append("Ukupno sa dostavom: " +
                     (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"])
                         ? string.Format("{0:N2}", ukupno - order.UserDiscountValue +
@@ -126,9 +136,27 @@ namespace eshopUtilities
                                 ? 0 : settings.DeliveryCost))
                         : (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
                             ? "" : " + cena dostave")));
+                }
+                else if(int.Parse(ConfigurationManager.AppSettings["deliveryCalculationType"]) == 2)
+                {
+                    body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", order.TotalValue + order.Packages.Sum(package => package.DeliveryCost)));
+                    body.Append("<br/>");
+                    body.Append("Broj paketa: " + order.NumberOfSuppliers.ToString());
+                }
                 body.Append("</div>");
                 body.Append("<br/>");
-                if(order.UserDiscountValue > 0)
+
+                if (bool.Parse(ConfigurationManager.AppSettings["distributeGifts"]))
+                {
+                    double giftMinValue = double.Parse(ConfigurationManager.AppSettings["giftMinValue"]);
+
+                    if(ukupno >= giftMinValue)
+                    {
+                        body.Append("<br /><br /><p><strong>Ostvarili ste pravo na poklon u vidu rukavice za kuhinju.<br /><br />Rukavica će Vam biti dostavljena zajedno sa ostatkom poručene robe.</strong></p><br /><br />");
+                    }
+                }
+
+                if (order.UserDiscountValue > 0)
                     body.Append("<p><strong>Odobren vam je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</strong></p>");
                 if(order.Lastname != string.Empty || order.Firstname != string.Empty)
                     body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");
@@ -142,6 +170,9 @@ namespace eshopUtilities
                 body.Append("<p><strong>Način plaćanja: </strong>" + order.Payment.Name + "</p>");
                 body.Append("<p><strong>Način preuzimanja: </strong>" + order.Delivery.Name + "</p>");
                 body.Append("<p><strong>Napomena: </strong>" + order.Comment + "</p>");
+
+                if(ConfigurationManager.AppSettings["deliveryTime"] != null)
+                    body.Append("<p><strong>Rok isporuke: </strong>" + ConfigurationManager.AppSettings["deliveryTime"]);
             
                 body.Append("<br/><br/>Vaša online prodavnica ");
                 body.Append("<span style='font-weight:bold;color:#174e87'>" + ConfigurationManager.AppSettings["companyName"] + "</span>");
@@ -166,6 +197,7 @@ namespace eshopUtilities
             }
             catch(Exception ex)
             {
+                ErrorLog.LogError(ex);
                 throw new BLException("Nije moguće poslati mail", ex);
             }
         }
@@ -454,10 +486,12 @@ namespace eshopUtilities
                     foreach (string destinationEmail in ConfigurationManager.AppSettings["webShopDestinationEmail"].Split(','))
                         mail.To.Add(new MailAddress(destinationEmail));
                 }
+                mail.ReplyToList.Add(new MailAddress(order.Email));
+                mail.ReplyToList.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
                 //mail.To.Add(new MailAddress(ConfigurationManager.AppSettings["infoEmail"]));
                 //foreach (string emailAddress in ConfigurationManager.AppSettings["infoEmail"].Split(';'))
                     //mail.To.Add(new MailAddress(emailAddress));
-                //mail.Subject = "Nova porudžbina";
+                mail.Subject = "Nova porudžbina";
                 StringBuilder body = new StringBuilder();
                 body.Append("<strong>Nova porudžbina na sajtu " + ConfigurationManager.AppSettings["webShopUrl"] + "</strong>");
                 body.Append("<br/>");
@@ -474,7 +508,7 @@ namespace eshopUtilities
                     ukupno += order.Items[i].UserPrice * order.Items[i].Quantity;
                     body.Append("<tr height='20px' valign='middle'>");
                     body.Append("<td align='center'>" + (i + 1).ToString() + "</td>" + "" +
-                        "<td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Brand.Name + " " + order.Items[i].Product.Name.ToString() + ", " + order.Items[i].Product.Description + ", " + order.Items[i].Product.Code + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
+                        "<td>" + "<a href='" + ConfigurationManager.AppSettings["webShopUrl"] + "/" + order.Items[i].Product.Url + "' style='color:#d3232e'>" + order.Items[i].Product.Brand.Name + " " + order.Items[i].Product.Name.ToString() + ", " + (bool.Parse(ConfigurationManager.AppSettings["showProductDescriptionInOrder"]) ? order.Items[i].Product.Description + ", " : string.Empty) + order.Items[i].Product.Code + "<br/>" + order.Items[i].Product.SupplierCode + "</a>" + "</td><td align='right'>" + order.Items[i].Quantity.ToString() + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].UserPrice) + "</td><td align='right'>" + string.Format("{0:N2}", order.Items[i].Quantity * order.Items[i].UserPrice) + "</td>");
                     body.Append("</tr>");
                 }
                 body.Append("</table>");
@@ -632,6 +666,13 @@ namespace eshopUtilities
 
                 mail.IsBodyHtml = true;
                 mail.Body = body.ToString();
+
+                AlternateView plainView = AlternateView.CreateAlternateViewFromString("Izmenjen status porudžbine na: " + status, null, "text/plain");
+                AlternateView htmlView = AlternateView.CreateAlternateViewFromString(mail.Body, null, "text/html");
+                mail.AlternateViews.Add(plainView);
+                mail.AlternateViews.Add(htmlView);
+                mail.Body = string.Empty;
+                mail.Headers.Add("Message-Id", "<" + Guid.NewGuid().ToString() + "@" + ConfigurationManager.AppSettings["webShopDomain"] + ">");
 
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");
                 //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"], "infoEmail");

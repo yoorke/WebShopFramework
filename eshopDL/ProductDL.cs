@@ -25,7 +25,12 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, supplierCode, brand.brandID, product.name, description, product.price, webPrice, brand.name, isApproved, isActive, isLocked, isInStock, ISNULL((SELECT TOP 1 price FROM promotionProduct WHERE productID = product.productID), 0) as promotionPrice, insertDate FROM product INNER JOIN brand ON product.brandID=brand.brandID", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, supplierCode, brand.brandID, product.name, description, product.price, webPrice, brand.name, isApproved, isActive, isLocked, isInStock, ISNULL((SELECT TOP 1 price FROM promotionProduct WHERE productID = product.productID), 0) as promotionPrice, insertDate," +
+                    "(SELECT ISNULL(CASE WHEN ppc.url <> 'proizvodi' THEN ppc.url ELSE '' END, '') + (CASE WHEN ppc.url IS NOT NULL AND ppc.url <> 'proizvodi' THEN '/' ELSE '' END) + ISNULL(CASE WHEN pc.url <> 'proizvodi' THEN pc.url ELSE '' END, '') + (CASE WHEN pc.url IS NOT NULL AND pc.url <> 'proizvodi' THEN '/' ELSE '' END) + category.url" +
+                    " FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID" +
+                    " LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID" +
+                    " WHERE category.categoryID = (SELECT TOP 1 categoryID FROM productCategory WHERE productID = product.productID AND isMainCategory = 1))" +
+                    " FROM product INNER JOIN brand ON product.brandID=brand.brandID", objConn))
                 {
                     try
                     {
@@ -170,6 +175,7 @@ namespace eshopDL
                                 product.Categories = new List<Category>();
                                 product.Categories.Add(new CategoryDL().GetCategory(categoryID));
                                 product.InsertDate = Common.ConvertToLocalTime(reader.GetDateTime(14));
+                                product.FullCategoryUrl = !Convert.IsDBNull(reader[15]) ? reader.GetString(15) : string.Empty;
 
                                 products.Add(product);
                             }
@@ -213,14 +219,28 @@ namespace eshopDL
             int tableIndex;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, promotion.dateFrom, promotion.dateTo, category.name, product.isInStock, insertDate" +
-                    ", (SELECT ppc.url + (CASE WHEN ppc.url IS NOT NULL THEN '/' ELSE '' END) + pc.url + (CASE WHEN pc.url IS NOT NULL THEN '/' ELSE '' END) + category.url" +
-                    " FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID" + 
-                    " LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID" +
-                    " WHERE category.categoryID = @urlCategoryID)" +
-                    " FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN productCategory ON product.productID=productCategory.productID LEFT JOIN promotionProduct ON product.productID=promotionProduct.productID LEFT JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN category ON productCategory.categoryID=category.categoryID", objConn))
+                //using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl, promotionProduct.price, promotion.imageUrl, promotion.dateFrom, promotion.dateTo, category.name, product.isInStock, insertDate" +
+                //    ", (SELECT ppc.url + (CASE WHEN ppc.url IS NOT NULL THEN '/' ELSE '' END) + pc.url + (CASE WHEN pc.url IS NOT NULL THEN '/' ELSE '' END) + category.url" +
+                //    " FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID" +
+                //    " LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID" +
+                //    " WHERE category.categoryID = @urlCategoryID)" +
+                //    " FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN productCategory ON product.productID=productCategory.productID LEFT JOIN promotionProduct ON product.productID=promotionProduct.productID LEFT JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN category ON productCategory.categoryID=category.categoryID", objConn))
+
+                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, product.name, product.description, product.price, webPrice, brand.name, productImageUrl.imageUrl," + 
+                    " promotionProduct.price, promotion.imageUrl, promotion.dateFrom, promotion.dateTo, category.name, product.isInStock, insertDate," +
+                        " (SELECT ISNULL(CASE WHEN ppc.url <> 'proizvodi' THEN ppc.url ELSE '' END, '') + (CASE WHEN ppc.url IS NOT NULL AND ppc.url <> 'proizvodi' THEN '/' ELSE '' END) + ISNULL(CASE WHEN pc.url <> 'proizvodi' THEN pc.url ELSE '' END, '') + (CASE WHEN pc.url IS NOT NULL AND pc.url <> 'proizvodi' THEN '/' ELSE '' END) +category.url" +
+                        " FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID" +
+                        " LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID" +
+                        " WHERE category.categoryID = (SELECT TOP 1 categoryID FROM productCategory WHERE productID = product.productID AND isMainCategory = 1))," +
+                    " CASE WHEN promotionProduct.price IS NOT NULL THEN promotionProduct.price ELSE webPrice END" +
+                    " FROM product INNER JOIN brand ON product.brandID = brand.brandID" +
+                    " INNER JOIN productImageUrl ON product.productID = productImageUrl.productID" +
+                    " INNER JOIN productCategory ON product.productID = productCategory.productID" +
+                    " LEFT JOIN promotionProduct ON product.productID = promotionProduct.productID" +
+                    " LEFT JOIN promotion ON promotionProduct.promotionID = promotion.promotionID" +
+                    " INNER JOIN category ON productCategory.categoryID = category.categoryID", objConn))
                 {
-                    if(attributeValues.Count > 0)
+                    if (attributeValues.Count > 0)
                     {
                         tempAttributeID = 0;
                         tableIndex = 0;
@@ -240,7 +260,7 @@ namespace eshopDL
                     objComm.CommandText += " WHERE productImageUrl.sortOrder=1 AND product.isActive=1 AND product.isApproved=1";
 
                     if (includeChildrenCategoriesProducts)
-                    { 
+                    {
                         List<int> childrenCategories = new CategoryDL().GetChildrenCategories(categoryID);
                         objComm.CommandText += " AND (productCategory.categoryID=@categoryID";
                         for (int i = 0; i < childrenCategories.Count; i++)
@@ -255,11 +275,11 @@ namespace eshopDL
                         objComm.CommandText += " AND productCategory.categoryID = @categoryID";
                         objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
                     }
-                    
-                    
-                    
 
-                    
+
+
+
+
 
                     if (priceFrom > 0)
                     {
@@ -309,9 +329,9 @@ namespace eshopDL
                             objComm.CommandText += ")";
 
 
-                            //objComm.CommandText += " AND a" + (i + 1).ToString() + ".attributeValueID=@attributeValueID" + (i + 1).ToString();
+                        //objComm.CommandText += " AND a" + (i + 1).ToString() + ".attributeValueID=@attributeValueID" + (i + 1).ToString();
                         objComm.Parameters.Add("@attributeValueID" + (i + 1).ToString(), SqlDbType.Int).Value = attributeValues[i].AttributeValueID;
-                        
+
                     }
 
                     objComm.CommandText += " ORDER BY product.isInStock DESC, " + sort;
@@ -391,7 +411,7 @@ namespace eshopDL
                     ", (SELECT ppc.url + (CASE WHEN ppc.url IS NOT NULL THEN '/' ELSE '' END) + pc.url + (CASE WHEN pc.url IS NOT NULL THEN '/' ELSE '' END) + category.url" +
                     " FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID" +
                     " LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID" +
-                    " WHERE category.categoryID = productCategory.categoryID)" +
+                    " WHERE category.categoryID = (SELECT TOP 1 categoryID FROM productCategory WHERE productID = product.productID AND isMainCategory = 1))" +
                     " FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID INNER JOIN promotionProduct ON product.productID=promotionProduct.productID INNER JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN productCategory ON productCategory.productID=product.productID INNER JOIN category ON productCategory.categoryID=category.categoryID WHERE promotion.promotionID=@promotionID AND isActive=1 AND isApproved=1 AND productImageUrl.sortOrder=1 and isMainCategory = 1 ORDER BY product.name", objConn))
                 {
                     objConn.Open();
@@ -444,7 +464,7 @@ namespace eshopDL
                     ", (SELECT ppc.url + (CASE WHEN ppc.url IS NOT NULL THEN '/' ELSE '' END) + pc.url + (CASE WHEN pc.url IS NOT NULL THEN '/' ELSE '' END) + category.url" +
                     " FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID" +
                     " LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID" +
-                    " WHERE category.categoryID = productCategory.categoryID)" +
+                    " WHERE category.categoryID = (SELECT TOP 1 categoryID FROM productCategory WHERE productID = product.productID AND isMainCategory = 1))" +
                     " FROM product INNER JOIN brand ON product.brandID=brand.brandID INNER JOIN productImageUrl ON product.productID=productImageUrl.productID LEFT JOIN promotionProduct ON product.productID=promotionProduct.productID LEFT JOIN promotion ON promotionProduct.promotionID=promotion.promotionID INNER JOIN productCategory ON product.productID=productCategory.productID INNER JOIN category ON productCategory.categoryID=category.categoryID ", objConn))
                 {
                     objConn.Open();
@@ -527,7 +547,7 @@ namespace eshopDL
             return barcodes;
         }
 
-        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, bool? isActive, bool? isApproved, string search, string sort, string reverse, bool? hasImage)
+        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, bool? isActive, bool? isApproved, string search, string sort, string reverse, bool? hasImage, bool? isInStock = null)
         {
             DataTable products = new DataTable();
             //products.Columns.Add("productID", typeof(int));
@@ -560,6 +580,7 @@ namespace eshopDL
                     objComm.Parameters.Add("@sort", SqlDbType.NVarChar, 200).Value = sort;
                     objComm.Parameters.Add("@reverse", SqlDbType.NVarChar, 200).Value = reverse;
                     objComm.Parameters.Add("@hasImage", SqlDbType.Bit).Value = hasImage;
+                    objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = isInStock;
 
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
@@ -611,7 +632,7 @@ namespace eshopDL
         {
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("INSERT INTO product (code, supplierCode, brandID, name, description, price, webPrice, isApproved, isActive, supplierID, vatID, insertDate, updateDate, specification, isLocked, isInStock, ean, supplierPrice, unitOfMeasureID, isPriceLocked) VALUES (@code, @supplierCode, @brandID, @name, @description, @price, @webPrice, @isApproved, @isActive, @supplierID, @vatID, @insertDate, @updateDate, @specification, @isLocked, @isInStock, @ean, @supplierPrice, @unitOfMeasureID, @isPriceLocked); SELECT SCOPE_IDENTITY()", objConn))
+                using (SqlCommand objComm = new SqlCommand("INSERT INTO product (code, supplierCode, brandID, name, description, price, webPrice, isApproved, isActive, supplierID, vatID, insertDate, updateDate, specification, isLocked, isInStock, ean, supplierPrice, unitOfMeasureID, isPriceLocked, declaration, weight, weightRangeID, comment, canBeDelivered, shortDescription, isFreeDelivery, listDescription, sortIndex) VALUES (@code, @supplierCode, @brandID, @name, @description, @price, @webPrice, @isApproved, @isActive, @supplierID, @vatID, @insertDate, @updateDate, @specification, @isLocked, @isInStock, @ean, @supplierPrice, @unitOfMeasureID, @isPriceLocked, @declaration, @weight, @weightRangeID, @comment, @canBeDelivered, @shortDescription, @isFreeDelivery, @listDescription, @sortIndex); SELECT SCOPE_IDENTITY()", objConn))
                 {
                     try
                     {
@@ -638,6 +659,17 @@ namespace eshopDL
                         objComm.Parameters.Add("@supplierPrice", SqlDbType.Float).Value = product.SupplierPrice;
                         objComm.Parameters.Add("@unitOfMeasureID", SqlDbType.Int).Value = product.UnitOfMeasure.UnitOfMeasureID;
                         objComm.Parameters.Add("@isPriceLocked", SqlDbType.Bit).Value = product.IsPriceLocked;
+                        objComm.Parameters.Add("@declaration", SqlDbType.NVarChar, 2000).Value = product.Declaration;
+                        objComm.Parameters.Add("@weight", SqlDbType.Float).Value = product.Weight;
+                        objComm.Parameters.Add("@weightRangeID", SqlDbType.Int).Value = product.WeightRangeID;
+                        if (product.WeightRangeID == null)
+                            objComm.Parameters["@weightRangeID"].Value = DBNull.Value;
+                        objComm.Parameters.Add("@comment", SqlDbType.NVarChar, 1000).Value = product.Comment;
+                        objComm.Parameters.Add("@canBeDelivered", SqlDbType.Bit).Value = product.CanBeDelivered;
+                        objComm.Parameters.Add("@shortDescription", SqlDbType.NVarChar, 500).Value = product.ShortDescription;
+                        objComm.Parameters.Add("@isFreeDelivery", SqlDbType.Bit).Value = product.IsFreeDelivery;
+                        objComm.Parameters.Add("@listDescription", SqlDbType.NVarChar, 200).Value = product.ListDescription;
+                        objComm.Parameters.Add("@sortIndex", SqlDbType.Int).Value = product.SortIndex;
 
                         product.ProductID = int.Parse(objComm.ExecuteScalar().ToString());
 
@@ -669,14 +701,14 @@ namespace eshopDL
             int status;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, specification=@specification, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPrice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID, isPriceLocked = @isPriceLocked WHERE productID=@productID", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, specification=@specification, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPrice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID, isPriceLocked = @isPriceLocked, declaration = @declaration, weight = @weight, weightRangeID = @weightRangeID, comment = @comment, canBeDelivered = @canBeDelivered, shortDescription = @shortDescription, isFreeDelivery = @isFreeDelivery, listDescription = @listDescription, sortIndex = @sortIndex WHERE productID=@productID", objConn))
                 {
                     try
                     {
                         objConn.Open();
 
                         if (product.Specification == string.Empty || product.Specification == null)
-                            objComm.CommandText = "UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPRice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID, isPriceLocked = @isPriceLocked WHERE productID=@productID";
+                            objComm.CommandText = "UPDATE product SET code=@code, supplierCode=@supplierCode, brandID=@brandID, name=@name, description=@description, price=@price, webPrice=@webPrice, isApproved=@isApproved, isActive=@isActive, supplierID=@supplierID, vatID=@vatID, updateDate=@updateDate, isLocked=@isLocked, isInStock=@isInStock, ean=@ean, supplierPrice = @supplierPrice, unitOfMeasureID = @unitOfMeasureID, isPriceLocked = @isPriceLocked, declaration = @declaration, weight = @weight, weightRangeID = @weightRangeID, comment = @comment, canBeDelivered = @canBeDelivered, shortDescription = @shortDescription, isFreeDelivery = @isFreeDelivery, listDescription = @listDescription, sortIndex = @sortIndex WHERE productID=@productID";
 
                         objComm.Parameters.Add("@code", SqlDbType.NVarChar, 50).Value = product.Code;
                         objComm.Parameters.Add("@supplierCode", SqlDbType.NVarChar, 50).Value = product.SupplierCode;
@@ -699,6 +731,18 @@ namespace eshopDL
                         objComm.Parameters.Add("@productID", SqlDbType.Int).Value = product.ProductID;
                         objComm.Parameters.Add("@unitOfMeasureID", SqlDbType.Int).Value = product.UnitOfMeasure.UnitOfMeasureID;
                         objComm.Parameters.Add("@isPriceLocked", SqlDbType.Bit).Value = product.IsPriceLocked;
+                        objComm.Parameters.Add("@declaration", SqlDbType.NVarChar, 2000).Value = product.Declaration;
+                        objComm.Parameters.Add("@weight", SqlDbType.Float).Value = product.Weight;
+                        //objComm.Parameters.Add("@weightRangeID", SqlDbType.Int).Value = product.WeightRangeID;
+                        objComm.Parameters.AddWithValue("@weightRangeID", product.WeightRangeID);
+                        if (product.WeightRangeID == null)
+                            objComm.Parameters["@weightRangeID"].Value = DBNull.Value;
+                        objComm.Parameters.Add("@comment", SqlDbType.NVarChar, 1000).Value = product.Comment;
+                        objComm.Parameters.Add("@canBeDelivered", SqlDbType.Bit).Value = product.CanBeDelivered;
+                        objComm.Parameters.Add("@shortDescription", SqlDbType.NVarChar, 500).Value = product.ShortDescription;
+                        objComm.Parameters.Add("@isFreeDelivery", SqlDbType.Bit).Value = product.IsFreeDelivery;
+                        objComm.Parameters.Add("@listDescription", SqlDbType.NVarChar, 200).Value = product.ListDescription;
+                        objComm.Parameters.Add("@sortIndex", SqlDbType.Int).Value = product.SortIndex;
 
                         status = objComm.ExecuteNonQuery();
 
@@ -902,11 +946,20 @@ namespace eshopDL
                 {
                     if (!showIfNotInStock)
                         objComm.CommandText += ", isActive = @isInStock";
-                    objComm.CommandText += " WHERE supplierID=@supplierID AND isLocked=0 AND productID IN (SELECT productID FROM productCategory WHERE categoryID=@categoryID)";
+                    objComm.CommandText += " WHERE supplierID=@supplierID AND isLocked=0";
+
+                    if(categoryID > 0)
+                    {
+                        objComm.CommandText += "  AND productID IN (SELECT productID FROM productCategory WHERE categoryID=@categoryID)";
+                    }
+
                     objConn.Open();
                     objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = inStock;
                     objComm.Parameters.Add("@supplierID", SqlDbType.Int).Value = supplierID;
-                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
+                    if(categoryID > 0)
+                    {
+                        objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
+                    }
 
                     status = objComm.ExecuteNonQuery();
                 }
@@ -936,7 +989,7 @@ namespace eshopDL
             int status = 0;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE product SET isInStock=@isInStock", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE product SET isInStock=@isInStock, updateDate=@updateDate", objConn))
                 {
                     if(!bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]))
                     {
@@ -946,6 +999,7 @@ namespace eshopDL
                     objComm.CommandText += " WHERE productID=@productID";
                     objConn.Open();
                     objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = isInStock;
+                    objComm.Parameters.Add("@updateDate", SqlDbType.DateTime).Value = DateTime.UtcNow;
                     objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
 
                     status = objComm.ExecuteNonQuery();
@@ -959,7 +1013,7 @@ namespace eshopDL
             int status = 0;
             using(SqlConnection objConn=new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE product SET price=@price, isInStock=@isInStock, webPrice=@webPrice", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE product SET price=@price, isInStock=@isInStock, webPrice=@webPrice, updateDate=@updateDate", objConn))
                 {
                     if(!showIfNotInStock)
                         objComm.CommandText += ", isActive = @isInStock";
@@ -969,6 +1023,7 @@ namespace eshopDL
                     objComm.Parameters.Add("@isInStock", SqlDbType.Bit).Value = isIsInStock;
                     objComm.Parameters.Add("@webPrice", SqlDbType.Float).Value = webPrice;
                     objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+                    objComm.Parameters.Add("@updateDate", SqlDbType.DateTime).Value = DateTime.UtcNow;
 
                     status = objComm.ExecuteNonQuery();
                 }
@@ -998,6 +1053,34 @@ namespace eshopDL
         public int SaveProductVariation(int productID, int variationID, string value, string color)
         {
             return 0;
+        }
+
+        public bool UpdateProductImageUrl(int productImageUrlId, string imageUrl)
+        {
+            int status = -1;
+
+            try
+            {
+                using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+                {
+                    using (SqlCommand objComm = new SqlCommand("product_image_update_url", objConn))
+                    {
+                        objConn.Open();
+                        objComm.CommandType = CommandType.StoredProcedure;
+                        objComm.Parameters.Add("@productImageUrlId", SqlDbType.Int).Value = productImageUrlId;
+                        objComm.Parameters.Add("@imageUrl", SqlDbType.VarChar, 100).Value = imageUrl;
+
+                        status = objComm.ExecuteNonQuery();     
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                ErrorLog.LogError(ex);
+                return false;
+            }
+
+            return true;
         }
 
         #endregion SaveProduct
@@ -1187,13 +1270,60 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, supplierCode, brand.brandID, product.name, description, price, webPrice, brand.name, isApproved, isActive, insertDate, updateDate, vatID, supplierID, specification, isLocked, isInStock, ean, product.supplierPrice, unitOfMeasureID, brand.logoUrl" +
-                    ", (SELECT ppc.url + (CASE WHEN ppc.url IS NOT NULL THEN '/' ELSE '' END) + pc.url + (CASE WHEN pc.url IS NOT NULL THEN '/' ELSE '' END) + category.url" +
-                    " FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID" + 
-                    " LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID" +
-                    " WHERE category.categoryID = productCategory.categoryID), isPriceLocked" +
-                    " FROM product INNER JOIN brand ON product.brandID=brand.brandID" +
-                    " INNER JOIN productCategory ON product.productID = productCategory.productID", objConn))
+                string query = $"SELECT " +
+                    $"product.productID," +
+                    $"code," +
+                    $"supplierCode," +
+                    $"brand.brandID," +
+                    $"product.name," +
+                    $"description," +
+                    $"price," +
+                    $"webPrice," +
+                    $"brand.name," +
+                    $"isApproved," +
+                    $"isActive," +
+                    $"insertDate," +
+                    $"updateDate," +
+                    $"vatID," +
+                    $"supplierID," +
+                    $"specification," +
+                    $"isLocked," +
+                    $"isInStock," +
+                    $"ean," +
+                    $"product.supplierPrice," +
+                    $"unitOfMeasureID," +
+                    $"brand.logoUrl," +
+                    $"(SELECT ISNULL(CASE WHEN ppc.url <> 'proizvodi' THEN ppc.url ELSE '' END, '') +" +
+                    $"(CASE WHEN ppc.url IS NOT NULL AND ppc.url <> 'proizvodi' THEN '/' ELSE '' END) +" +
+                    $"ISNULL(CASE WHEN pc.url <> 'proizvodi' THEN pc.url ELSE '' END, '') +" +
+                    $"(CASE WHEN pc.url IS NOT NULL AND pc.url <> 'proizvodi' THEN '/' ELSE '' END) +" +
+                    $"category.url " +
+                    $"FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID " +
+                    $"LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID " +
+                    $"WHERE category.categoryID = (SELECT TOP 1 categoryID FROM productCategory WHERE productID = product.productID AND isMainCategory= 1)), " +
+                    $"isPriceLocked," +
+                    $"declaration," +
+                    $"weight," +
+                    $"weightRangeID," +
+                    $"comment," +
+                    $"canBeDelivered, " +
+                    $"CAST(CASE WHEN EXISTS(SELECT * FROM productVariant WHERE productID = product.productID) THEN 1 ELSE 0 END as bit), " +
+                    $"shortDescription, " +
+                    $"isFreeDelivery, " +
+                    $"manualUrl, " +
+                    $"listDescription, " +
+                    $"sortIndex " +
+                    $"FROM product INNER JOIN brand ON product.brandID = brand.brandID " +
+                    $"INNER JOIN productCategory ON product.productID = productCategory.productID";
+
+                //using (SqlCommand objComm = new SqlCommand("SELECT product.productID, code, supplierCode, brand.brandID, product.name, description, price, webPrice, brand.name, isApproved, isActive, insertDate, updateDate, vatID, supplierID, specification, isLocked, isInStock, ean, product.supplierPrice, unitOfMeasureID, brand.logoUrl" +
+                    //", (SELECT ppc.url + (CASE WHEN ppc.url IS NOT NULL THEN '/' ELSE '' END) + pc.url + (CASE WHEN pc.url IS NOT NULL THEN '/' ELSE '' END) + category.url" +
+                        //" FROM category LEFT JOIN category pc ON category.parentCategoryID = pc.categoryID" + 
+                        //" LEFT JOIN category ppc ON pc.parentCategoryID = ppc.categoryID" +
+                        //" WHERE category.categoryID = productCategory.categoryID), isPriceLocked, declaration, weight, weightRangeID, comment, canBeDelivered" +
+                    //" FROM product INNER JOIN brand ON product.brandID=brand.brandID" +
+                    //" INNER JOIN productCategory ON product.productID = productCategory.productID", objConn))
+                using (SqlCommand objComm = new SqlCommand(query, objConn))
                 {
                     try
                     {
@@ -1258,6 +1388,17 @@ namespace eshopDL
                                     product.UnitOfMeasure = new UnitOfMeasureDL().GetUnitOfMeasure(reader.GetInt32(20));
                                 product.FullCategoryUrl = !Convert.IsDBNull(reader[22]) ? reader.GetString(22) : string.Empty;
                                 product.IsPriceLocked = !Convert.IsDBNull(reader[23]) ? reader.GetBoolean(23) : false;
+                                product.Declaration = !Convert.IsDBNull(reader[24]) ? reader.GetString(24) : string.Empty;
+                                product.Weight = !Convert.IsDBNull(reader[25]) ? reader.GetDouble(25) : 0;
+                                product.WeightRangeID = !Convert.IsDBNull(reader[26]) ? reader.GetInt32(26) : -1;
+                                product.Comment = !Convert.IsDBNull(reader[27]) ? reader.GetString(27) : string.Empty;
+                                product.CanBeDelivered = !Convert.IsDBNull(reader[28]) ? reader.GetBoolean(28) : false;
+                                product.HasVariants = !Convert.IsDBNull(reader[29]) ? reader.GetBoolean(29) : false;
+                                product.ShortDescription = !Convert.IsDBNull(reader[30]) ? reader.GetString(30) : string.Empty;
+                                product.IsFreeDelivery = !Convert.IsDBNull(reader[31]) ? reader.GetBoolean(31) : false;
+                                product.ManualUrl = !Convert.IsDBNull(reader[32]) ? reader.GetString(32) : string.Empty;
+                                product.ListDescription = !Convert.IsDBNull(reader[33]) ? reader.GetString(33) : string.Empty;
+                                product.SortIndex = !Convert.IsDBNull(reader[34]) ? reader.GetInt32(34) : 0;
 
                                 //if (product.Specification == string.Empty)
                                     //product.Specification = createProductSpecification(product.ProductID);
@@ -1461,11 +1602,16 @@ namespace eshopDL
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
-                    specification += "<table class='table table-striped table-condensed'><tbody>";
+                    
                     string attributeGroup = string.Empty;
                     int i = 0;
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
+                        if(reader.HasRows)
+                        {
+                            specification += "<table class='table table-striped table-condensed'><tbody>";
+                        }
+
                         while (reader.Read())
                         {
                             if (reader.GetString(0).Contains("-") && attributeGroup != reader.GetString(0).Substring(0, reader.GetString(0).IndexOf("-")))
@@ -1479,8 +1625,11 @@ namespace eshopDL
                                 specification += "<td class='attributeName'>" + (reader.GetString(0).Contains("-") ? reader.GetString(0).Substring(reader.GetString(0).IndexOf("-")+1) : reader.GetString(0)) + "</td><td>" + reader.GetString(1) + "</td></tr>";
                             //}
                         }
-                        
-                        specification += "</table>  ";
+
+                        if(reader.HasRows)
+                        {
+                            specification += "</tbody></table>";
+                        }
                     }
                 }
             }
@@ -1621,9 +1770,10 @@ namespace eshopDL
         public List<Product> SearchProducts(string search, string sort, int? categoryID, int productCountLimit)
         {
             List<Product> products = new List<Product>();
+            List<string> restrictedSearchItems = new List<string>() { };
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("product_search", objConn))
+                using (SqlCommand objComm = new SqlCommand("product_search_new", objConn))
                 {
                     DataTable searchTable = new DataTable();
                     searchTable.Columns.Add("search");
@@ -1633,9 +1783,12 @@ namespace eshopDL
                     searchTable.Rows.Add(newRow);
                     foreach (string searchItem in search.Split(' '))
                     { 
-                        newRow = searchTable.NewRow();
-                        newRow["search"] = searchItem;
-                        searchTable.Rows.Add(newRow);
+                        if(searchItem.Length > 1 && !restrictedSearchItems.Contains(searchItem))
+                        { 
+                            newRow = searchTable.NewRow();
+                            newRow["search"] = searchItem;
+                            searchTable.Rows.Add(newRow);
+                        }
                     }
 
                     objConn.Open();
@@ -1680,6 +1833,8 @@ namespace eshopDL
                             product.Categories.Add(new CategoryDL().GetCategory(reader.GetInt32(13)));
                             product.IsInStock = reader.GetBoolean(14);
                             product.FullCategoryUrl = reader.GetString(15);
+                            product.CanBeDelivered = !Convert.IsDBNull(reader[16]) ? reader.GetBoolean(16) : false;
+                            product.HasVariants = !Convert.IsDBNull(reader[17]) ? reader.GetBoolean(17) : true;
                             products.Add(product);
                         }
                     }
@@ -1982,6 +2137,7 @@ namespace eshopDL
                     objConn.Open();
                     objComm.CommandType = CommandType.StoredProcedure;
                     objComm.Parameters.Add("@supplierCode", SqlDbType.VarChar, 50).Value = supplierCode;
+                    
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while(reader.Read())
@@ -1995,6 +2151,36 @@ namespace eshopDL
                     }
                 }
             }
+            return productUpdatePrice;
+        }
+
+        public ProductUpdatePrice GetProductBySupplierAndProductCode(string supplierCode, string supplierProductCode)
+        {
+            ProductUpdatePrice productUpdatePrice = null;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("productUpdatePrice_getBySupplierAndProductCode", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@supplierCode", SqlDbType.VarChar, 10).Value = supplierCode;
+                    objComm.Parameters.Add("@supplierProductCode", SqlDbType.VarChar, 50).Value = supplierProductCode;
+
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            productUpdatePrice = new ProductUpdatePrice();
+                            productUpdatePrice.ID = reader.GetInt32(0);
+                            productUpdatePrice.BrandID = reader.GetInt32(1);
+                            productUpdatePrice.IsLocked = reader.GetBoolean(2);
+                            productUpdatePrice.IsPriceLocked = !Convert.IsDBNull(reader[3]) ? reader.GetBoolean(3) : false;
+                            productUpdatePrice.CategoryID = !Convert.IsDBNull(reader[4]) ? reader.GetInt32(4) : -1;
+                        }
+                    }
+                }
+            }
+
             return productUpdatePrice;
         }
 
@@ -2018,6 +2204,81 @@ namespace eshopDL
                 }
             }
             return list;
+        }
+
+        public void CopyData(int oldID, int newID)
+        {
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_copy_data", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@old_id", SqlDbType.Int).Value = oldID;
+                    objComm.Parameters.Add("@new_id", SqlDbType.Int).Value = newID;
+
+                    objComm.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public DataTable GetAllProductImages(bool excludeNotApproved = true, bool excludeNotActive = true)
+        {
+            DataTable images = new DataTable();
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_images_get_all", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@excludeNotApproved", SqlDbType.Bit).Value = excludeNotApproved;
+                    objComm.Parameters.Add("@excludeNotActive", SqlDbType.Bit).Value = excludeNotActive;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        images.Load(reader);
+                    }
+                }
+            }
+            return images;
+        }
+
+        public string GetNewProductCode(int categoryID)
+        {
+            string code = string.Empty;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_getNewProductCode", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            code = reader.GetString(0);
+                        }
+                    }
+                }
+            }
+
+            return code;
+        }
+
+        public void SetSortIndex(int productID, int sortIndex)
+        {
+            using(SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("product_setSortIndex", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@productID", SqlDbType.Int).Value = productID;
+                    objComm.Parameters.Add("@sortIndex", SqlDbType.Int).Value = sortIndex;
+
+                    objComm.ExecuteNonQuery();                    
+                }
+            }
         }
 
         #endregion GetProduct

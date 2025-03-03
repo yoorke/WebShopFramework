@@ -20,7 +20,7 @@ namespace eshopBL
             return brands;
         }
 
-        public List<Brand> GetBrands(string categoryUrl, bool includeChildrenCategories = false)
+        public List<BrandFilter> GetBrands(string categoryUrl, bool includeChildrenCategories = false)
         {
             Category category = null;
             CategoryDL categoryDL = new CategoryDL();
@@ -29,14 +29,14 @@ namespace eshopBL
             else
             {
                 string[] categoryUrlArray = categoryUrl.Split('/');
-                category = categoryDL.GetCategoryByUrl(categoryUrlArray.Length > 2 ? categoryUrlArray[categoryUrlArray.Length - 3] : string.Empty, categoryUrlArray[categoryUrlArray.Length - 2], categoryUrlArray[categoryUrlArray.Length - 1]);
+                category = categoryDL.GetCategoryByUrl(categoryUrlArray.Length > 2 ? categoryUrlArray[categoryUrlArray.Length - 3] : string.Empty, categoryUrlArray[categoryUrlArray.Length - 2], categoryUrlArray[categoryUrlArray.Length - 1], false);
             }
 
             BrandDL brandDL = new BrandDL();
             return brandDL.GetBrands(category.CategoryID, includeChildrenCategories);
         }
 
-        public List<Brand> GetBrands(int categoryID, bool includeChildrenCategories = false)
+        public List<BrandFilter> GetBrands(int categoryID, bool includeChildrenCategories = false)
         {
             return new BrandDL().GetBrands(categoryID, includeChildrenCategories);
         }

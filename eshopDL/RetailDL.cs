@@ -26,7 +26,18 @@ namespace eshopDL
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while(reader.Read())
-                            retails.Add(new Retail(reader.GetInt32(0), new City(reader.GetInt32(1), reader.GetString(2), reader.GetString(3)), reader.GetString(4), reader.GetString(5), reader.GetString(6), reader.GetString(7), reader.GetString(8), reader.GetBoolean(9)));
+                            retails.Add(new Retail(
+                                reader.GetInt32(0),
+                                new City(reader.GetInt32(1),
+                                reader.GetString(2),
+                                reader.GetString(3)),
+                                reader.GetString(4),
+                                reader.GetString(5),
+                                reader.GetString(6),
+                                reader.GetString(7),
+                                reader.GetString(8),
+                                reader.GetBoolean(9)
+                            ));
                     }
                 }
             }

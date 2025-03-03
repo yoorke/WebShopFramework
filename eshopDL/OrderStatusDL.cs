@@ -24,7 +24,7 @@ namespace eshopDL
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while (reader.Read())
-                            orderStatuses.Add(new OrderStatus(reader.GetInt32(0), reader.GetString(1), reader.GetBoolean(2)));
+                            orderStatuses.Add(new OrderStatus(reader.GetInt32(0), reader.GetString(1), reader.GetBoolean(2), reader.GetBoolean(3)));
                     }
                 }
             }
@@ -44,7 +44,7 @@ namespace eshopDL
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while (reader.Read())
-                            orderStatus = new OrderStatus(reader.GetInt32(0), reader.GetString(1), reader.GetBoolean(2));
+                            orderStatus = new OrderStatus(reader.GetInt32(0), reader.GetString(1), reader.GetBoolean(2), reader.GetBoolean(3));
                     }
                 }
             }

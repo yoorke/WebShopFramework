@@ -32,6 +32,13 @@ namespace eshopBE
         private double _userDiscountValue;
         private int _deliveryServiceID;
         private string _trackCode;
+        private double _deliveryCost;
+        private double _totalWeight;
+        private List<Package> _packages;
+        private bool _isPaid;
+        private string _paymentStatus;
+        private bool _confirmed;
+        private bool _createPackageForEverySupplier = true;
 
         public int OrderID
         {
@@ -175,6 +182,153 @@ namespace eshopBE
         {
             get { return _trackCode; }
             set { _trackCode = value; }
+        }
+
+        public double TotalWeight
+        {
+            get { return calculateWeight(); }
+        }
+
+        private double calculateWeight()
+        {
+            double weight = 0;
+
+            foreach(var item in Items)
+            {
+                if(item.Product.Weight == 0)
+                {
+                    return -1;
+                }
+
+                weight += item.Product.Weight;
+            }
+
+            return weight;
+        }
+
+        public double TotalValue
+        {
+            get { return getTotalValue(); }
+        }
+
+        private double getTotalValue()
+        {
+            double total = _items.Sum(item => item.UserPrice * item.Quantity);
+            return total - _userDiscountValue;
+        }
+
+        public int NumberOfSuppliers
+        {
+            get { return getNumberOfSuppliers(); }
+        }
+
+        private int getNumberOfSuppliers()
+        {
+            //int numberOfSuppliers = 0;
+            //int currentSupplier = -1;
+            List<int> suppliers = new List<int>();
+
+            foreach(var item in _items)
+            {
+                if(!suppliers.Contains(item.Product.SupplierID))
+                {
+                    suppliers.Add(item.Product.SupplierID);
+                    //numberOfSuppliers++;
+                }
+            }
+
+            return suppliers.Count();
+        }
+
+        public List<Package> Packages
+        {
+            get { return getPackages(); }
+        }
+
+        public List<Package> getPackages()
+        {
+            if(_packages != null)
+            {
+                return _packages;
+            }
+
+            List<Package> packages = new List<Package>();
+
+            foreach(var item in _items)
+            {
+                if(_createPackageForEverySupplier)
+                {
+                    if (!packageListContainsSupplierID(packages, item.Product.SupplierID))
+                    {
+                        addPackage(packages, item.Product.SupplierID);
+                    }
+
+                    ((Package)(packages.First(package => package.Supplier.SupplierID == item.Product.SupplierID))).Items.Add(item);
+                }
+                else
+                {
+                    if(packages.Count == 0)
+                    {
+                        addPackage(packages, 0);
+                    }
+                    ((Package)(packages.First())).Items.Add(item);
+                }
+            }
+
+            _packages = packages;
+
+            return packages;
+        }
+
+        public bool IsPaid
+        {
+            get { return _isPaid; }
+            set { _isPaid = value; }
+        }
+
+        public string PaymentStatus
+        {
+            get { return _paymentStatus; }
+            set { _paymentStatus = value; }
+        }
+
+        public bool Confirmed
+        {
+            get { return _confirmed; }
+            set { _confirmed = value; }
+        }
+
+        public bool CreatePackageForEverySupplier
+        {
+            get { return _createPackageForEverySupplier; }
+            set { _createPackageForEverySupplier = value; }
+        }
+
+        private bool packageListContainsSupplierID(List<Package> packages, int supplierID)
+        {
+            foreach(var package in packages)
+            {
+                if(package.Supplier.SupplierID == supplierID)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void addPackage(List<Package> packages, int supplierID)
+        {
+            packages.Add(new Package()
+            {
+                DeliveryCost = 0,
+                Items = new List<OrderItem>(),
+                Supplier = new Supplier()
+                {
+                    SupplierID = supplierID,
+                    Name = "Paket " + (packages.Count + 1).ToString()
+                }
+            });
         }
     }
 }

@@ -23,7 +23,7 @@ namespace eshopDL
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while (reader.Read())
-                            cities.Add(new City(reader.GetInt32(0), reader.GetString(1), reader.GetString(2)));
+                            cities.Add(new City(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetString(2) : string.Empty));
                     }
                 }
             }
@@ -48,6 +48,27 @@ namespace eshopDL
                 }
             }
             return city;
+        }
+
+        public List<City> GetCities(string name)
+        {
+            List<City> cities = new List<City>();
+            using (SqlConnection objConn = new SqlConnection(ConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("city_getByName", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@name", SqlDbType.NVarChar, 50).Value = name;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            cities.Add(new City(reader.GetInt32(0), reader.GetString(1), reader.GetString(2)));
+                    }
+                }
+            }
+
+            return cities;
         }
     }
 }

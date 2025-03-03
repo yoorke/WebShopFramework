@@ -10,11 +10,19 @@ using System.IO;
 using System.Drawing;
 using eshopUtilities;
 using System.Configuration;
+using eshopUtilities.Extensions;
 
 namespace eshopBL
 {
     public class ProductBL
     {
+        ImageProcessor imageProc;
+
+        public ProductBL()
+        {
+            imageProc = new ImageProcessor();
+        }
+
         public Product GetProduct(int productID, string url, bool count, string code)
         {
             ProductDL productDL = new ProductDL();
@@ -129,6 +137,17 @@ namespace eshopBL
             return isActive;
         }
 
+        private bool? getInStock(string isInStockName)
+        {
+            bool? isInStock = null;
+            switch(isInStockName)
+            {
+                case "Na stanju": { isInStock = true; break; }
+                case "Nema na stanju": { isInStock = false; break; }
+            }
+            return isInStock;
+        }
+
         public int SetApproved(int productID, bool isApproved)
         {
             ProductDL productDL = new ProductDL();
@@ -190,8 +209,12 @@ namespace eshopBL
             switch (sortName)
             {
                 case "name": { sort = " product.name" + (bool.Parse(ConfigurationManager.AppSettings["sortProductsByDescriptionAlso"].ToString()) ? ", product.Description" : string.Empty) ; break; }
-                case "priceDesc": { sort = " product.price DESC"; break; }
-                case "priceAsc": { sort = " product.price"; break; }
+                //case "priceDesc": { sort = " product.price DESC"; break; }
+                //case "priceDesc": { sort = " CASE WHEN promotionProduct.price IN NOT NULL THEN promotionProduct.price ELSE product.webPrice END DESC"; break; }
+                case "priceDesc": { sort = " 17 DESC"; break; }
+                //case "priceAsc": { sort = " product.price"; break; }
+                //case "priceAsc": { sort = " CASE WHEN promotionProduct.price IS NOT NULL THEN promotionProduct.price ELSE product.webPrice END"; break; }
+                case "priceAsc": { sort = " 17"; break; }
                 case "sortIndex": { sort = " sortIndex"; break; }
             }
             return sort;
@@ -276,6 +299,37 @@ namespace eshopBL
             return new ProductDL().SearchProducts(search, getSort(sort), categoryID, productCountLimit);
         }
 
+        public List<ProductFPView> SearchProductsView(string search, string sort, int categoryID, int productCountLimit = -1)
+        {
+            List<Product> products = new ProductDL().SearchProducts(search, getSort(sort), categoryID, productCountLimit);
+            List<ProductFPView> productsView = new List<ProductFPView>();
+
+            foreach(var product in products)
+            {
+                productsView.Add(new ProductFPView()
+                {
+                    BrandName = product.Brand.Name,
+                    CanBeDelivered = product.CanBeDelivered,
+                    CategoryName = product.Categories[0].Name,
+                    Code = product.Code,
+                    FullCategoryUrl = product.FullCategoryUrl,
+                    HasVariants = product.HasVariants,
+                    ImageUrl = product.Images[0].ImageUrl,
+                    IsFreeDelivery = product.IsFreeDelivery,
+                    IsInStock = product.IsInStock,
+                    Name = product.Name,
+                    Price = product.Price,
+                    ProductID = product.ProductID,
+                    PromotionImageUrl = product.Promotion != null ? product.Promotion.ImageUrl : string.Empty,
+                    PromotionPrice = product.Promotion != null ? product.Promotion.Price : product.Price,
+                    WebPrice = product.Promotion != null ? product.Promotion.Price : product.WebPrice
+                });
+            }
+
+            return productsView;
+
+        }
+
         public void SetPromotionPrice(int productID, double price, double value, int promotionID)
         {
             double promotionPrice = value > 0 ? bool.Parse(ConfigurationManager.AppSettings["roundPromotionPrice"]) ? ((int)(price * (1 - value / 100))) / 100 * 100 - 10 : price * (1 - value / 100) : price;
@@ -317,23 +371,46 @@ namespace eshopBL
                     { 
                         exist = true;
                         string extension = fullPath.Substring(fullPath.LastIndexOf('.'));
-                        Image original = Image.FromFile(fullPath);
-                        Image thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["mainWidth"]), int.Parse(ConfigurationManager.AppSettings["mainHeight"]));
-                        thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["mainName"] + extension);
+                        Image original = null;
+                        if (extension.Equals(".webp"))
+                        {
+                            original = WebpImage.FromFile(fullPath);
+                            //File.Copy(fullPath, fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["mainName"] + extension);
+                            //File.Copy(fullPath, fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["listName"] + extension);
+                            //File.Copy(fullPath, fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["thumbName"] + extension);
+                            //return true;
+                        }
+                        else
+                        { 
+                            original = Image.FromFile(fullPath);
+                            if(bool.Parse(ConfigurationManager.AppSettings["useWebpImages"]))
+                            {
+                                original.SaveWebp(fullPath.Substring(0, fullPath.LastIndexOf('.')) + ".webp");
+                            }
+                        }
 
-                        thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["listWidth"]), int.Parse(ConfigurationManager.AppSettings["listHeight"]));
-                        thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["listName"] + extension);
+                        //Image thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["mainWidth"]), int.Parse(ConfigurationManager.AppSettings["mainHeight"]));
+                        //thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["mainName"] + extension);
 
-                        thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["thumbWidth"]), int.Parse(ConfigurationManager.AppSettings["thumbHeight"]));
-                        thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["thumbName"] + extension);
+                        //thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["listWidth"]), int.Parse(ConfigurationManager.AppSettings["listHeight"]));
+                        //thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["listName"] + extension);
+
+                        //thumb = Common.CreateThumb(original, int.Parse(ConfigurationManager.AppSettings["thumbWidth"]), int.Parse(ConfigurationManager.AppSettings["thumbHeight"]));
+                        //thumb.Save(fullPath.Substring(0, fullPath.LastIndexOf('.')) + "-" + ConfigurationManager.AppSettings["thumbName"] + extension);
+
+                        imageProc.SaveThumb(original, int.Parse(ConfigurationManager.AppSettings["mainWidth"]), int.Parse(ConfigurationManager.AppSettings["mainHeight"]), ConfigurationManager.AppSettings["mainName"], fullPath.Substring(0, fullPath.LastIndexOf('.')), extension);
+                        imageProc.SaveThumb(original, int.Parse(ConfigurationManager.AppSettings["listWidth"]), int.Parse(ConfigurationManager.AppSettings["listHeight"]), ConfigurationManager.AppSettings["listName"], fullPath.Substring(0, fullPath.LastIndexOf('.')), extension);
+                        imageProc.SaveThumb(original, int.Parse(ConfigurationManager.AppSettings["thumbWidth"]), int.Parse(ConfigurationManager.AppSettings["thumbHeight"]), ConfigurationManager.AppSettings["thumbName"], fullPath.Substring(0, fullPath.LastIndexOf('.')), extension);
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         return false;
                     }
             }
             return exist;
         }
+
+        
 
         public int SaveProductFromExternalApplication(string barcode, string name, double quantity, double price, int externalCategoryID, bool insertIfNew)
         {
@@ -413,9 +490,9 @@ namespace eshopBL
             return new ProductDL().GetActualPrice(productID);
         }
 
-        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, string isActiveName, string isApprovedName, string search, string sort, string reverse, string hasImage)
+        public DataTable GetProductsDataTable(int? categoryID, int? supplierID, int? promotionID, int? brandID, string isActiveName, string isApprovedName, string search, string sort, string reverse, string hasImage, string isInStockName = "Sve")
         {
-            return new ProductDL().GetProductsDataTable(categoryID, supplierID, promotionID, brandID, getActive(isActiveName), getApproved(isApprovedName), search, sort, reverse, hasImage.Equals("Sve") ? null : (bool?)(hasImage.Equals("Ima") ? true : false));
+            return new ProductDL().GetProductsDataTable(categoryID, supplierID, promotionID, brandID, getActive(isActiveName), getApproved(isApprovedName), search, sort, reverse, hasImage.Equals("Sve") ? null : (bool?)(hasImage.Equals("Ima") ? true : false), getInStock(isInStockName));
         }
 
         public DataTable GetProductsDataTable()
@@ -463,6 +540,11 @@ namespace eshopBL
             return new ProductDL().GetProductBySupplierCode(supplierCode);
         }
 
+        public ProductUpdatePrice GetProductBySupplierAndProductCode(string supplierCode, string supplierProductCode)
+        {
+            return new ProductDL().GetProductBySupplierAndProductCode(supplierCode, supplierProductCode);
+        }
+
         public List<ProductSearch> SearchProductsSimple(string search, string sort, int categoryID, int productCountLimit)
         {
             List<Product> products = new ProductDL().SearchProducts(search, sort, categoryID, productCountLimit);
@@ -488,6 +570,48 @@ namespace eshopBL
         public List<ProductSimple> GetProductsByNameAndCode(string name)
         {
             return new ProductDL().GetProductsByNameAndCode(name);
+        }
+
+        public void CopyData(int oldID, int newID)
+        {
+            new ProductDL().CopyData(oldID, newID);
+        }
+
+        public string GetFullImageUrl(string imageUrl, string suffix)
+        {
+            string filename = imageUrl.Substring(0, imageUrl.LastIndexOf('.'));
+            string extension = imageUrl.Substring(imageUrl.LastIndexOf('.'));
+
+            //return CreateImageDirectory(int.Parse(filename)) + filename + (suffix != string.Empty ? "-" : string.Empty) + suffix + extension;
+
+            string fullFilename = CreateImageDirectory(int.Parse(filename)) + filename + (suffix != string.Empty ? "-" : string.Empty) + suffix + extension;
+
+            if (imageExists(fullFilename))
+            {
+                return fullFilename;
+            }
+
+            return "/images/no-image.jpg";
+        }
+
+        public string GetNewProductCode(int categoryID)
+        {
+            return new ProductDL().GetNewProductCode(categoryID);
+        }
+
+        private bool imageExists(string filename)
+        {
+            return File.Exists(HttpContext.Current.Server.MapPath("~/" + filename));
+        }
+
+        public bool UpdateProductImageUrl(int productImageUrlId, string imageUrl)
+        {
+            return new ProductDL().UpdateProductImageUrl(productImageUrlId, imageUrl);
+        }
+
+        public void SetSortIndex(int productID, int sortIndex)
+        {
+            new ProductDL().SetSortIndex(productID, sortIndex);
         }
     }
 }

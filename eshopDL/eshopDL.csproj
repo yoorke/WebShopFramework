@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>eshopDL</RootNamespace>
     <AssemblyName>eshopDL</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -72,6 +72,7 @@
     <Compile Include="categoryBrandDL.cs" />
     <Compile Include="CategoryDL.cs" />
     <Compile Include="CategoryExtraMenuDL.cs" />
+    <Compile Include="CategoryViewDL.cs" />
     <Compile Include="CityDL.cs" />
     <Compile Include="CouponDL.cs" />
     <Compile Include="CustomPageDL.cs" />
@@ -82,6 +83,8 @@
     <Compile Include="OrderDL.cs" />
     <Compile Include="OrderStatusDL.cs" />
     <Compile Include="ProductDL.cs" />
+    <Compile Include="ProductVariantDL.cs" />
+    <Compile Include="ProductViewDL.cs" />
     <Compile Include="PromotionDL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -101,6 +104,7 @@
     <Compile Include="ThreegDL.cs" />
     <Compile Include="UnitOfMeasureDL.cs" />
     <Compile Include="UserDL.cs" />
+    <Compile Include="UsponDL.cs" />
     <Compile Include="VatDL.cs" />
     <Compile Include="Web References\rs.kimtec.b2b\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -165,6 +169,10 @@
     <ProjectReference Include="..\eshopBE\eshopBE.csproj">
       <Project>{a34bb306-9c16-4dae-be9d-4672b7343435}</Project>
       <Name>eshopBE</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\eshopDL.Interfaces\eshopDL.Interfaces.csproj">
+      <Project>{3a62020f-381d-4787-a737-c32a8df139fc}</Project>
+      <Name>eshopDL.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\eshopUtilities\eshopUtilities.csproj">
       <Project>{046a463c-401e-437a-aed0-deb506886c0c}</Project>

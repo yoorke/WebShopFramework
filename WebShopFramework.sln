@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1082
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshopBE", "eshopBE\eshopBE.csproj", "{A34BB306-9C16-4DAE-BE9D-4672B7343435}"
 EndProject
@@ -10,6 +10,22 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshopDL", "eshopDL\eshopDL.csproj", "{AFB2D507-AEAB-4F44-8891-1071BE34631B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshopUtilities", "eshopUtilities\eshopUtilities.csproj", "{046A463C-401E-437A-AED0-DEB506886C0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshopBLInterfaces", "eshopBEInterfaces\eshopBLInterfaces.csproj", "{437C33A5-44E6-424A-9A94-3BFBA6DC2BA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshopDL.Interfaces", "eshopDL.Interfaces\eshopDL.Interfaces.csproj", "{3A62020F-381D-4787-A737-C32A8DF139FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.Import.BE", "eshop.Import.BE\eshop.Import.BE.csproj", "{C4F04884-B57B-4391-9933-94CE36CF2EF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.Import.BL", "eshop.Import.BL\eshop.Import.BL.csproj", "{7CA4BF3D-F93D-44CE-9AE1-0423739C58DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.Import.DL", "eshop.Import.DL\eshop.Import.DL.csproj", "{A0A22A0F-B2B1-4420-B476-2DAB032A0D14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.PaymentProcessor.BE", "eshop.PaymentProcessor.BE\eshop.PaymentProcessor.BE.csproj", "{2A237D41-619C-4A92-AC46-5AD60F58CBD3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.PaymentProcessor.BL", "eshop.PaymentProcessor.BL\eshop.PaymentProcessor.BL.csproj", "{F3677FDE-7468-491B-85FA-06FAB0CF8AFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.PaymentProcessor.DL", "eshop.PaymentProcessor.DL\eshop.PaymentProcessor.DL.csproj", "{1B22016D-460A-49BA-9EC8-0F86F4D48EE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,8 +49,43 @@ Global
 		{046A463C-401E-437A-AED0-DEB506886C0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{046A463C-401E-437A-AED0-DEB506886C0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{046A463C-401E-437A-AED0-DEB506886C0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{437C33A5-44E6-424A-9A94-3BFBA6DC2BA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{437C33A5-44E6-424A-9A94-3BFBA6DC2BA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{437C33A5-44E6-424A-9A94-3BFBA6DC2BA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{437C33A5-44E6-424A-9A94-3BFBA6DC2BA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A62020F-381D-4787-A737-C32A8DF139FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A62020F-381D-4787-A737-C32A8DF139FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A62020F-381D-4787-A737-C32A8DF139FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A62020F-381D-4787-A737-C32A8DF139FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4F04884-B57B-4391-9933-94CE36CF2EF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4F04884-B57B-4391-9933-94CE36CF2EF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4F04884-B57B-4391-9933-94CE36CF2EF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4F04884-B57B-4391-9933-94CE36CF2EF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CA4BF3D-F93D-44CE-9AE1-0423739C58DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CA4BF3D-F93D-44CE-9AE1-0423739C58DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CA4BF3D-F93D-44CE-9AE1-0423739C58DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CA4BF3D-F93D-44CE-9AE1-0423739C58DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0A22A0F-B2B1-4420-B476-2DAB032A0D14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0A22A0F-B2B1-4420-B476-2DAB032A0D14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0A22A0F-B2B1-4420-B476-2DAB032A0D14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0A22A0F-B2B1-4420-B476-2DAB032A0D14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A237D41-619C-4A92-AC46-5AD60F58CBD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A237D41-619C-4A92-AC46-5AD60F58CBD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A237D41-619C-4A92-AC46-5AD60F58CBD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A237D41-619C-4A92-AC46-5AD60F58CBD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3677FDE-7468-491B-85FA-06FAB0CF8AFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3677FDE-7468-491B-85FA-06FAB0CF8AFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3677FDE-7468-491B-85FA-06FAB0CF8AFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3677FDE-7468-491B-85FA-06FAB0CF8AFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B22016D-460A-49BA-9EC8-0F86F4D48EE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B22016D-460A-49BA-9EC8-0F86F4D48EE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B22016D-460A-49BA-9EC8-0F86F4D48EE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B22016D-460A-49BA-9EC8-0F86F4D48EE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {99D20D83-2B15-43D3-9D1F-6F697F49F20B}
 	EndGlobalSection
 EndGlobal

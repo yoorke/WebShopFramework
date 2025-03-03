@@ -9,6 +9,8 @@ namespace eshopBE
     {
         private int _supplierID;
         private string _name;
+        private string _code;
+        private string _currencyCode;
 
         public Supplier()
         {
@@ -18,6 +20,13 @@ namespace eshopBE
         {
             _supplierID = supplierID;
             _name = name;
+        }
+
+        public Supplier(int supplierID, string name, string currencyCode)
+        {
+            _supplierID = supplierID;
+            _name = name;
+            _currencyCode = currencyCode;
         }
 
         public int SupplierID
@@ -30,6 +39,18 @@ namespace eshopBE
         {
             get { return _name; }
             set { _name = value; }
+        }
+
+        public string Code
+        {
+            get { return _code; }
+            set { _code = value; }
+        }
+
+        public string CurrencyCode
+        {
+            get { return _currencyCode; }
+            set { _currencyCode = value; }
         }
     }
 }

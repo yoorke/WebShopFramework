@@ -11,6 +11,9 @@ namespace eshopBE
         private int _bannerID;
         private string _url;
         private string _imageUrl;
+        private string _title;
+        private string _text;
+        private string _buttonText;
 
         public BannerItem()
         {
@@ -39,6 +42,23 @@ namespace eshopBE
         {
             get { return _imageUrl; }
             set { _imageUrl = value; }
+        }
+
+        public string Title
+        {
+            get { return _title; }
+            set { _title = value; }
+        }
+
+        public string Text
+        {
+            get { return _text; }
+            set { _text = value; }
+        }
+
+        public string ButtonText
+        {
+            get { return _buttonText; }
         }
     }
 }

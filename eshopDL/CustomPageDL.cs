@@ -55,7 +55,7 @@ namespace eshopDL
             catch (Exception ex)
             {
                 ErrorLog.LogError(ex);
-                throw new DLException("Error while saving custom page", ex);
+                throw new DLException("Error while saving custom page.", ex);
             }
             return customPage.CustomPageID;
         }

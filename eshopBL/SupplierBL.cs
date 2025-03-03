@@ -34,5 +34,10 @@ namespace eshopBL
             SupplierDL supplierDL = new SupplierDL();
             return supplierDL.DeleteSupplier(supplierID);
         }
+
+        public Supplier GetSupplier(string code)
+        {
+            return new SupplierDL().GetSupplier(code);
+        }
     }
 }

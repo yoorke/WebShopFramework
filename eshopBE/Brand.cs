@@ -10,6 +10,7 @@ namespace eshopBE
         private int _brandID;
         private string _name;
         private string _logoUrl;
+        private string _url;
 
         public Brand()
         {
@@ -38,6 +39,12 @@ namespace eshopBE
         {
             get { return _logoUrl; }
             set { _logoUrl = value; }
+        }
+
+        public string Url
+        {
+            get { return _url; }
+            set { _url = value; }
         }
     }
 }

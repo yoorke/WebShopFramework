@@ -13,18 +13,22 @@ namespace eshopBE
         List<AttributeValue> _values;
         private bool _isDescription;
         private int _position;
+        private bool _isVariant;
+        private string _displayName;
 
         public Attribute()
         {
         }
 
-        public Attribute(int attributeID, string name, bool filter, bool isDescription, int position)
+        public Attribute(int attributeID, string name, bool filter, bool isDescription, int position, bool isVariant= false, string displayName = "")
         {
             _attributeID = attributeID;
             _name = name;
             _filter = filter;
             _isDescription = isDescription;
             _position = position;
+            _isVariant = isVariant;
+            _displayName = displayName;
         }
 
         public int AttributeID
@@ -66,6 +70,18 @@ namespace eshopBE
         {
             get { return _position; }
             set { _position = value; }
+        }
+
+        public bool IsVariant
+        {
+            get { return _isVariant; }
+            set { _isVariant = value; }
+        }
+
+        public string DisplayName
+        {
+            get { return _displayName; }
+            set { _displayName = value; }
         }
     }
 }

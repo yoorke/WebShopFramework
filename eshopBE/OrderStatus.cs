@@ -10,16 +10,18 @@ namespace eshopBE
         private int _orderStatusID;
         private string _name;
         private bool _sendDeliveryInfo;
+        private bool _sendToCustomer;
 
         public OrderStatus()
         {
         }
         
-        public OrderStatus(int orderStatusID, string name, bool sendDeliveryInfo)
+        public OrderStatus(int orderStatusID, string name, bool sendDeliveryInfo, bool sendToCustomer = false)
         {
             _orderStatusID=orderStatusID;
             _name=name;
             _sendDeliveryInfo = sendDeliveryInfo;
+            _sendToCustomer = sendToCustomer;
         }
 
         public int OrderStatusID
@@ -38,6 +40,12 @@ namespace eshopBE
         {
             get { return _sendDeliveryInfo; }
             set { _sendDeliveryInfo = value; }
+        }
+
+        public bool SendToCustomer
+        {
+            get { return _sendToCustomer; }
+            set { _sendToCustomer = value; }
         }
     }
 }

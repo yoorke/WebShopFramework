@@ -443,7 +443,8 @@ namespace eshopBL
                     newRow["name"] = xmlNode.SelectSingleNode("name").InnerText.Trim();
                     newRow["price"] = xmlNode.SelectSingleNode("price").InnerText.Replace('.',',').Trim();
                     newRow["priceRebate"] = xmlNode.SelectSingleNode("price_rebate").InnerText.Replace('.',',').Trim();
-                    newRow["vat"] = xmlNode.SelectSingleNode("vat").InnerText.Trim();
+                    //newRow["vat"] = xmlNode.SelectSingleNode("vat").InnerText.Trim();
+                    newRow["vat"] = "20";
                     newRow["category"] = xmlNode.SelectSingleNode("category").InnerText.Trim();
                     newRow["ean"] = xmlNode.SelectSingleNode("ean").InnerText.Trim();
                     newRow["images"] = xmlNode.SelectSingleNode("images") != null ? xmlNode.SelectSingleNode("images").OuterXml.Trim() : string.Empty;
@@ -555,10 +556,18 @@ namespace eshopBL
                 //}
                 //}
 
-                return exists ? fullPath.Substring(fullPath.LastIndexOf('/') + 1) : string.Empty;
+                string returnValue = fullPath.Substring(fullPath.LastIndexOf('/') + 1);
+                if(bool.Parse(ConfigurationManager.AppSettings["useWebPImages"]))
+                {
+                    returnValue = returnValue.Substring(0, returnValue.LastIndexOf('.')) + ".webp";
+                }
+
+                //return exists ? fullPath.Substring(fullPath.LastIndexOf('/') + 1) : string.Empty;
+                return exists ? returnValue : string.Empty;
             }
             catch(Exception ex)
             {
+                ErrorLog.LogError(ex);
                 throw;
             }
 
@@ -605,7 +614,7 @@ namespace eshopBL
         {
             //return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 100 * 100 - 10).ToString());
             double price = ((int)((supplierPrice * (percent / 100 + 1) + priceFixedAmount) * 1.2));
-            return double.Parse(((int)price / getRoundIndex(price) * getRoundIndex(price) - getRoundSubstractValue(price)).ToString());
+            return double.Parse(((int)price / getRoundIndex(price) * getRoundIndex(price) + getRoundIndex(price) - getRoundSubstractValue(price)).ToString());
         }
 
         private int getRoundIndex(double price)
@@ -627,7 +636,7 @@ namespace eshopBL
             EweDL eweDL = new EweDL();
             XmlDocument xmlDoc = eweDL.GetXml(string.Empty, string.Empty, false, false);
 
-            DeleteEweCategories();
+            //DeleteEweCategories();
             if (xmlDoc.DocumentElement != null)
             { 
                 XmlNodeList nodeList = xmlDoc.DocumentElement.SelectNodes("product");
@@ -709,6 +718,11 @@ namespace eshopBL
             //bool isLocked = false;
             product.Code = product.SupplierCode;
             product.Description = string.Empty;
+            product.Declaration = string.Empty;
+            product.WeightRangeID = 1;
+            product.Comment = string.Empty;
+            product.CanBeDelivered = true;
+            product.ShortDescription = string.Empty;
 
             //product.ProductID = new ProductBL().GetProductIDBySupplierCode(product.SupplierCode);
             ProductUpdatePrice productUpdatePrice = new ProductBL().GetProductBySupplierCode(product.SupplierCode);

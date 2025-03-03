@@ -18,7 +18,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT supplierID, name FROM supplier ORDER BY name", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT supplierID, name, currencyCode FROM supplier ORDER BY name", objConn))
                 {
                     try
                     {
@@ -28,7 +28,7 @@ namespace eshopDL
                             if (reader.HasRows)
                                 suppliers = new List<Supplier>();
                             while (reader.Read())
-                                suppliers.Add(new Supplier(reader.GetInt32(0), reader.GetString(1)));
+                                suppliers.Add(new Supplier(reader.GetInt32(0), reader.GetString(1), reader.GetString(2)));
                         }
                     }
                     catch (SqlException ex)
@@ -94,6 +94,37 @@ namespace eshopDL
                 }
             }
             return status;
+        }
+
+        public Supplier GetSupplier(string code)
+        {
+            Supplier supplier = null;
+
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("supplier_getByCode", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@code", SqlDbType.VarChar, 10).Value = code;
+
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            supplier = new Supplier()
+                            {
+                                SupplierID = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                Code = reader.GetString(2),
+                                CurrencyCode = reader.GetString(3)
+                            };
+                        }
+                    }
+                }
+            }
+
+            return supplier;
         }
     }
 }

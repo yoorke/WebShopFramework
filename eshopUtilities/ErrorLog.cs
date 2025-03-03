@@ -25,7 +25,8 @@ namespace eshopUtilities
             try { 
                 using (StreamWriter sw = new StreamWriter(HttpContext.Current.Server.MapPath("/log/" + DateTime.Now.ToString("ddMMyyyy") + "-error.log"), true))
                     sw.WriteLine(DateTime.Now.ToUniversalTime().ToString() + " - " + code.ToString() + " - " + message + " " + Environment.NewLine + rawUrl +  Environment.NewLine + userHostAddress + Environment.NewLine + url);
-                sendMail(message, rawUrl, userHostAddress, url);
+                if(bool.Parse(ConfigurationManager.AppSettings["sendErrorEmail"]))
+                    sendMail(message, rawUrl, userHostAddress, url);
             }
             catch(Exception exx)
             {

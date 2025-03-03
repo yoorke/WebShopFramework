@@ -46,6 +46,7 @@ namespace eshopDL
                 if (e.Message.Contains("Root element is missing"))
                     return null;
                 //throw new BLException("Ne postoje podaci za kategoriju", e);
+                throw;
             }
             return xmlDoc;
         }

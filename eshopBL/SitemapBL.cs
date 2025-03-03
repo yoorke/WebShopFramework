@@ -7,6 +7,9 @@ using eshopBE;
 using System.Data;
 using System.Web;
 using System.Configuration;
+using System.Globalization;
+using System.Web.Configuration;
+using System.IO;
 
 namespace eshopBL
 {
@@ -14,18 +17,31 @@ namespace eshopBL
     {
         public void SaveSitemap()
         {
-            using (XmlTextWriter tw = new XmlTextWriter(HttpContext.Current.Server.MapPath("~/Web.sitemap"), Encoding.UTF8))
-            {
-                tw.Formatting = Formatting.Indented;
-                tw.WriteProcessingInstruction("xml", "version='1.0' encoding='UTF-8'");
-                tw.WriteStartElement("siteMap", "http://schemas.microsoft.com/AspNet/SiteMap-File-1.0");
+            int siteMapValidity = int.Parse(ConfigurationManager.AppSettings["siteMapValidity"]);
+            //DateTime siteMapCreatedDate = DateTime.ParseExact(ConfigurationManager.AppSettings["siteMapCreatedDate"], "d.M.yyyy", CultureInfo.InstalledUICulture);
+            DateTime siteMapCreatedDate = getSitemapCreatedDate();
+
+            if(DateTime.Now > siteMapCreatedDate.AddDays(siteMapValidity))
+            { 
+                using (XmlTextWriter tw = new XmlTextWriter(HttpContext.Current.Server.MapPath("~/Web.sitemap"), Encoding.UTF8))
+                {
+                    tw.Formatting = Formatting.Indented;
+                    tw.WriteProcessingInstruction("xml", "version='1.0' encoding='UTF-8'");
+                    tw.WriteStartElement("siteMap", "http://schemas.microsoft.com/AspNet/SiteMap-File-1.0");
+                }
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(HttpContext.Current.Server.MapPath("~/Web.sitemap"));
+                CreateXmlSitemap(xmlDoc);
+
+                xmlDoc.Save(HttpContext.Current.Server.MapPath("~/Web.sitemap"));
+
+                //Configuration configuration = WebConfigurationManager.OpenWebConfiguration("/");
+                //configuration.AppSettings.Settings["siteMapCreatedDate"].Value = DateTime.UtcNow.ToString("d.M.yyyy");
+                //configuration.Save();
+
+                saveSitemapCreatedDate(DateTime.UtcNow);
             }
-
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(HttpContext.Current.Server.MapPath("~/Web.sitemap"));
-            CreateXmlSitemap(xmlDoc);
-
-            xmlDoc.Save(HttpContext.Current.Server.MapPath("~/Web.sitemap"));
         }
 
         public XmlDocument CreateXmlSitemap(XmlDocument xmlDoc)
@@ -43,12 +59,16 @@ namespace eshopBL
             pocetna.AppendChild(createElement("siteMapNode", "/kontakt", "Kontakt", "Kontakt", xmlDoc));
             pocetna.AppendChild(createElement("siteMapNode", "/prijava", "Prijava", "Prijava", xmlDoc));
             pocetna.AppendChild(createElement("siteMapNode", "/registracija", "Registracija", "Registracija", xmlDoc));
+            pocetna.AppendChild(createElement("siteMapNode", "/poredjenje-proizvoda", "Poređenje proizvoda", "Poređenje proizvoda", xmlDoc));
 
             if (bool.Parse(ConfigurationManager.AppSettings["hasRetails"]))
                 pocetna.AppendChild(createElement("siteMapNode", "/prodajna-mesta", "Prodajna mesta", "Prodajna mesta", xmlDoc));
 
             foreach(CustomPage customPage in new CustomPageBL().GetCustomPages())
-                pocetna.AppendChild(createElement("siteMapNode", "/" + customPage.Url, customPage.Title, customPage.Title, xmlDoc));
+                if(customPage.IsActive)
+                {
+                    pocetna.AppendChild(createElement("siteMapNode", "/" + customPage.Url, customPage.Title, customPage.Title, xmlDoc));
+                }
 
             List<Category> categories = new CategoryBL().GetNestedCategoriesList(false);
             foreach (Category category in categories)
@@ -98,6 +118,25 @@ namespace eshopBL
             }
 
             return categoryElement;
+        }
+
+        private DateTime getSitemapCreatedDate()
+        {
+            DateTime sitemapCreatedDate = DateTime.Now;
+            using (TextReader tr = new StreamReader(HttpContext.Current.Server.MapPath("~/sitemap.config")))
+            {
+                sitemapCreatedDate = DateTime.ParseExact(tr.ReadLine(), "d.M.yyyy", CultureInfo.InvariantCulture);
+            }
+
+            return sitemapCreatedDate;
+        }
+
+        private void saveSitemapCreatedDate(DateTime sitemapCreatedDate)
+        {
+            using (TextWriter tw = new StreamWriter(HttpContext.Current.Server.MapPath("~/sitemap.config"), false))
+            {
+                tw.Write(sitemapCreatedDate.ToString("d.M.yyyy"));
+            }
         }
     }
 }

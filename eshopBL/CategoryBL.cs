@@ -154,6 +154,8 @@ namespace eshopBL
 
         private List<Category> GetCategoriesList(DataTable categoriesDT, int parentID, string rootUrl)
         {
+            if (categoriesDT == null || categoriesDT.Rows.Count == 0)
+                return new List<Category>();
             List<Category> list = null;
 
             DataView dv = new DataView(categoriesDT);
@@ -317,7 +319,7 @@ namespace eshopBL
             return categoryDL.GetCategoriesForFirstPage();
         }
 
-        public Category GetCategoryByUrl(string url)
+        public Category GetCategoryByUrl(string url, bool showActive = false)
         {
             if(!url.Contains('/') && !bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]))
                 return new CategoryDL().GetCategoryByUrl(url);
@@ -325,7 +327,7 @@ namespace eshopBL
             string[] urlArray = url.Split('/');
             //if (urlArray.Length < 2)
                 //return null;
-            return new CategoryDL().GetCategoryByUrl(urlArray.Length > 2 ? urlArray[urlArray.Length - 3] : string.Empty, urlArray.Length > 1 ? urlArray[urlArray.Length - 2] : string.Empty, urlArray[urlArray.Length - 1]);
+            return new CategoryDL().GetCategoryByUrl(urlArray.Length > 2 ? urlArray[urlArray.Length - 3] : string.Empty, urlArray.Length > 1 ? urlArray[urlArray.Length - 2] : string.Empty, urlArray[urlArray.Length - 1], showActive);
         }
 
         public List<Category> GetAllSubCategories(int categoryID, bool includeAllSubcategories)
@@ -426,6 +428,11 @@ namespace eshopBL
         public DataTable Search(string searchText)
         {
             return new CategoryDL().Search(searchText);
+        }
+
+        public List<Category> GetNestedCategoriesListForFP()
+        {
+            return GetCategoriesList(new CategoryDL().GetCategoriesForFirstPage(), 1, string.Empty);
         }
     }
 }

@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A0A22A0F-B2B1-4420-B476-2DAB032A0D14}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>eshop.Import.DL</RootNamespace>
+    <AssemblyName>eshop.Import.DL</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AbstractClasses\BaseCategoryImportDL.cs" />
+    <Compile Include="AbstractClasses\BaseProductImportDL.cs" />
+    <Compile Include="CategoryImportDSCDL.cs" />
+    <Compile Include="CategoryImportEweDL.cs" />
+    <Compile Include="CategoryImportUsponDL.cs" />
+    <Compile Include="CategoryImprotEweV2DL.cs" />
+    <Compile Include="Interfaces\ICategoryImportDL.cs" />
+    <Compile Include="Interfaces\IProductImportDL.cs" />
+    <Compile Include="ProductImportDSCDL.cs" />
+    <Compile Include="ProductImportEweDL.cs" />
+    <Compile Include="ProductImportEweV2DL.cs" />
+    <Compile Include="ProductImportUsponDL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\eshop.Import.BE\eshop.Import.BE.csproj">
+      <Project>{c4f04884-b57b-4391-9933-94ce36cf2ef5}</Project>
+      <Name>eshop.Import.BE</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\eshopUtilities\eshopUtilities.csproj">
+      <Project>{046a463c-401e-437a-aed0-deb506886c0c}</Project>
+      <Name>eshopUtilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

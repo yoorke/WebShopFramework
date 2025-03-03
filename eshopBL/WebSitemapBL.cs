@@ -34,6 +34,15 @@ namespace eshopBL
             root.AppendChild(createElement(webShopUrl + "/kontakt", xmlDoc));
             root.AppendChild(createElement(webShopUrl + "/prijava", xmlDoc));
             root.AppendChild(createElement(webShopUrl + "/registracija", xmlDoc));
+            root.AppendChild(createElement(webShopUrl + "/poredjenje-proizvoda", xmlDoc));
+            if(bool.Parse(ConfigurationManager.AppSettings["addSeparateContactPage"]))
+                root.AppendChild(createElement(webShopUrl + "/kontakt", xmlDoc));
+
+            if(int.Parse(ConfigurationManager.AppSettings["accountPageVersion"]) == 2)
+            {
+                root.AppendChild(createElement(webShopUrl + "/istorija-porudzbina", xmlDoc));
+                root.AppendChild(createElement(webShopUrl + "/moj-profil", xmlDoc));
+            }
 
             if (bool.Parse(ConfigurationManager.AppSettings["hasRetails"]))
                 root.AppendChild(createElement(webShopUrl + "/prodajna-mesta", xmlDoc));

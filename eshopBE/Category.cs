@@ -36,12 +36,14 @@ namespace eshopBE
         private string _icon;
         private bool _showProductsFromSubCategories;
         private double _priceFixedAmount;
+        private string _fullUrl;
+        private string _categoryBannerUrl;
 
         public Category()
         {
         }
 
-        public Category(int categoryID, string name, int? parentCategoryID, string url, string imageUrl, int sortOrder, double pricePercent, double webPricePercent, string description, bool active, int categoryBannerID, bool updateProductsFromExternalApplication, bool exportProducts, int imageUrlSource, int imageUrlPositionX, int imageUrlPositionY, Slider slider = null, bool showProductsFromSubcategories = false)
+        public Category(int categoryID, string name, int? parentCategoryID, string url, string imageUrl, int sortOrder, double pricePercent, double webPricePercent, string description, bool active, int categoryBannerID, bool updateProductsFromExternalApplication, bool exportProducts, int imageUrlSource, int imageUrlPositionX, int imageUrlPositionY, Slider slider = null, bool showProductsFromSubcategories = false, string fullUrl = "")
         {
             _categoryID = categoryID;
             _name = name;
@@ -61,6 +63,7 @@ namespace eshopBE
             _imageUrlPositionX = imageUrlPositionX;
             _imageUrlPositionY = imageUrlPositionY;
             _showProductsFromSubCategories = showProductsFromSubcategories;
+            _fullUrl = fullUrl;
         }
 
         public int CategoryID
@@ -235,6 +238,18 @@ namespace eshopBE
         {
             get { return _priceFixedAmount; }
             set { _priceFixedAmount = value; }
+        }
+
+        public string FullUrl
+        {
+            get { return _fullUrl; }
+            set { _fullUrl = value; }
+        }
+
+        public string CategoryBannerUrl
+        {
+            get { return _categoryBannerUrl; }
+            set { _categoryBannerUrl = value; }
         }
     }
 }

@@ -91,7 +91,7 @@ namespace eshopBL
                 product.WebPrice = calculatePrice(double.Parse(threegProduct.Rows[0]["vpCena"].ToString()), categoryBrandPrice[1], double.Parse(threegProduct.Rows[0]["rabat"].ToString()), category.PriceFixedAmount);
             }
             product.Ean = threegProduct.Rows[0]["barkod"].ToString();
-            double supplierPrice = double.Parse(threegProduct.Rows[0]["vpCena"].ToString()) * new SettingsBL().GetSettings().ExchangeRate;
+            double supplierPrice = double.Parse(threegProduct.Rows[0]["vpCena"].ToString());// * new SettingsBL().GetSettings().ExchangeRate;
             supplierPrice = supplierPrice * (1 - double.Parse(threegProduct.Rows[0]["rabat"].ToString()) / 100);
             product.SupplierPrice = supplierPrice; //double.Parse(threegProduct.Rows[0]["vpCena"].ToString());
             product.UnitOfMeasure = new UnitOfMeasure(2, "Komad", "kom");
@@ -131,7 +131,7 @@ namespace eshopBL
         private double calculatePrice(double supplierPrice, double percent, double rebate, double priceFixedAmount)
         {
             Settings settings = new SettingsBL().GetSettings();
-            supplierPrice = supplierPrice * settings.ExchangeRate;
+            //supplierPrice = supplierPrice * settings.ExchangeRate;
             supplierPrice = supplierPrice - supplierPrice * (rebate / 100);
             //return double.Parse(((int)(supplierPrice * (percent / 100 + 1) * 1.2) / 10 * 10 - 10).ToString());
             double price = ((int)((supplierPrice * (percent / 100 + 1) + priceFixedAmount) * 1.2));

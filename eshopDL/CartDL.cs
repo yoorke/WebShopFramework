@@ -10,7 +10,7 @@ namespace eshopDL
 {
     public class CartDL
     {
-        public int AddProductToCart(int productID, string cartID, double quantity, double productPrice, double userPrice)
+        public int AddProductToCart(int productID, string cartID, double quantity, double productPrice, double userPrice, int productVariantID, string userImageUrl)
         {
             int status;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
@@ -25,6 +25,8 @@ namespace eshopDL
                     objComm.Parameters.Add("@productPrice", SqlDbType.Float).Value = productPrice;
                     objComm.Parameters.Add("@userPrice", SqlDbType.Float).Value = userPrice;
                     objComm.Parameters.Add("@couponID", SqlDbType.Int).Value = 1;
+                    objComm.Parameters.Add("@userImageUrl", SqlDbType.NVarChar, 100).Value = userImageUrl;
+                    objComm.Parameters.Add("@productVariantID", SqlDbType.Int).Value = productVariantID;
 
                     status = objComm.ExecuteNonQuery();
                 }

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>eshopBE</RootNamespace>
     <AssemblyName>eshopBE</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -61,11 +61,13 @@
     <Compile Include="Banner.cs" />
     <Compile Include="BannerPosition.cs" />
     <Compile Include="Brand.cs" />
+    <Compile Include="BrandFilter.cs" />
     <Compile Include="Category.cs" />
     <Compile Include="CategoryBanner.cs" />
     <Compile Include="CategoryBrand.cs" />
     <Compile Include="CategoryExtraMenu.cs" />
     <Compile Include="CategoryExtraMenuCategory.cs" />
+    <Compile Include="CategoryView.cs" />
     <Compile Include="City.cs" />
     <Compile Include="Coupon.cs" />
     <Compile Include="CouponObject.cs" />
@@ -78,12 +80,17 @@
     <Compile Include="Order.cs" />
     <Compile Include="OrderItem.cs" />
     <Compile Include="OrderStatus.cs" />
+    <Compile Include="Package.cs" />
     <Compile Include="PageSize.cs" />
     <Compile Include="Payment.cs" />
     <Compile Include="Product.cs" />
+    <Compile Include="ProductFPView.cs" />
     <Compile Include="ProductImage.cs" />
+    <Compile Include="ProductOrderByType.cs" />
     <Compile Include="ProductSearch.cs" />
     <Compile Include="ProductSimple.cs" />
+    <Compile Include="ProductVariant.cs" />
+    <Compile Include="ProductVariantAttributeValue.cs" />
     <Compile Include="Promotion.cs" />
     <Compile Include="PromotionPrice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -97,6 +104,7 @@
     <Compile Include="UserType.cs" />
     <Compile Include="ProductVariation.cs" />
     <Compile Include="Vat.cs" />
+    <Compile Include="VVSImageType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

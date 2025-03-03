@@ -82,7 +82,7 @@ namespace eshopDL
             List<eshopBE.Attribute> attributes = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT attribute.attributeID, name, filter, categoryAttribute.isDescription, position FROM attribute INNER JOIN categoryAttribute ON attribute.attributeID=categoryAttribute.attributeID WHERE categoryID=@categoryID ORDER BY position, name", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT attribute.attributeID, name, filter, categoryAttribute.isDescription, position, categoryAttribute.isVariant FROM attribute INNER JOIN categoryAttribute ON attribute.attributeID=categoryAttribute.attributeID WHERE categoryID=@categoryID ORDER BY position, name", objConn))
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
@@ -91,10 +91,44 @@ namespace eshopDL
                         if (reader.HasRows)
                             attributes = new List<eshopBE.Attribute>();
                         while (reader.Read())
-                            attributes.Add(new eshopBE.Attribute(reader.GetInt32(0), reader.GetString(1), reader.GetBoolean(2), Convert.IsDBNull(reader[3]) == false ? reader.GetBoolean(3) : false, (Convert.IsDBNull(reader[4])==false)?reader.GetInt32(4):0));
+                            attributes.Add(new eshopBE.Attribute(reader.GetInt32(0), reader.GetString(1), reader.GetBoolean(2), Convert.IsDBNull(reader[3]) == false ? reader.GetBoolean(3) : false, (Convert.IsDBNull(reader[4])==false)?reader.GetInt32(4):0, !Convert.IsDBNull(reader[5]) ? reader.GetBoolean(5) : false));
                     }
                 }
             }
+            return attributes;
+        }
+
+        public List<eshopBE.Attribute> GetVariantAttributesForCategory(int categoryID)
+        {
+            List<eshopBE.Attribute> attributes = null;
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("attribute_getVariantAttributesForCategory", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
+                    using (SqlDataReader reader = objComm.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                            attributes = new List<eshopBE.Attribute>();
+
+                        while (reader.Read())
+                        {
+                            attributes.Add(new eshopBE.Attribute()
+                            {
+                                AttributeID = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                Filter = !Convert.IsDBNull(reader[2]) ? reader.GetBoolean(2) : false,
+                                IsDescription = !Convert.IsDBNull(reader[3]) ? reader.GetBoolean(3) : false,
+                                Position = !Convert.IsDBNull(reader[4]) ? reader.GetInt32(4) : 0,
+                                IsVariant = !Convert.IsDBNull(reader[5]) ? reader.GetBoolean(5) : false
+                            });
+                        }
+                    }
+                }
+            }
+
             return attributes;
         }
 
@@ -229,7 +263,7 @@ namespace eshopDL
             int attributeID = 0;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("INSERT INTO attribute (name, isDescription) VALUES (@name, @isDescription);SELECT SCOPE_IDENTITY()", objConn))
+                using (SqlCommand objComm = new SqlCommand("INSERT INTO attribute (name, isDescription, displayName) VALUES (@name, @isDescription, @displayName);SELECT SCOPE_IDENTITY()", objConn))
                 {
                     try
                     {
@@ -237,6 +271,7 @@ namespace eshopDL
 
                         objComm.Parameters.Add("@name", SqlDbType.NVarChar, 100).Value = attribute.Name;
                         objComm.Parameters.Add("@isDescription", SqlDbType.Bit).Value = attribute.IsDescription;
+                        objComm.Parameters.Add("@displayName", SqlDbType.NVarChar, 50).Value = attribute.DisplayName;
 
                         attributeID = int.Parse(objComm.ExecuteScalar().ToString());
                         if (attributeID > 0)
@@ -258,7 +293,7 @@ namespace eshopDL
             int status = 0;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("UPDATE attribute SET name=@name, isDescription=@isDescription WHERE attributeID=@attributeID", objConn))
+                using (SqlCommand objComm = new SqlCommand("UPDATE attribute SET name=@name, isDescription=@isDescription, displayName=@displayName WHERE attributeID=@attributeID", objConn))
                 {
                     try
                     {
@@ -266,6 +301,7 @@ namespace eshopDL
 
                         objComm.Parameters.Add("@name", SqlDbType.NVarChar, 100).Value = attribute.Name;
                         objComm.Parameters.Add("@isDescription", SqlDbType.Bit).Value = attribute.IsDescription;
+                        objComm.Parameters.Add("@displayName", SqlDbType.NVarChar, 50).Value = attribute.DisplayName;
                         
                         objComm.Parameters.Add("@attributeID", SqlDbType.Int).Value = attribute.AttributeID;
 
@@ -487,7 +523,7 @@ namespace eshopDL
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT attribute.attributeID, attribute.name FROM attribute INNER JOIN categoryAttribute ON attribute.attributeID=categoryAttribute.attributeID INNER JOIN category ON categoryAttribute.categoryID=category.categoryID WHERE category.url=@categoryUrl AND filter=1 ORDER BY attribute.name", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT attribute.attributeID, attribute.name, attribute.displayName FROM attribute INNER JOIN categoryAttribute ON attribute.attributeID=categoryAttribute.attributeID INNER JOIN category ON categoryAttribute.categoryID=category.categoryID WHERE category.url=@categoryUrl AND filter=1 ORDER BY attribute.name", objConn))
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@categoryUrl", SqlDbType.NVarChar, 50).Value = categoryUrl;
@@ -502,6 +538,7 @@ namespace eshopDL
                             attribute.Name = reader.GetString(1);
                             attribute.Filter = true;
                             attribute.Values = GetAttributeValuesForFilter(attribute.AttributeID, categoryUrl);
+                            attribute.DisplayName = !Convert.IsDBNull(reader[2]) ? reader.GetString(2) : reader.GetString(1);
 
                             attributes.Add(attribute);
                         }
@@ -651,6 +688,23 @@ namespace eshopDL
                 }
             }
             return status;
+        }
+
+        public void SetIsVariant(int categoryID, int attributeID, bool isVariant)
+        {
+            using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using (SqlCommand objComm = new SqlCommand("attribute_setIsVariant", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@categoryID", SqlDbType.Int).Value = categoryID;
+                    objComm.Parameters.Add("@attributeID", SqlDbType.Int).Value = attributeID;
+                    objComm.Parameters.Add("@isVariant", SqlDbType.Bit).Value = isVariant;
+
+                    objComm.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

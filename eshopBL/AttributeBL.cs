@@ -28,6 +28,11 @@ namespace eshopBL
             return attributes;
         }
 
+        public List<eshopBE.Attribute> GetVariantAttributesForCategory(int categoryID)
+        {
+            return new AttributeDL().GetVariantAttributesForCategory(categoryID);
+        }
+
         public eshopBE.Attribute GetAttribute(string name)
         {
             AttributeDL attributeDL = new AttributeDL();
@@ -61,10 +66,10 @@ namespace eshopBL
             return attributeDL.DeleteAttributeForCategory(categoryID, attributeID);
         }
 
-        public List<AttributeValue> GetAttributeValues(int attributeID)
+        public List<AttributeValue> GetAttributeValues(int attributeID, bool showNP = true)
         {
             AttributeDL attributeDL = new AttributeDL();
-            return attributeDL.GetAttributeValues(attributeID, true);
+            return attributeDL.GetAttributeValues(attributeID, showNP);
         }
         
         public int SaveAttributeValue(AttributeValue attributeValue, bool isKimtec)
@@ -121,6 +126,18 @@ namespace eshopBL
         public int SaveAttributeValueSort(int attributeValueID, int sort)
         {
             return new AttributeDL().SaveAttributeValueSort(attributeValueID, sort);
+        }
+
+        public void SetIsVariant(int categoryID, int attributeID, bool isVariant)
+        {
+            new AttributeDL().SetIsVariant(categoryID, attributeID, isVariant);
+        }
+
+        public List<AttributeValue> GetAttributes(Dictionary<string, string> descriptionAttributes)
+        {
+            List<AttributeValue> attributes = new List<AttributeValue>();
+
+            return attributes;
         }
     }
 }

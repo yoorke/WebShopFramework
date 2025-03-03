@@ -34,6 +34,18 @@ namespace eshopBE
         private UnitOfMeasure _unitOfMeasure;
         private string _fullCategoryUrl;
         private bool _isPriceLocked;
+        private string _declaration;
+        private double _weight;
+        private int? _weightRangeID;
+        private bool _allowUserImageUpload;
+        private string _comment;
+        private bool _canBeDelivered;
+        private bool _hasVariants = true;
+        private string _shortDescription;
+        private bool _isFreeDelivery;
+        private string _manualUrl;
+        private string _listDescription;
+        private int _sortIndex;
 
         public int ProductID
         {
@@ -61,7 +73,15 @@ namespace eshopBE
 
         public string Name
         {
-            get { return _name; }
+            get
+            {
+                if(bool.Parse(ConfigurationManager.AppSettings["productNameToLowerCase"]))
+                {
+                    return toLowerCase(_name);
+                }
+
+                return _name;
+            }
             set { _name = value; }
         }
 
@@ -200,14 +220,25 @@ namespace eshopBE
                     string url = bool.Parse(ConfigurationManager.AppSettings["fullProductUrl"]) ? (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]) ? this._fullCategoryUrl + "/" : _categories[0].Name + "/") + _brand.Name + " " : string.Empty;
                     url += _name.Replace('/', '-') + "-" + _productID.ToString();
                     //return "/proizvodi/" + CreateFriendlyUrl(_categories[0].Name + "/" + _brand.Name + " " + _name.Replace('/','-') + "-" + _productID);
-                    return "/proizvodi/" + CreateFriendlyUrl(url);
+                    url = (url.Contains("proizvodi") ? string.Empty : "/proizvodi/") + CreateFriendlyUrl(url);
+                    if (!url.StartsWith("/"))
+                        url = "/" + url;
+                    return url;
                 }
             }
         }
 
         public string FullName
         {
-            get { return _brand.Name + " " + _name; }
+            get
+            {
+                if(bool.Parse(ConfigurationManager.AppSettings["productNameToLowerCase"]))
+                {
+                    return _brand.Name + " " + toLowerCase(_name);
+                }
+
+                return _brand.Name + " " + _name;
+            }
         }
 
         public UnitOfMeasure UnitOfMeasure
@@ -247,6 +278,86 @@ namespace eshopBE
             get { return _isPriceLocked; }
             set { _isPriceLocked = value; }
         }
+
+        public string Declaration
+        {
+            get { return _declaration; }
+            set { _declaration = value; }
+        }
+
+        public double Weight
+        {
+            get { return _weight; }
+            set { _weight = value; }
+        }
+
+        public int? WeightRangeID
+        {
+            get { return _weightRangeID; }
+            set { _weightRangeID = value; }
+        }
+
+        public bool AllowUserImageUpload
+        {
+            get { return _allowUserImageUpload; }
+            set { _allowUserImageUpload = value; }
+        }
+
+        public string Comment
+        {
+            get { return _comment; }
+            set { _comment = value; }
+        }
+
+        public bool CanBeDelivered
+        {
+            get { return _canBeDelivered; }
+            set { _canBeDelivered = value; }
+        }
+
+        public bool HasVariants
+        {
+            get { return _hasVariants; }
+            set { _hasVariants = value; }
+        }
+
+        public string ShortDescription
+        {
+            get { return _shortDescription; }
+            set { _shortDescription = value; }
+        }
+
+        public bool IsFreeDelivery
+        {
+            get { return _isFreeDelivery; }
+            set { _isFreeDelivery = value; }
+        }
+
+        public string ManualUrl
+        {
+            get { return _manualUrl; }
+            set { _manualUrl = value; }
+        }
+
+        public string ListDescription
+        {
+            get { return _listDescription; }
+            set { _listDescription = value; }
+        }
+
+        public int SortIndex
+        {
+            get { return _sortIndex; }
+            set { _sortIndex = value; }
+        }
+
+        private string toLowerCase(string content)
+        {
+            string loweredContent = content.ToLower();
+            loweredContent = loweredContent.Substring(0, 1).ToUpper() + loweredContent.Substring(1);
+
+            return loweredContent;
+        }
     }
 
     public class ProductUpdatePrice
@@ -255,5 +366,6 @@ namespace eshopBE
         public bool IsLocked { get; set; }
         public bool IsPriceLocked { get; set; }
         public int BrandID { get; set; }
+        public int CategoryID { get; set; }
     }
 }

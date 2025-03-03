@@ -254,7 +254,7 @@ namespace eshopDL
             Category category = null;
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
-                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID, showInFooter, imageUrlSource, imageUrlPositionX, imageUrlPositionY, icon, showProductsFromSubCategories, priceFixedAmount FROM category"))
+                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, category.name, parentCategoryID, category.url, category.imageUrl, sortOrder, pricePercent, webPricePercent, showOnFirstPage, numberOfProducts, firstPageSortOrder, firstPageOrderBy, description, active, sliderID, category.categoryBannerID, updateProductsFromExternalApplication, exportProducts, externalID, externalParentID, showInFooter, imageUrlSource, imageUrlPositionX, imageUrlPositionY, icon, showProductsFromSubCategories, priceFixedAmount, categoryBanner.imageUrl FROM category LEFT JOIN categoryBanner ON category.categoryBannerID = categoryBanner.categoryBannerID"))
                 {
                     try
                     {
@@ -320,6 +320,7 @@ namespace eshopDL
                                 category.Icon = !Convert.IsDBNull(reader[24]) ? reader.GetString(24) : string.Empty;
                                 category.ShowProductsFromSubCategories = !Convert.IsDBNull(reader[25]) ? reader.GetBoolean(25) : false;
                                 category.PriceFixedAmount = !Convert.IsDBNull(reader[26]) ? reader.GetDouble(26) : 0;
+                                category.CategoryBannerUrl = !Convert.IsDBNull(reader[27]) ? reader.GetString(27) : string.Empty;
                             }
                         }
                     }
@@ -352,7 +353,7 @@ namespace eshopDL
             Category category = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
-                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, name, parentCategoryID, url, imageUrl, sortOrder, pricePercent, webPricePercent, description, active, sliderID, categoryBannerID, updateProductsFromExternalApplication, exportProducts, showProductsFromSubcategories FROM category WHERE url=@categoryUrl", objConn))
+                using (SqlCommand objComm = new SqlCommand("SELECT categoryID, category.name, parentCategoryID, category.url, category.imageUrl, sortOrder, pricePercent, webPricePercent, description, active, sliderID, category.categoryBannerID, updateProductsFromExternalApplication, exportProducts, showProductsFromSubcategories, categoryBanner.imageUrl FROM category LEFT JOIN categoryBanner ON category.categoryBannerID = categoryBanner.categoryBannerID WHERE category.url=@categoryUrl", objConn))
                 {
                     objConn.Open();
                     objComm.Parameters.Add("@categoryUrl", SqlDbType.NVarChar, 50).Value = categoryUrl;
@@ -361,6 +362,7 @@ namespace eshopDL
                         while (reader.Read())
                         {
                             category = new Category(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), reader.GetString(4), reader.GetInt32(5), reader.GetDouble(6), reader.GetDouble(7), Convert.IsDBNull(reader[8]) == false ? reader.GetString(8) : string.Empty, Convert.IsDBNull(reader[9]) ? false : reader.GetBoolean(9), !Convert.IsDBNull(reader[11]) ? reader.GetInt32(11) : -1, reader.GetBoolean(12), reader.GetBoolean(13), 0, 0, 0, new Slider(Convert.IsDBNull(reader[10]) == false ? reader.GetInt32(10) : 0, string.Empty, DateTime.Now, DateTime.Now, true), !Convert.IsDBNull(reader[14]) ? reader.GetBoolean(14) : false);
+                            category.CategoryBannerUrl = !Convert.IsDBNull(reader[15]) ? reader.GetString(15) : string.Empty;
                         }
                     }
                 }
@@ -368,7 +370,7 @@ namespace eshopDL
             return category;
         }
 
-        public Category GetCategoryByUrl(string parentParentCategoryUrl, string parentCategoryUrl, string categoryUrl)
+        public Category GetCategoryByUrl(string parentParentCategoryUrl, string parentCategoryUrl, string categoryUrl, bool showActive = false)
         {
             Category category = null;
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
@@ -380,9 +382,11 @@ namespace eshopDL
                     objComm.Parameters.Add("@parentUrl", SqlDbType.NVarChar, 50).Value = parentCategoryUrl;
                     objComm.Parameters.Add("@categoryUrl", SqlDbType.NVarChar, 50).Value = categoryUrl;
                     objComm.Parameters.Add("@parentParentCategoryUrl", SqlDbType.NVarChar, 50).Value = parentParentCategoryUrl;
+                    objComm.Parameters.Add("@showActive", SqlDbType.Bit).Value = showActive;
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         while (reader.Read())
+                        {
                             category = new Category(reader.GetInt32(0),
                                                     reader.GetString(1),
                                                     reader.GetInt32(2),
@@ -400,7 +404,10 @@ namespace eshopDL
                                                     0,
                                                     0,
                                                     new Slider(!Convert.IsDBNull(reader[10]) ? reader.GetInt32(10) : 0, string.Empty, DateTime.Now, DateTime.Now, false),
-                                                    !Convert.IsDBNull(reader[14]) ? reader.GetBoolean(14) : false);
+                                                    !Convert.IsDBNull(reader[14]) ? reader.GetBoolean(14) : false,
+                                                    reader.GetString(15));
+                            category.CategoryBannerUrl = !Convert.IsDBNull(reader[16]) ? reader.GetString(16) : string.Empty;
+                        }
                     }
                 }
             }
@@ -538,7 +545,7 @@ namespace eshopDL
                         if (reader.HasRows)
                             categories = new List<Category>();
                         while (reader.Read())
-                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1) + "(" + reader.GetInt32(8) + ")", !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, "/proizvodi/" + (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]) ? (!Convert.IsDBNull(reader[7]) ? reader.GetString(7) : string.Empty) : reader.GetString(4)), !Convert.IsDBNull(reader[6]) ? reader.GetString(6) : string.Empty, 0, 0, 0, string.Empty, true, -1, false, false, 0, 0, 0, null));
+                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1) + " (" + reader.GetInt32(8) + ")", !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, "/proizvodi/" + (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]) ? (!Convert.IsDBNull(reader[7]) ? reader.GetString(7) : string.Empty) : reader.GetString(4)), !Convert.IsDBNull(reader[6]) ? reader.GetString(6) : string.Empty, 0, 0, 0, string.Empty, true, -1, false, false, 0, 0, 0, null));
                     }
                 }
             }

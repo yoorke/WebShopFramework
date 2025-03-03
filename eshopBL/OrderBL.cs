@@ -6,15 +6,38 @@ using eshopBE;
 using eshopDL;
 using System.Data;
 using eshopUtilities;
+using eshopBLInterfaces;
 
 namespace eshopBL
 {
     public class OrderBL
     {
+        IDeliveryCostCalculator _deliveryCostCalculator;
+
+        public OrderBL()
+        {
+
+        }
+
+        public OrderBL(IDeliveryCostCalculator deliveryCostCalculator)
+        {
+            _deliveryCostCalculator = deliveryCostCalculator;
+        }
+
         public int SaveOrder(Order order)
         {
             OrderDL orderDL = new OrderDL();
-            int status = orderDL.SaveOrder(order);
+            int status = 0;
+            //int status = orderDL.SaveOrder(order);
+
+            if(order.OrderID <= 0)
+            {
+                status = orderDL.Insert(order);
+            }
+            else if(order.OrderID > 0)
+            {
+                status = orderDL.Update(order);
+            }
             //Common.SendOrder();
             //System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem(bw =>
             //{
@@ -23,10 +46,10 @@ namespace eshopBL
             return status;
         }
 
-        public Order GetOrder(int orderID)
+        public Order GetOrder(int orderID, int code = -1)
         {
             OrderDL orderDL = new OrderDL();
-            return orderDL.GetOrder(orderID);
+            return orderDL.GetOrder(orderID, code);
         }
 
         public DataTable GetOrders()
@@ -67,9 +90,20 @@ namespace eshopBL
             OrderDL orderDL = new OrderDL();
             int status = orderDL.UpdateOrderStatus(orderID, orderStatus.OrderStatusID, deliveryService != null ? deliveryService : null, trackCode);
             //Order order = new OrderBL().GetOrder(orderID);
-            Common.SendOrderStatusUpdate(email, name, number, DateTime.Parse(date), orderStatus.Name, deliveryService, trackCode);
+            if(orderStatus.SendToCustomer)
+                Common.SendOrderStatusUpdate(email, name, number, DateTime.Parse(date), orderStatus.Name, deliveryService, trackCode);
 
             return status;
+        }
+
+        public void UpdateOrderPaymentStatus(int orderID, string paymentStatusCode)
+        {
+            new OrderDL().UpdateOrderPaymentStatus(orderID, paymentStatusCode);
+        }
+
+        public void UpdateConfirmed(int orderID, bool confirmed)
+        {
+            new OrderDL().UpdateConfirmed(orderID, confirmed);
         }
 
         public int DeleteOrder(int orderID)
@@ -169,6 +203,26 @@ namespace eshopBL
             int status = new OrderDL().SetDiscount(order.OrderID, order.UserDiscountValue);
             Common.SendOrderDiscountGrantedNotification(order);
             return status;
+        }
+
+        public double CalculateDeliveryCost(Order order, Settings settings, int deliveryServiceID)
+        {
+            if(_deliveryCostCalculator == null)
+            {
+                throw new ArgumentNullException("DeliveryCostCalculator");
+            }
+
+            return _deliveryCostCalculator.CalculateDeliveryCost(order, settings, deliveryServiceID);
+        }
+
+        public double CalculateDeliveryCost(Package package, Settings settings, int deliveryServiceID)
+        {
+            if(_deliveryCostCalculator == null)
+            {
+                throw new ArgumentNullException("DeliveryCostCalculator");
+            }
+
+            return _deliveryCostCalculator.CalculateDeliveryCost(package, settings, deliveryServiceID);
         }
     }
 }

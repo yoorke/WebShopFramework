@@ -33,9 +33,9 @@ namespace eshopDL
             return brands;
         }
 
-        public List<Brand> GetBrands(int categoryID, bool includeChildrenCategories = false)
+        public List<BrandFilter> GetBrands(int categoryID, bool includeChildrenCategories = false)
         {
-            List<Brand> brands = null;
+            List<BrandFilter> brands = null;
 
             using (SqlConnection objConn = new SqlConnection(WebConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
             {
@@ -62,9 +62,10 @@ namespace eshopDL
                     using (SqlDataReader reader = objComm.ExecuteReader())
                     {
                         if (reader.HasRows)
-                            brands = new List<Brand>();
+                            brands = new List<BrandFilter>();
                         while (reader.Read())
-                            brands.Add(new Brand(reader.GetInt32(0), reader.GetString(1) + " (" + reader.GetInt32(2).ToString() + ")", !Convert.IsDBNull(reader[3]) ? reader.GetString(3) : string.Empty));
+                            //brands.Add(new Brand(reader.GetInt32(0), reader.GetString(1) + " (" + reader.GetInt32(2).ToString() + ")", !Convert.IsDBNull(reader[3]) ? reader.GetString(3) : string.Empty));
+                            brands.Add(new BrandFilter(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[3]) ? reader.GetString(3) : string.Empty, string.Empty, reader.GetInt32(2)));
                     }
                 }
             }

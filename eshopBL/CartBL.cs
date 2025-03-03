@@ -11,12 +11,12 @@ namespace eshopBL
 {
     public class CartBL
     {
-        public int AddProductToCart(int productID, string cartID, double quantity, double productPrice, double userPrice)
+        public int AddProductToCart(int productID, string cartID, double quantity, double productPrice, double userPrice, int productVariantID, string userImageUrl = "")
         {
             if (new ProductBL().IsInStock(productID))
             {
                 CartDL cartDL = new CartDL();
-                int status = cartDL.AddProductToCart(productID, cartID, quantity, productPrice, userPrice);
+                int status = cartDL.AddProductToCart(productID, cartID, quantity, productPrice, userPrice, productVariantID, userImageUrl);
                 ApplyCoupon(cartID);
                 return status;
             }
