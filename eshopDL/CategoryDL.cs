@@ -545,7 +545,7 @@ namespace eshopDL
                         if (reader.HasRows)
                             categories = new List<Category>();
                         while (reader.Read())
-                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1) + " (" + reader.GetInt32(8) + ")", !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, "/proizvodi/" + (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]) ? (!Convert.IsDBNull(reader[7]) ? reader.GetString(7) : string.Empty) : reader.GetString(4)), !Convert.IsDBNull(reader[6]) ? reader.GetString(6) : string.Empty, 0, 0, 0, string.Empty, true, -1, false, false, 0, 0, 0, null));
+                            categories.Add(new Category(reader.GetInt32(0), reader.GetString(1), !Convert.IsDBNull(reader[2]) ? reader.GetInt32(2) : -1, "/proizvodi/" + (bool.Parse(ConfigurationManager.AppSettings["includeParentUrlInCategoryUrl"]) ? (!Convert.IsDBNull(reader[7]) ? reader.GetString(7) : string.Empty) : reader.GetString(4)), !Convert.IsDBNull(reader[6]) ? reader.GetString(6) : string.Empty, 0, 0, 0, string.Empty, true, -1, false, false, 0, 0, 0, null));
                     }
                 }
             }

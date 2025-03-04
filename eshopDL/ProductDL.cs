@@ -615,6 +615,7 @@ namespace eshopDL
                             product.FullCategoryUrl = !Convert.IsDBNull(reader[4]) ? reader.GetString(4) : string.Empty;
                             product.Description = !Convert.IsDBNull(reader[5]) ? reader.GetString(5) : string.Empty;
                             product.Description = product.Description.Replace("<p>", string.Empty).Replace("</p>", string.Empty).Trim();
+                            product.ListDescription = !Convert.IsDBNull(reader[6]) ? reader.GetString(6) : string.Empty;
 
                             products.Add(product);
                         }

@@ -193,6 +193,8 @@ namespace eshopUtilities
                 //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
                 smtp.Send(message);
 
+                ErrorLog.LogMessage($"Confirmation email sent. Email: {email}");
+
                 return 0;
             }
             catch(Exception ex)
@@ -571,6 +573,8 @@ namespace eshopUtilities
                 SmtpClient smtp = getSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
                 //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
                 smtp.Send(mail);
+
+                ErrorLog.LogMessage($"Order notification email sent.");
             }
             catch(Exception ex)
             {

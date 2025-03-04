@@ -64,16 +64,20 @@ namespace eshopBL
                 foreach (CustomPage customPage in new CustomPageBL().GetCustomPages())
                 {
                     if (bool.Parse(ConfigurationManager.AppSettings["addSeparateContactPage"]) && customPage.Url == "kontakt")
+                    { 
                         continue;
+                    }
 
-                    if(customPage.IsActive)
+                    if (customPage.IsActive)
                     { 
                         routes.MapPageRoute(customPage.Url, customPage.Url, "~/customPage.aspx", false, new RouteValueDictionary { { "url", customPage.Url } });
                     }
                 }
 
                 foreach (Promotion promotion in new PromotionBL().GetPromotions(false, null, null))
+                {
                     routes.MapPageRoute(promotion.Name, "akcija/" + promotion.Url, "~/promotion.aspx", false, new RouteValueDictionary { { "url", promotion.Url } });
+                }
             }
         }
     }
