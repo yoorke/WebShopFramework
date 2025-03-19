@@ -46,7 +46,7 @@ namespace eshopBL
 
                 message.Headers.Add("Message-Id", $"<{Guid.NewGuid().ToString()}@{ConfigurationManager.AppSettings["webShopDomain"]}>");
 
-                SmtpClient smtp = getSmtp("order");
+                SmtpClient smtp = getSmtp("info");
 
                 smtp.Send(message);
                 ErrorLog.LogMessage("Mail sent");

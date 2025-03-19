@@ -58,7 +58,16 @@ namespace eshopBL
                 routes.MapPageRoute("placanje-neuspesno", "placanje-neuspesno", "~/paymentResponse.aspx");
 
                 routes.MapPageRoute("saradnja", "saradnja", "~/saradnja.aspx");
-                routes.MapPageRoute("gde-kupiti", "gde-kupiti", "~/gdeKupiti.aspx");
+
+                if (bool.Parse(ConfigurationManager.AppSettings["addSeparateGdeKupitiPage"]))
+                {
+                    routes.MapPageRoute("gde-kupiti", "gde-kupiti", "~/gdeKupiti.aspx");
+                }
+
+                if (bool.Parse(ConfigurationManager.AppSettings["enableIPSPayment"]))
+                {
+                    routes.MapPageRoute("ips-placanje", "ips-placanje", "~/IPSPayment.aspx");
+                }
 
 
                 foreach (CustomPage customPage in new CustomPageBL().GetCustomPages())

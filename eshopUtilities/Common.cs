@@ -51,7 +51,7 @@ namespace eshopUtilities
             return table;
         }
 
-        public static int SendOrderConfirmationMail(string email, string name, Order order, Settings settings)
+        public static int SendOrderConfirmationMail(string email, string name, Order order, Settings settings, string serverPath)
         {
             try
             {
@@ -107,14 +107,14 @@ namespace eshopUtilities
                 {
                     body.Append("Dostava: " +
                         (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"])
-                            ? string.Format("{0:N2}", ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
+                            ? string.Format("{0:N2}", (ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue) || order.Delivery.DeliveryID == 2
                                 ? 0 : settings.DeliveryCost)
                             : ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
                                 ? "0,00" : " Po cenovniku kurirske službe"));
                 }
                 else if(int.Parse(ConfigurationManager.AppSettings["deliveryCalculationType"]) == 2)
                 {
-                    body.Append("Dostava: " + string.Format("{0:N2}", order.Packages.Sum(package => package.DeliveryCost)));
+                    body.Append("Dostava: " + string.Format("{0:N2}", order.Delivery.DeliveryID == 1 ? order.Packages.Sum(package => package.DeliveryCost) : 0));
                 }
 
                 body.Append("<br />");
@@ -132,14 +132,14 @@ namespace eshopUtilities
                 body.Append("Ukupno sa dostavom: " +
                     (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"])
                         ? string.Format("{0:N2}", ukupno - order.UserDiscountValue +
-                            (ukupno > settings.FreeDeliveryTotalValue
+                            (ukupno > settings.FreeDeliveryTotalValue || order.Delivery.DeliveryID == 2
                                 ? 0 : settings.DeliveryCost))
                         : (string.Format("{0:N2}", ukupno - order.UserDiscountValue)) + (ukupno - order.UserDiscountValue > settings.FreeDeliveryTotalValue
                             ? "" : " + cena dostave")));
                 }
                 else if(int.Parse(ConfigurationManager.AppSettings["deliveryCalculationType"]) == 2)
                 {
-                    body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", order.TotalValue + order.Packages.Sum(package => package.DeliveryCost)));
+                    body.Append("Ukupno sa dostavom: " + string.Format("{0:N2}", order.TotalValue + (order.Delivery.DeliveryID == 1 ? order.Packages.Sum(package => package.DeliveryCost) : 0)));
                     body.Append("<br/>");
                     body.Append("Broj paketa: " + order.NumberOfSuppliers.ToString());
                 }
@@ -193,13 +193,13 @@ namespace eshopUtilities
                 //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["orderEmail"], "orderEmail");
                 smtp.Send(message);
 
-                ErrorLog.LogMessage($"Confirmation email sent. Email: {email}");
+                ErrorLog.LogMessage($"Confirmation email sent. Email: {email}", serverPath);
 
                 return 0;
             }
             catch(Exception ex)
             {
-                ErrorLog.LogError(ex);
+                ErrorLog.LogError(ex, "", "", "", serverPath);
                 throw new BLException("Nije moguće poslati mail", ex);
             }
         }
@@ -473,7 +473,7 @@ namespace eshopUtilities
                 yield return day;
         }
 
-        public static void SendNewOrderNotification(string orderID, Order order, Settings settings)
+        public static void SendNewOrderNotification(string orderID, Order order, Settings settings, string serverPath)
         {
             try
             {
@@ -529,7 +529,7 @@ namespace eshopUtilities
                         //? 0 : double.Parse(ConfigurationManager.AppSettings["deliveryCost"])));
 
                 body.Append("Dostava: " +
-                    string.Format("{0:N2}", ukupno > settings.FreeDeliveryTotalValue
+                    string.Format("{0:N2}", ukupno > settings.FreeDeliveryTotalValue || order.Delivery.DeliveryID == 2
                         ? 0 : settings.DeliveryCost));
                 body.Append("<br />");
 
@@ -540,7 +540,7 @@ namespace eshopUtilities
 
                 body.Append("Ukupno sa dostavom: "
                     + string.Format("{0:N2}", ukupno - order.UserDiscountValue +
-                    (ukupno > settings.FreeDeliveryTotalValue
+                    (ukupno > settings.FreeDeliveryTotalValue || order.Delivery.DeliveryID == 2
                         ? 0 : settings.DeliveryCost)));
                 body.Append("</div>");
                 if(order.UserDiscountValue > 0)
@@ -574,7 +574,7 @@ namespace eshopUtilities
                 //MimeMailer smtp = getAegisSmtp(ConfigurationManager.AppSettings["infoEmail"].ToString(), "infoEmail");
                 smtp.Send(mail);
 
-                ErrorLog.LogMessage($"Order notification email sent.");
+                ErrorLog.LogMessage($"Order notification email sent.", serverPath);
             }
             catch(Exception ex)
             {

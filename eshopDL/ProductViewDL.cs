@@ -308,13 +308,13 @@ namespace eshopDL
                 case ProductOrderByType.Order:
                     {
                         return " GROUP BY product.productID, product.code, brand.name, product.name, product.price, webPrice, promotionProduct.price, " +
-                               " promotion.imageUrl, productImageUrl.imageUrl, isInStock, category.name, canBeDelivered, isFreeDelivery";
+                               " promotion.imageUrl, productImageUrl.imageUrl, isInStock, category.name, canBeDelivered, isFreeDelivery, listDescription, sortIndex";
                         break;
                     }
                 case ProductOrderByType.Access:
                     {
                         return " GROUP BY product.productID, product.code, brand.name, product.name, product.price, webPrice, promotionProduct.price, " +
-                               " promotion.imageUrl, productImageUrl.imageUrl, isInStock, category.name, canBeDelivered, isFreeDelivery";
+                               " promotion.imageUrl, productImageUrl.imageUrl, isInStock, category.name, canBeDelivered, isFreeDelivery, listDescription, sortIndex";
                         break;
                     }
                 default: { return string.Empty; break; }

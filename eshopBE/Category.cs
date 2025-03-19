@@ -38,6 +38,7 @@ namespace eshopBE
         private double _priceFixedAmount;
         private string _fullUrl;
         private string _categoryBannerUrl;
+        private string _aiDescriptionText;
 
         public Category()
         {
@@ -250,6 +251,12 @@ namespace eshopBE
         {
             get { return _categoryBannerUrl; }
             set { _categoryBannerUrl = value; }
+        }
+
+        public string AIDescriptionText
+        {
+            get { return _aiDescriptionText; }
+            set { _aiDescriptionText = value; }
         }
     }
 }

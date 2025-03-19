@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1082
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshopBE", "eshopBE\eshopBE.csproj", "{A34BB306-9C16-4DAE-BE9D-4672B7343435}"
 EndProject
@@ -26,6 +26,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.PaymentProcessor.BL", "eshop.PaymentProcessor.BL\eshop.PaymentProcessor.BL.csproj", "{F3677FDE-7468-491B-85FA-06FAB0CF8AFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.PaymentProcessor.DL", "eshop.PaymentProcessor.DL\eshop.PaymentProcessor.DL.csproj", "{1B22016D-460A-49BA-9EC8-0F86F4D48EE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.ContentGenerator.BL", "eshop.ContentGenerator.BL\eshop.ContentGenerator.BL.csproj", "{67129524-C623-493D-8467-2310F2CA2680}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.ContentGenerator.BE", "eshop.ContentGenerator.BE\eshop.ContentGenerator.BE.csproj", "{5419827A-69CC-4D3C-AC81-9D43CCEF8A3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.AI.Models", "eshop.AI.Models\eshop.AI.Models.csproj", "{B2D6E3D2-BB60-4B96-9ACA-75333B1AB108}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.AI.BL.Interfaces", "eshop.AI.BL.Interfaces\eshop.AI.BL.Interfaces.csproj", "{E400D42F-97C5-4E30-824A-373464848C7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eshop.AI.BL", "eshop.AI.BL\eshop.AI.BL.csproj", "{901FF756-0B6D-4066-B067-24D4630D3907}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +91,26 @@ Global
 		{1B22016D-460A-49BA-9EC8-0F86F4D48EE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B22016D-460A-49BA-9EC8-0F86F4D48EE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B22016D-460A-49BA-9EC8-0F86F4D48EE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67129524-C623-493D-8467-2310F2CA2680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67129524-C623-493D-8467-2310F2CA2680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67129524-C623-493D-8467-2310F2CA2680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67129524-C623-493D-8467-2310F2CA2680}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5419827A-69CC-4D3C-AC81-9D43CCEF8A3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5419827A-69CC-4D3C-AC81-9D43CCEF8A3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5419827A-69CC-4D3C-AC81-9D43CCEF8A3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5419827A-69CC-4D3C-AC81-9D43CCEF8A3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2D6E3D2-BB60-4B96-9ACA-75333B1AB108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2D6E3D2-BB60-4B96-9ACA-75333B1AB108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2D6E3D2-BB60-4B96-9ACA-75333B1AB108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2D6E3D2-BB60-4B96-9ACA-75333B1AB108}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E400D42F-97C5-4E30-824A-373464848C7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E400D42F-97C5-4E30-824A-373464848C7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E400D42F-97C5-4E30-824A-373464848C7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E400D42F-97C5-4E30-824A-373464848C7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{901FF756-0B6D-4066-B067-24D4630D3907}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{901FF756-0B6D-4066-B067-24D4630D3907}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{901FF756-0B6D-4066-B067-24D4630D3907}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{901FF756-0B6D-4066-B067-24D4630D3907}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

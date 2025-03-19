@@ -201,7 +201,7 @@ namespace eshop.Import.BL.AbstractClasses
             CategoryBrandBL categoryBrandBL = new CategoryBrandBL();
             int updatedCount = 0;
 
-            productDL.SetInStock(supplier.SupplierID, false, -1, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
+            //productDL.SetInStock(supplier.SupplierID, false, -1, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
 
             foreach(var product in products)
             {
@@ -229,6 +229,8 @@ namespace eshop.Import.BL.AbstractClasses
                     updatedCount++;
                 }
             }
+
+            this.SetStock(_supplierCode, bool.Parse(ConfigurationManager.AppSettings["showIfNotInStock"]));
 
             return updatedCount;
         }
@@ -296,6 +298,11 @@ namespace eshop.Import.BL.AbstractClasses
             attributeValue.AttributeValueID = attributeBL.SaveAttributeValue(attributeValue, false);
 
             return attributeValue;
+        }
+
+        public void SetStock(string supplierCode, bool showIfNotInStock)
+        {
+            _productImportDL.SetStock(supplierCode, showIfNotInStock);
         }
     }
 }

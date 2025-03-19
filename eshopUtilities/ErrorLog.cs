@@ -13,8 +13,13 @@ namespace eshopUtilities
 {
     public class ErrorLog
     {
-        public static void LogError(Exception ex, string rawUrl = "", string userHostAddress = "", string url = "")
+        public static void LogError(Exception ex, string rawUrl = "", string userHostAddress = "", string url = "", string serverPath = "")
         {
+            if(string.IsNullOrWhiteSpace(serverPath))
+            {
+                serverPath = HttpContext.Current.Server.MapPath("~/");
+            }
+
             int code = 0;
             string message = string.Empty;
 
@@ -22,10 +27,14 @@ namespace eshopUtilities
                 code = ((SqlException)ex).Number;
             message = getMessage(ex);
 
-            try { 
-                using (StreamWriter sw = new StreamWriter(HttpContext.Current.Server.MapPath("/log/" + DateTime.Now.ToString("ddMMyyyy") + "-error.log"), true))
+            try
+            { 
+                using (StreamWriter sw = new StreamWriter($"{serverPath}/log/{DateTime.Now.ToString("ddMMyyyy")}-error.log", true))
+                {
                     sw.WriteLine(DateTime.Now.ToUniversalTime().ToString() + " - " + code.ToString() + " - " + message + " " + Environment.NewLine + rawUrl +  Environment.NewLine + userHostAddress + Environment.NewLine + url);
-                if(bool.Parse(ConfigurationManager.AppSettings["sendErrorEmail"]))
+                }
+
+                if (bool.Parse(ConfigurationManager.AppSettings["sendErrorEmail"]))
                     sendMail(message, rawUrl, userHostAddress, url);
             }
             catch(Exception exx)
@@ -33,7 +42,7 @@ namespace eshopUtilities
                 if(exx is IOException)
                 { 
                     Thread.Sleep(1000);
-                    LogError(ex, rawUrl, userHostAddress, url);
+                    LogError(ex, rawUrl, userHostAddress, url, serverPath);
                 }
             }
 
@@ -42,19 +51,24 @@ namespace eshopUtilities
             //LogError(ex.InnerException);
         }
 
-        public static void LogMessage(string message)
+        public static void LogMessage(string message, string serverPath = "")
         {
+            if(string.IsNullOrWhiteSpace(serverPath))
+            {
+                serverPath = HttpContext.Current.Server.MapPath("~/");
+            }
+
             try
             { 
-            using (StreamWriter sw = new StreamWriter(HttpContext.Current.Server.MapPath("/log/" + DateTime.Now.ToString("ddMMyyyy") + ".log"), true))
-                sw.WriteLine(DateTime.Now.ToUniversalTime().ToString() + " - " + message);
+                using (StreamWriter sw = new StreamWriter($"{serverPath}/log/{ DateTime.Now.ToString("ddMMyyyy")}.log", true))
+                    sw.WriteLine(DateTime.Now.ToUniversalTime().ToString() + " - " + message);
             }
             catch(Exception ex)
             {
                 if(ex is IOException)
                 { 
                     Thread.Sleep(100);
-                    LogMessage(message);
+                    LogMessage(message, serverPath);
                 }
             }
         }

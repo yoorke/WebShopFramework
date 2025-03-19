@@ -70,7 +70,11 @@ namespace eshopBL
             pocetna.AppendChild(createElement("siteMapNode", "/istorija-porudzbina", "Istorija porudžbina", "Istorija porudžbina", xmlDoc));
             pocetna.AppendChild(createElement("siteMapNode", "/cenovnik-dostave", "Cenovnik dostava", "Cenovnik dostave", xmlDoc));
             pocetna.AppendChild(createElement("siteMapNode", "/saradnja", "Saradnja", "Saradnja", xmlDoc));
-            pocetna.AppendChild(createElement("siteMapNode", "/gde-kupiti", "Gde kupiti", "Gde kupiti", xmlDoc));
+
+            if (bool.Parse(ConfigurationManager.AppSettings["addSeparateGdeKupitiPage"]))
+            {
+                pocetna.AppendChild(createElement("siteMapNode", "/gde-kupiti", "Gde kupiti", "Gde kupiti", xmlDoc));
+            }
 
             if (int.Parse(ConfigurationManager.AppSettings["accountPageVersion"]) == 2)
             {

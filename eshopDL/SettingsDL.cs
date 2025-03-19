@@ -32,6 +32,8 @@ namespace eshopDL
                             settings.FreeDeliveryTotalValue = !Convert.IsDBNull(reader[5]) ? reader.GetDouble(5) : 0;
                             settings.ExchangeRate = !Convert.IsDBNull(reader[6]) ? reader.GetDouble(6) : 0;
                             settings.UnknownBrandName = !Convert.IsDBNull(reader[7]) ? reader.GetString(7) : string.Empty;
+                            settings.AIDescriptionSystemText = !Convert.IsDBNull(reader[8]) ? reader.GetString(8) : string.Empty;
+                            settings.AIDescriptionUserText = !Convert.IsDBNull(reader[9]) ? reader.GetString(9) : string.Empty;
                         }
                     }
                 }
@@ -56,6 +58,8 @@ namespace eshopDL
                     objComm.Parameters.Add("@freeDeliveryTotalValue", SqlDbType.Float).Value = settings.FreeDeliveryTotalValue;
                     objComm.Parameters.Add("@exchangeRate", SqlDbType.Float).Value = settings.ExchangeRate;
                     objComm.Parameters.Add("@unknownBrandName", SqlDbType.NVarChar, 50).Value = settings.UnknownBrandName;
+                    objComm.Parameters.Add("@aiDescriptionSystemText", SqlDbType.NVarChar, 2000).Value = settings.AIDescriptionSystemText;
+                    objComm.Parameters.Add("@aiDescriptionUserText", SqlDbType.NVarChar, 2000).Value = settings.AIDescriptionUserText;
 
                     status = objComm.ExecuteNonQuery();
                 }

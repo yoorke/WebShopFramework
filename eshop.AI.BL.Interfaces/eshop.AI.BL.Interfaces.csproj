@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2A237D41-619C-4A92-AC46-5AD60F58CBD3}</ProjectGuid>
+    <ProjectGuid>{E400D42F-97C5-4E30-824A-373464848C7E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>eshop.PaymentProcessor.BE</RootNamespace>
-    <AssemblyName>eshop.PaymentProcessor.BE</AssemblyName>
+    <RootNamespace>eshop.AI.BL.Interfaces</RootNamespace>
+    <AssemblyName>eshop.AI.BL.Interfaces</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,11 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CardPaymentParameter.cs" />
-    <Compile Include="HashAlgorithmType.cs" />
-    <Compile Include="IPSQRCodeRequest.cs" />
-    <Compile Include="NBSQRCodeGeneratorRequest.cs" />
-    <Compile Include="PaymentResponse.cs" />
+    <Compile Include="IAIHandler.cs" />
+    <Compile Include="IContentGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

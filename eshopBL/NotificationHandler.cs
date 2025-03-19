@@ -14,9 +14,26 @@ namespace eshopBL
 {
     public class NotificationHandler
     {
+        private string _templatePath = string.Empty;
+
+        public NotificationHandler()
+        {
+
+        }
+
+        public NotificationHandler(string templatePath)
+        {
+            _templatePath = templatePath;
+        }
+
         private string loadTemplate(string name)
         {
-            using (TextReader tr = new StreamReader(HttpContext.Current.Server.MapPath("~/" + ConfigurationManager.AppSettings["emailTemplatesPath"] + "/" + name)))
+            if(string.IsNullOrEmpty(_templatePath))
+            {
+                _templatePath = HttpContext.Current.Server.MapPath("~/" + ConfigurationManager.AppSettings["emailTemplatesPath"] + "/");
+            }
+
+            using (TextReader tr = new StreamReader($"{_templatePath}{name}"))
             {
                 return tr.ReadToEnd();
             }
@@ -196,6 +213,27 @@ namespace eshopBL
             new MailBL().SendMail(order.Email, $"Plaćanje neuspešno za porudžbinu broj {order.Code}", content.ToString(), $"Plaćanje nije uspešno izvršeno");
         }
 
+        public void SendIPSPaymentNotification(Order order, Settings settings, string IPSQRCodeSrc)
+        {
+            Dictionary<string, string> replaceTags = new Dictionary<string, string>();
+
+            StringBuilder content = new StringBuilder();
+
+            replaceTags.Add("NAME", order.Firstname);
+            replaceTags.Add("WEBSHOP-URL", ConfigurationManager.AppSettings["webShopDomain"]);
+            replaceTags.Add("WEBSHOP-DESCRIPTION", ConfigurationManager.AppSettings["companyTitle"]);
+            replaceTags.Add("ORDER-CODE", order.Code);
+            replaceTags.Add("ORDER-DATE", order.Date.ToString("dd.MM.yyyy"));
+            replaceTags.Add("AMOUNT", string.Format("{0:N2}", (order.TotalValue + this.getDeliveryCost(order, settings))));
+            replaceTags.Add("IPS-QR-CODE-SRC", $"{ConfigurationManager.AppSettings["webShopUrl"]}{IPSQRCodeSrc}");
+
+            content.Append(getHeader());
+            content.Append(generateContent(replaceTags, "IPSPaymentTemplate.html"));
+            content.Append(getFooter());
+
+            new MailBL().SendMail(order.Email, $"Instrukcije za IPS plaćanje za porudžbinu broj {order.Code}", content.ToString(), $"Instrukcije za IPS plaćanje.");
+        }
+
         private string getHeaderContent()
         {
             Dictionary<string, string> replaceTags = new Dictionary<string, string>();            
@@ -272,6 +310,29 @@ namespace eshopBL
             Dictionary<string, string> replaceTags = new Dictionary<string, string>();
 
             return generateContent(replaceTags, "emailStyleTemplate.html");
+        }
+
+        private double getDeliveryCost(Order order, Settings settings)
+        {
+            double deliveryCost = 0;
+
+            if (order.Delivery.DeliveryID == 2)
+            {
+                return deliveryCost;
+            }
+
+            if (bool.Parse(ConfigurationManager.AppSettings["calculateDelivery"]))
+            {
+                int deliveryServiceID = new DeliveryServiceBL().GetActiveDeliveryServiceID();
+                foreach (var package in order.Packages)
+                {
+                    package.DeliveryCost = new OrderBL(new DeliveryCostCalculatorByWeight()).CalculateDeliveryCost(package, settings, deliveryServiceID);
+                }
+
+                return order.Packages.Sum(package => package.DeliveryCost);
+            }
+
+            return settings.DeliveryCost;
         }
     }
 }

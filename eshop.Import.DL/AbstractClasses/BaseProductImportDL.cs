@@ -302,5 +302,21 @@ namespace eshop.Import.DL.AbstractClasses
 
             return manufacturers;
         }
+
+        public void SetStock(string supplierCode, bool showIfNotInStock)
+        {
+            using(SqlConnection objConn = new SqlConnection(ConfigurationManager.ConnectionStrings["eshopConnectionString"].ConnectionString))
+            {
+                using(SqlCommand objComm = new SqlCommand("import.product_setStock", objConn))
+                {
+                    objConn.Open();
+                    objComm.CommandType = CommandType.StoredProcedure;
+                    objComm.Parameters.Add("@supplierCode", SqlDbType.VarChar, 10).Value = supplierCode;
+                    objComm.Parameters.Add("@showIfNotInStock", SqlDbType.Bit).Value = showIfNotInStock;
+
+                    objComm.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

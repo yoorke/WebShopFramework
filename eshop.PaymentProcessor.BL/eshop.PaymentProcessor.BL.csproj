@@ -32,9 +32,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="eshopUtilities">
+      <HintPath>..\..\DLLs\dev\eshopUtilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,8 +53,10 @@
     <Compile Include="CardPaymentParametersConfigBL.cs" />
     <Compile Include="Interfaces\ICardPaymentBL.cs" />
     <Compile Include="Interfaces\ICardPaymentParameterBL.cs" />
+    <Compile Include="Interfaces\IIPSGenerator.cs" />
     <Compile Include="Interfaces\IPaymentResponseBL.cs" />
     <Compile Include="IntesaCardPaymentBL.cs" />
+    <Compile Include="NBSIPSQRCodeGenerator.cs" />
     <Compile Include="PaymentResponseBL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -60,6 +69,9 @@
       <Project>{1b22016d-460a-49ba-9ec8-0f86f4d48ee4}</Project>
       <Name>eshop.PaymentProcessor.DL</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2A237D41-619C-4A92-AC46-5AD60F58CBD3}</ProjectGuid>
+    <ProjectGuid>{B2D6E3D2-BB60-4B96-9ACA-75333B1AB108}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>eshop.PaymentProcessor.BE</RootNamespace>
-    <AssemblyName>eshop.PaymentProcessor.BE</AssemblyName>
+    <RootNamespace>eshop.AI.Models</RootNamespace>
+    <AssemblyName>eshop.AI.Models</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,11 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CardPaymentParameter.cs" />
-    <Compile Include="HashAlgorithmType.cs" />
-    <Compile Include="IPSQRCodeRequest.cs" />
-    <Compile Include="NBSQRCodeGeneratorRequest.cs" />
-    <Compile Include="PaymentResponse.cs" />
+    <Compile Include="OpenAIChatCompletionResponse.cs" />
+    <Compile Include="OpenAIChoice.cs" />
+    <Compile Include="OpenAIRequest.cs" />
+    <Compile Include="OpenAIRequestMessage.cs" />
+    <Compile Include="OpenAIResponseMessage.cs" />
+    <Compile Include="OpenAITokenDetails.cs" />
+    <Compile Include="OpenAIUsage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

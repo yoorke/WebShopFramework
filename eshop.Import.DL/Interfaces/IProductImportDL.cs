@@ -17,5 +17,6 @@ namespace eshop.Import.DL.Interfaces
         void SaveProducts(List<ProductImport> products, string category);
 
         List<ManufacturerImport> GetManufacturers(List<string> subCategories);
+        void SetStock(string supplierCode, bool showIfNotInStock);
     }
 }
