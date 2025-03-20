@@ -150,7 +150,8 @@ namespace eshop.Import.BL.AbstractClasses
                 ShortDescription = string.Empty,
                 //Attributes = _attributeBL.GetAttributes(_productImportDescriptionBL.GetDescriptionAttributes(productImport.Description))
                 Attributes = new List<AttributeValue>(),
-                Weight = double.TryParse(productImport.Weight, out weight) ? weight : 0
+                Weight = double.TryParse(productImport.Weight, out weight) ? weight : 0,
+                ListDescription = string.Empty
             };
 
             //ProductUpdatePrice productUP = new ProductBL().GetProductBySupplierCode(product.SupplierCode);
