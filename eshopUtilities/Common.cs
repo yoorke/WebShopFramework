@@ -158,6 +158,8 @@ namespace eshopUtilities
 
                 if (order.UserDiscountValue > 0)
                     body.Append("<p><strong>Odobren vam je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</strong></p>");
+
+                body.Append($"<p><strong>Broj porudžbine: </strong>{order.Code}</p>");
                 if(order.Lastname != string.Empty || order.Firstname != string.Empty)
                     body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");
                 else if (order.Name != string.Empty)
@@ -165,7 +167,8 @@ namespace eshopUtilities
                     body.Append("<p><strong>Naziv: </strong>" + order.Name + "</p>");
                     body.Append("<p><strong>PIB: </strong>" + order.Pib + "</p>");
                 }
-                body.Append("<p><strong>Adresa: </strong>" + order.Address + " " + order.Code + " " + order.City + " " + order.Zip + "</p>");
+                //body.Append("<p><strong>Adresa: </strong>" + order.Address + " " + order.Code + " " + order.City + " " + order.Zip + "</p>");
+                body.Append($"<p><strong>Adresa: </strong> {order.Address}, {order.Zip} {order.City}</p>");
                 body.Append("<p><strong>Telefon: </strong>" + order.Phone + "</p>");
                 body.Append("<p><strong>Način plaćanja: </strong>" + order.Payment.Name + "</p>");
                 body.Append("<p><strong>Način preuzimanja: </strong>" + order.Delivery.Name + "</p>");
@@ -546,6 +549,8 @@ namespace eshopUtilities
                 if(order.UserDiscountValue > 0)
                     body.Append("<p>Odobren je popust u iznosu od: " + string.Format("{0:N2}", order.UserDiscountValue) + " dinara</p");
                 body.Append("<br/>");
+
+                body.Append($"<p><strong>Broj porudžbine: </strong>{order.Code}</p>");
                 if (order.Lastname != string.Empty || order.Firstname != string.Empty)
                     body.Append("<p><strong>Prezime i ime: </strong>" + order.Lastname + " " + order.Firstname + "</p>");
                 if (order.Name != string.Empty)
@@ -553,7 +558,8 @@ namespace eshopUtilities
                     body.Append("<p><strong>Naziv: </strong>" + order.Name + "</p>");
                     body.Append("<p><strong>PIB: </strong>" + order.Pib + "</p>");
                 }
-                body.Append("<p><strong>Adresa: </strong>" + order.Address + " " + order.Code + " " + order.City + " " + order.Zip + "</p>");
+                //body.Append("<p><strong>Adresa: </strong>" + order.Address + " " + order.Code + " " + order.City + " " + order.Zip + "</p>");
+                body.Append($"<p><strong>Adresa: </strong> {order.Address}, {order.Zip} {order.City}</p>");
                 body.Append("<p><strong>Telefon: </strong>" + order.Phone + "</p>");
                 body.Append("<p><strong>Način plaćanja: </strong>" + order.Payment.Name + "</p>");
                 body.Append("<p><strong>Način preuzimanja: </strong>" + order.Delivery.Name + "</p>");
